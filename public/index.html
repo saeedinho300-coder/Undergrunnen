@@ -90,6 +90,15 @@ main{padding:18px;max-width:860px;width:100%}
 .skille::before,.skille::after{content:"";flex:1;height:1px;background:var(--line)}
 .googleknapp{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:.6em 1em;border-radius:var(--radius);background:#fff;color:#1f1f1f;font-weight:600;text-decoration:none}
 .googleknapp:hover{background:#f1f1f1}
+.rankbar{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:6px 10px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);color:var(--text);font-weight:500;text-align:left}
+.rankbar:hover{background:var(--panel2);border-color:var(--gold)}
+.rb-navn{font-family:"Bebas Neue",Impact,sans-serif;font-size:1.15rem;letter-spacing:.04em;color:var(--gold);white-space:nowrap}
+.rb-spor{flex:1;height:8px;background:#0f0e0d;border-radius:4px;overflow:hidden;min-width:60px}
+.rb-spor i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .6s ease}
+.rb-pst{font-size:.85rem;white-space:nowrap}
+.rb-neste{font-size:.8rem;color:var(--dim);white-space:nowrap}
+tr.denne td{background:var(--panel2)}
+@media (max-width:420px){.rb-neste{display:none}}
 .modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
 .modal .card{max-width:380px;width:100%}
 
@@ -299,8 +308,22 @@ function stopp() {
 }
 
 // ---------------------------------------------------------------- STATUS
+// Prosent fremgang mot neste rank (heltall, 0–100)
+function rankProsent() {
+  if (!st?.neste_exp) return 100;
+  const p = ((st.spiller.exp - st.rank_exp) / (st.neste_exp - st.rank_exp)) * 100;
+  return Math.max(0, Math.min(99, Math.floor(p)));
+}
+let forrigeRank = null;
+
 async function oppdater() {
   st = await rpc('min_status');
+  if (st.spiller) {
+    if (forrigeRank !== null && st.rank_indeks > forrigeRank) {
+      setTimeout(() => varsel(st.rank_indeks >= 9 ? `Du er nå Don – byens høyeste rank!` : `Gratulerer! Du er nå ${st.rank}.`, 'ok'), 1500);
+    }
+    forrigeRank = st.rank_indeks;
+  }
   offset = new Date(st.tid).getTime() - Date.now();
   if (!st.spiller) {
     if (!$('#spill').classList.contains('hidden')) { clearInterval(pollTimer); visLag(); }
@@ -324,13 +347,18 @@ function tegnTopp() {
   $('#topp').innerHTML = `
     <div class="topp">
       <div class="navn">${esc(s.navn)}</div>
-      <div class="pill"><span>Rank</span>${esc(st.rank)}</div>
       <div class="pill"><span>Kontant</span><b class="mono gold">${kr(s.penger)}</b></div>
       <div class="pill"><span>Bank</span><b class="mono">${kr(s.bank)}</b></div>
       <div class="pill"><span>Helse</span><b class="mono ${s.helse < 50 ? 'bad' : ''}">${s.helse}%</b></div>
       <div class="pill"><span>By</span>${esc(s.sted)}</div>
       <button class="ghost small loggut" data-loggut>Logg ut</button>
     </div>
+    <button class="rankbar" data-side-lenke="ranker" title="Se alle ranker">
+      <span class="rb-navn">${esc(st.rank)}</span>
+      <span class="rb-spor"><i style="width:${rankProsent()}%"></i></span>
+      <span class="rb-pst mono">${st.neste_rank ? rankProsent() + ' %' : 'Maks'}</span>
+      <span class="rb-neste">${st.neste_rank ? '→ ' + esc(st.neste_rank) : ''}</span>
+    </button>
     <div class="timere">
       <span class="timer" data-til="${s.fengsel_til || ''}" data-navn="Fengsel" data-skjul></span>
       <span class="timer" data-til="${s.krim_klar}" data-navn="Krim"></span>
@@ -344,7 +372,7 @@ function tegnTopp() {
 const SIDER = [
   ['oversikt', 'Oversikt'], ['krim', 'Kriminalitet'], ['bil', 'Biltyveri'], ['fengsel', 'Fengsel'],
   ['bank', 'Bank'], ['butikk', 'Butikk'], ['sykehus', 'Sykehus'], ['reise', 'Reise'],
-  ['kasino', 'Kasino'], ['angrep', 'Angrep'], ['toppliste', 'Toppliste'],
+  ['kasino', 'Kasino'], ['angrep', 'Angrep'], ['toppliste', 'Toppliste'], ['ranker', 'Ranker'],
   ['meldinger', 'Meldinger'], ['chat', 'Chat'], ['gravplass', 'Gravplass'],
 ];
 function tegnMeny() {
@@ -399,15 +427,15 @@ const rankIndeks = () => st.rank_indeks;
 const SIDE_HTML = {
   async oversikt() {
     const s = st.spiller;
-    const pst = st.neste_exp ? Math.min(100, ((s.exp - st.rank_exp) / (st.neste_exp - st.rank_exp)) * 100) : 100;
     const online = await rpc('antall_online');
     const besk = sekIgjen(s.beskyttet_til);
     return `
       <h2>Oversikt</h2>
       <div class="card">
         <h3>${esc(st.rank)}</h3>
-        <div class="dim">${st.neste_rank ? `Neste rank: ${esc(st.neste_rank)}` : 'Høyeste rank nådd'}</div>
-        <div class="bar"><i style="width:${pst.toFixed(1)}%"></i></div>
+        <div class="dim">${st.neste_rank ? `${rankProsent()} % av veien til ${esc(st.neste_rank)}` : 'Du har nådd høyeste rank: Don.'}</div>
+        <div class="bar"><i style="width:${rankProsent()}%"></i></div>
+        <p class="dim" style="margin:8px 0 0;font-size:.85rem">All kriminalitet, biltyveri, utbrudd, angrep og reiser gir erfaring – også når det går galt. <button class="link" data-side-lenke="ranker">Se reglene</button></p>
         ${besk ? `<p class="ok">Du er ny i byen og kan ikke bli skutt de neste <b data-til="${s.beskyttet_til}"></b>. Angriper du noen, mister du beskyttelsen.</p>` : ''}
       </div>
       <div class="grid">
@@ -604,6 +632,34 @@ const SIDE_HTML = {
       </div>`;
   },
 
+  async ranker() {
+    const ri = st.rank_indeks;
+    return `
+      <h2>Ranker</h2>
+      <div class="card">
+        <h3>Slik stiger du i rank</h3>
+        <p class="dim" style="margin-top:0">Du får erfaring hver gang du gjør noe i byen. Når du har nok erfaring, rykker du opp. Høyere rank gir bedre sjanser, nye jobber og gjør deg vanskeligere å drepe.</p>
+        <table>
+          <tr><th>Handling</th><th>Lykkes</th><th>Mislykkes</th></tr>
+          <tr><td>Kriminalitet</td><td>${data.krim.map(k => '+' + k.exp).join(' / ')}</td><td>+1</td></tr>
+          <tr><td>Biltyveri</td><td>+4 / +6 / +8</td><td>+1</td></tr>
+          <tr><td>Bryte ut en spiller</td><td>+5</td><td>+1</td></tr>
+          <tr><td>Angrep</td><td>+3 treff, drap +40 og mer</td><td>+1</td></tr>
+          <tr><td>Reise til ny by</td><td>+1</td><td>–</td></tr>
+        </table>
+        <p class="dim" style="margin-bottom:0;font-size:.85rem">Drap gir 40 erfaring pluss 15 for hver rank offeret hadde. Bank, butikk, kasino og chat gir ikke erfaring.</p>
+      </div>
+      <div class="card" style="padding:6px 10px">
+        <table>
+          <tr><th>Rank</th><th>Erfaring</th><th></th></tr>
+          ${data.ranker.map(r => `<tr class="${r.indeks === ri ? 'denne' : ''}">
+            <td>${r.indeks === ri ? '<b class="gold">' + esc(r.navn) + '</b>' : esc(r.navn)}</td>
+            <td class="mono">${tall(r.exp)}</td>
+            <td class="dim" style="white-space:nowrap">${r.indeks < ri ? 'Passert' : r.indeks === ri ? (st.neste_rank ? 'Du er her · ' + rankProsent() + ' %' : 'Du er her') : ''}</td></tr>`).join('')}
+        </table>
+      </div>`;
+  },
+
   async toppliste() {
     const l = await rpc('toppliste');
     return `
@@ -726,6 +782,11 @@ function leggTilChat(m) {
 }
 
 // ---------------------------------------------------------------- KLIKK OG SKJEMA
+$('#topp').addEventListener('click', (e) => {
+  const lenke = e.target.closest('[data-side-lenke]');
+  if (lenke) { side = lenke.dataset.sideLenke; tegnMeny(); visSide(side); window.scrollTo({ top: 0 }); }
+});
+
 $('#side').addEventListener('click', async (e) => {
   const act = e.target.closest('[data-act]');
   if (act) {
