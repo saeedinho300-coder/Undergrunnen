@@ -87,6 +87,9 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .hvem .by{display:none}
 @media (min-width:520px){.hvem .by{display:inline}}
 .hvem .pst{color:var(--signal2);font-weight:700}
+.botdetalj>summary{list-style:none;cursor:pointer}.botdetalj>summary::-webkit-details-marker{display:none}.botdetalj[open]>summary{background:var(--hover)}
+.adminmerke{display:inline-block;vertical-align:middle;font-family:var(--body);font-size:.68rem;font-weight:700;padding:1px 6px;border-radius:5px;background:#2b230e;color:var(--gul);border:1px solid #6b5520}
+.regelmerke{background:#2b230e;color:var(--gul);border-color:#6b5520}
 .statboks{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .statboks div{display:flex;flex-direction:column;align-items:center;padding:4px 8px;min-width:0}
 .statboks div+div{border-left:1px solid var(--line)}
@@ -453,7 +456,7 @@ async function handling(fn, args) {
     if (r && r.melding) varsel(r.melding, r.ok || r.uavgjort ? 'ok' : 'bad');
     if (r && r.rankopp) setTimeout(() => varsel(`Gratulerer! Du er nå ${r.rankopp}.`, 'ok'), 2200);
     await oppdater();
-    await tegnSide(true);
+    if (fn === 'slett_traad') gaa('forum'); else await tegnSide(true);
     return r;
   } catch (e) {
     if (e instanceof IkkeInnlogget) return tilInnlogging();
@@ -553,7 +556,7 @@ function tegnTopp() {
     <div class="topprad">
       <button class="avatarknapp" data-gaa="minprofil" aria-label="Din profil">${avatar(s.navn)}</button>
       <button class="hvem" data-gaa="ranker" aria-label="Se ranker">
-        <b>${esc(s.navn)}${st.gjeng_tag ? ` <span class="dim" style="font-size:.85rem">[${esc(st.gjeng_tag)}]</span>` : ''}</b>
+        <b>${esc(s.navn)}${st.admin && s.navn !== 'Admin' ? ' <span class="adminmerke">Admin</span>' : ''}${st.gjeng_tag ? ` <span class="dim" style="font-size:.85rem">[${esc(st.gjeng_tag)}]</span>` : ''}</b>
         <span>${esc(st.rank)} · <span class="pst">${st.neste_rank ? rankProsent() + ' %' : 'MAKS'}</span><span class="by"> · ${esc(s.sted)}</span></span>
       </button>
       <div class="statboks" aria-label="Kontanter, poeng og kuler">
@@ -665,7 +668,7 @@ const HUBER = {
   sosial: { tittel: 'Sosial', under: 'Gjeng, forum og spillere', seksjoner: [
     ['Deg', ['minprofil', 'meldinger']],
     ['Gjeng og rangering', ['gjeng', 'rangering', 'prestasjoner', 'gravplass']],
-    ['Prat', ['chat', 'forum']],
+    ['Prat', ['chat', 'forum', 'regler']],
     ['Spillere', ['sok', 'palogget', 'verv:bred']],
     ['Info', ['nyheter', 'avis']]] },
   casino: { tittel: 'Casino', under: 'Undergrunnen · Spill på egen risiko', seksjoner: [
@@ -675,7 +678,7 @@ const HUBER = {
 function tegnHub(id) {
   if (id === 'oppdrag') return '';
   const h = { ...HUBER[id] }, v = st.varsler || {};
-  if (id === 'sosial' && st.admin && !h.seksjoner.some(x => x[0] === 'Admin')) h.seksjoner = [...h.seksjoner, ['Admin', ['botrapport:bred']]];
+  if (id === 'sosial' && st.admin && !h.seksjoner.some(x => x[0] === 'Admin')) h.seksjoner = [...h.seksjoner, ['Admin', ['adminpanel', 'botrapport']]];
   return sidehode(h.tittel, h.under) + `<div class="innside">${fengselBanner()}${h.seksjoner.map(([tittel, sider]) => seksjon(tittel, `<div class="rutenett">${sider.map(x => {
     const [k, bred] = x.split(':'); const d = SIDER[k];
     const merke = d.kommer ? '<span class="merke gul">Kommer</span>'
@@ -908,19 +911,28 @@ const SIDER = {
   chat: { fane: 'sosial', tittel: 'Chat', kort: 'Snakk med hele byen', async vis() {
     return seksjon('Byens chat', `<div class="chatlogg" id="chatlogg"></div><form id="chatForm" class="rad" style="padding:0 16px 14px"><div style="flex:5 1 180px"><input name="tekst" maxlength="300" placeholder="Skriv noe …" autocomplete="off" required aria-label="Chatmelding"></div><button class="knapp">Send</button></form>`);
   }, etter() { startChat(); } },
+  regler: { fane: 'sosial', tittel: 'Regler', kort: 'Alle regler for spillet', async vis() { return SIDER.forum.vis('Regler'); } },
   forum: { fane: 'sosial', tittel: 'Forum', kort: 'Diskusjoner, salg, gjeng og hjelp', async vis(p) {
+    const KAT = st.admin ? ['Regler', 'Generelt', 'Salg', 'Gjeng', 'Hjelp'] : ['Generelt', 'Salg', 'Gjeng', 'Hjelp'];
     if (p && String(p).startsWith('t')) {
-      const t = await rpc('forum_traad', { p_id: Number(String(p).slice(1)) });
+      const t = await rpc('forum_traad', { p_id: Number(String(p).slice(1)) }), regel = t.traad.kategori === 'Regler';
+      const tekst = (x) => regel ? `<div class="tekst bb">${bbkode(x)}</div>` : `<div class="tekst">${esc(x)}</div>`;
       return `<button class="lenke" data-gaa="forum" data-param="${esc(t.traad.kategori)}">‹ ${esc(t.traad.kategori)}</button>`
-        + seksjon(esc(t.traad.tittel), `<div>${t.innlegg.map(i => `<div class="innlegg"><div class="hode">${avatar(i.forfatter, 1)}<b><button class="lenke" data-profil="${esc(i.forfatter)}">${esc(i.forfatter)}</button></b><small class="dim">${dato(i.tid)}</small></div><div class="tekst">${esc(i.tekst)}</div></div>`).join('')}</div>`)
-        + seksjon('Svar', kropp(`<form data-rpc="svar_traad"><input type="hidden" name="p_id" value="${t.traad.id}" data-num><div class="felt"><textarea name="p_tekst" rows="3" maxlength="3000" required aria-label="Svar"></textarea></div><button class="knapp">Publiser svar</button></form>`));
+        + seksjon(esc(t.traad.tittel), `<div>${t.innlegg.map(i => `<div class="innlegg"><div class="hode">${avatar(i.forfatter, 1)}<b><button class="lenke" data-profil="${esc(i.forfatter)}">${esc(i.forfatter)}</button></b><small class="dim">${dato(i.tid)}</small></div>${tekst(i.tekst)}</div>`).join('')}</div>`)
+        + (regel && !st.admin ? '<p class="dim" style="text-align:center">Regeltrådene kan bare endres av Admin. Spørsmål? Skriv i Hjelp.</p>'
+          : seksjon('Svar', kropp(`<form data-rpc="svar_traad"><input type="hidden" name="p_id" value="${t.traad.id}" data-num><div class="felt"><textarea name="p_tekst" rows="3" maxlength="6000" required aria-label="Svar"></textarea></div><button class="knapp">Publiser svar</button></form>`)))
+        + (st.admin && regel ? seksjon('Rediger regel (Admin)', kropp(`<form data-rpc="rediger_regel"><input type="hidden" name="p_id" value="${t.traad.id}" data-num><div class="felt"><label for="rTit">Tittel</label><input id="rTit" name="p_tittel" maxlength="80" value="${esc(t.traad.tittel)}" required></div><div class="felt"><label for="rTek">Tekst (BBCode: [b]fet[/b], [i]kursiv[/i])</label><textarea id="rTek" name="p_tekst" rows="14" maxlength="6000" required>${esc(t.innlegg[0]?.tekst || '')}</textarea></div><button class="knapp">Lagre regel</button></form>`)) : '')
+        + (st.admin ? `<div class="rad" style="justify-content:center;margin:14px 0"><button class="knapp sek liten" data-act="slett_traad" data-args='${arg({ p_id: t.traad.id })}'>Slett tråden (Admin)</button></div>` : '');
     }
     const kat = p || '';
     const l = await rpc('forum_liste', { p_kategori: kat });
-    return `<div class="faner" style="margin:0;flex-wrap:wrap">${['', 'Generelt', 'Salg', 'Gjeng', 'Hjelp'].map(k => `<button class="${kat === k ? 'aktiv' : ''}" data-gaa="forum" data-param="${k}">${k || 'Alle'}</button>`).join('')}</div>`
-      + seksjon('Tråder', l.length ? `<div class="liste">${l.map(t => `<div class="linjeel" style="cursor:pointer" data-gaa="forum" data-param="t${t.id}"><div class="info"><b>${esc(t.tittel)}</b><small>${esc(t.kategori)} · ${esc(t.forfatter)} · ${t.antall} innlegg · ${dato(t.sist_aktiv)}</small></div></div>`).join('')}</div>` : '<p class="tom">Ingen tråder her ennå.</p>')
-      + seksjon('Ny tråd', kropp(`<form data-rpc="ny_traad"><div class="rad" style="margin-bottom:10px"><div style="flex:1 1 120px"><label for="fKat">Kategori</label><select id="fKat" name="p_kategori">${['Generelt', 'Salg', 'Gjeng', 'Hjelp'].map(k => `<option ${k === kat ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div style="flex:3 1 200px"><label for="fTit">Tittel</label><input id="fTit" name="p_tittel" maxlength="80" required></div></div>
-        <div class="felt"><label for="fTek">Innlegg</label><textarea id="fTek" name="p_tekst" rows="4" maxlength="3000" required></textarea></div><button class="knapp">Opprett tråd</button></form>`));
+    const regler = l.filter(t => t.kategori === 'Regler'), andre = l.filter(t => t.kategori !== 'Regler');
+    const rad = t => `<div class="linjeel" style="cursor:pointer" data-gaa="forum" data-param="t${t.id}"><div class="info"><b>${t.kategori === 'Regler' ? '<span class="merke regelmerke">Regel</span> ' : ''}${esc(t.tittel)}</b><small>${esc(t.kategori)} · ${esc(t.forfatter)} · ${t.antall} innlegg · ${dato(t.sist_aktiv)}</small></div></div>`;
+    return `<div class="faner" style="margin:0;flex-wrap:wrap">${['', 'Regler', 'Generelt', 'Salg', 'Gjeng', 'Hjelp'].map(k => `<button class="${kat === k ? 'aktiv' : ''}" data-gaa="forum" data-param="${k}">${k || 'Alle'}</button>`).join('')}</div>`
+      + (regler.length ? seksjon('Regler', `<div class="liste">${regler.map(rad).join('')}</div>`) : '')
+      + (kat === 'Regler' ? '' : seksjon('Tråder', andre.length ? `<div class="liste">${andre.map(rad).join('')}</div>` : '<p class="tom">Ingen tråder her ennå.</p>'))
+      + (kat === 'Regler' && !st.admin ? '' : seksjon(kat === 'Regler' ? 'Ny regel (Admin)' : 'Ny tråd', kropp(`<form data-rpc="ny_traad"><div class="rad" style="margin-bottom:10px"><div style="flex:1 1 120px"><label for="fKat">Kategori</label><select id="fKat" name="p_kategori">${KAT.map(k => `<option ${k === (kat || 'Generelt') ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div style="flex:3 1 200px"><label for="fTit">Tittel</label><input id="fTit" name="p_tittel" maxlength="80" required></div></div>
+        <div class="felt"><label for="fTek">Innlegg</label><textarea id="fTek" name="p_tekst" rows="4" maxlength="6000" required></textarea></div><button class="knapp">Opprett tråd</button></form>`)));
   } },
   sok: { fane: 'sosial', tittel: 'Søk', kort: 'Finn spillere', async vis(p) {
     const res = p ? await rpc('sok_spillere', { p_sok: p }) : [];
@@ -961,7 +973,7 @@ const SIDER = {
     const s = st.spiller;
     return `<div class="profiltopp">${avatar(s.navn, 0, 1)}<h2>${esc(s.navn)}</h2><span class="dim">${esc(st.rank)} · ${rankProsent()} %</span></div>`
       + seksjon('Utstyr', `<div class="liste"><div class="linjeel"><div class="info dim">Våpen</div><b>${esc(vapenNavn(s.vapen))}</b></div><div class="linjeel"><div class="info dim">Beskyttelse</div><b>${esc(beskNavn(s.beskyttelse))}</b></div><div class="linjeel"><div class="info dim">Kuler</div><b class="tall">${tall(s.kuler)}</b></div></div>`)
-      + seksjon('Andre seksjoner', `<div class="liste">${[['profil', 'Se offentlig profil', s.navn], ['prestasjoner', 'Prestasjoner'], ['statistikk', 'Din statistikk'], ['ranker', 'Ranker og regler'], ['meldinger', 'Handlingslogg', 'logg']].map(([g, t, pa]) => `<button class="linjeel pil" data-gaa="${g}" ${pa ? `data-param="${esc(pa)}"` : ''}><div class="info"><b>${t}</b></div></button>`).join('')}</div>`)
+      + seksjon('Andre seksjoner', `<div class="liste">${[['profil', 'Se offentlig profil', s.navn], ['prestasjoner', 'Prestasjoner'], ['statistikk', 'Din statistikk'], ['ranker', 'Ranker'], ['regler', 'Regler (forum)'], ['meldinger', 'Handlingslogg', 'logg']].map(([g, t, pa]) => `<button class="linjeel pil" data-gaa="${g}" ${pa ? `data-param="${esc(pa)}"` : ''}><div class="info"><b>${t}</b></div></button>`).join('')}</div>`)
       + seksjon('Utseende', `<div class="temavalg">${TEMAER.map(([id, navn, a, b, c]) => `<button type="button" data-velg-tema="${id}" class="${(hent('ug_tema') || 'midnatt') === id ? 'aktiv' : ''}"><span class="prover"><i style="background:${a}"></i><i style="background:${b}"></i><i style="background:${c}"></i></span>${navn}</button>`).join('')}</div>`)
       + seksjon('Innstillinger', `<div class="liste"><button class="linjeel pil" data-gaa="rediger_profil"><div class="info"><b>Rediger profil</b><small>Bilde, kjønn, musikk og om meg</small></div></button>
         <label class="linjeel bryter"><div class="info"><b>Skjul casino</b><small>Tar casino-fanen bort fra menyen nederst. Gjelder bare denne enheten.</small></div><input type="checkbox" id="skjulCasino" ${skjulCasino() ? 'checked' : ''}><span class="spor" aria-hidden="true"></span></label>
@@ -992,12 +1004,12 @@ const SIDER = {
     const rad = (a, b) => `<div class="linjeel"><div class="info dim">${a}</div><b>${b}</b></div>`;
     const mus = musikk(x.musikk);
     if (x.bilde) bildeKart[x.navn] = x.bilde; else delete bildeKart[x.navn];
-    return `<div class="profiltopp">${avatar(x.navn, 0, 1)}<h2>${esc(x.navn)}</h2><span class="dim">${esc(x.rank)}</span>
+    return `<div class="profiltopp">${avatar(x.navn, 0, 1)}<h2>${esc(x.navn)}</h2><span class="dim">${x.admin ? '<span class="adminmerke">Admin</span> · ' : ''}${esc(x.rank)}</span>
         <div class="merker"><span class="merke mint">Levende</span>${x.online ? '<span class="merke mint">Online</span>' : '<span class="merke" style="opacity:.6">Offline</span>'}${x.tag ? `<span class="merke gul">${esc(x.tag)}</span>` : ''}${x.fengsel ? '<span class="merke">I fengsel</span>' : ''}${x.bot ? '<span class="merke" title="Datastyrt spiller">Bot</span>' : ''}</div>
         <div class="rad" style="justify-content:center;margin-top:12px">${x.min ? '<button class="knapp sek liten" data-gaa="rediger_profil">Rediger profil</button>' : `<button class="knapp liten" data-gaa="meldinger" data-param="${esc(x.navn)}">Send melding</button>`}</div></div>`
       + seksjon('Identitet', `<div class="liste">${rad('Gjeng', x.gjeng ? esc(x.gjeng) : '–')}${rad('Pengestatus', esc(x.pengestatus))}${rad('Kjønn', x.kjonn === 'mann' ? 'Mann' : x.kjonn === 'kvinne' ? 'Kvinne' : '–')}${x.bot ? rad('Type', 'Datastyrt spiller') : ''}</div>`)
       + seksjon('Prestasjoner', `<div class="linjeel"><span class="skjold">${tall(x.prestasjonspoeng)}</span><div class="info"><b class="gul">${tall(x.prestasjonspoeng)} poeng</b><small>${x.prestasjoner} av ${x.prestasjoner_totalt} låst opp</small></div></div>`)
-      + seksjon('Statistikk', `<div class="liste">${rad('Totale drap', tall(x.drap))}${rad('Kriminalitet utført', tall(x.krim))}${rad('Biler stjålet', tall(x.biler))}${rad('Meldinger sendt', tall(x.meldinger_sendt))}</div>`)
+      + (x.statistikk_skjult ? '' : seksjon('Statistikk', `<div class="liste">${rad('Totale drap', tall(x.drap))}${rad('Kriminalitet utført', tall(x.krim))}${rad('Biler stjålet', tall(x.biler))}${rad('Meldinger sendt', tall(x.meldinger_sendt))}</div>`))
       + seksjon('Aktivitet', `<div class="nokkeltall" style="padding:12px"><div><span>Registrert</span><b>${new Date(x.opprettet).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</b></div><div><span>Sist aktiv</span><b>${new Date(x.sist_aktiv).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</b></div></div>`)
       + (mus ? seksjon('Musikk', kropp(mus)) : '')
       + (x.bio ? seksjon('Om spilleren', `<div class="bb kropp">${bbkode(x.bio)}</div>`) : '');
@@ -1007,6 +1019,23 @@ const SIDER = {
     const p = await rpc('min_profil'), s = p.statistikk || {};
     const navn = { krim: 'Kriminalitet forsøkt', krim_ok: 'Kriminalitet lyktes', bil: 'Biltyveri forsøkt', bil_ok: 'Biler stjålet', ran: 'Ran forsøkt', ran_ok: 'Ran lyktes', utbrudd: 'Utbrudd forsøkt', utbrudd_ok: 'Spillere brutt ut', angrep: 'Angrep', drap: 'Drap', reise: 'Reiser', kasino: 'Kasinospill', melding: 'Meldinger sendt' };
     return seksjon('Alt du har gjort', `<table class="tabell">${Object.entries(navn).map(([k, t]) => `<tr><td>${t}</td><td class="tall">${tall(s[k] || 0)}</td></tr>`).join('')}</table>`);
+  } },
+
+  adminpanel: { fane: 'sosial', tittel: 'Adminpanel', kort: 'Oversikt og alt botene gjør', oppfrisk: 60, async vis() {
+    const r = await rpc('admin_oversikt');
+    const N = { krim: 'Kriminalitet forsøkt', krim_ok: 'Kriminalitet lyktes', bil: 'Biltyveri forsøkt', bil_ok: 'Biler stjålet', ran: 'Ran forsøkt', ran_ok: 'Ran lyktes', utbrudd: 'Utbrudd forsøkt', utbrudd_ok: 'Brøt ut andre', angrep: 'Angrep', drap: 'Drap', reise: 'Reiser', kasino: 'Kasinospill', melding: 'Meldinger sendt' };
+    const nokler = [...new Set([...Object.keys(N), ...Object.keys(r.bot_totalt)])];
+    const statTabell = (idag, tot) => `<table class="tabell"><tr><th>Handling</th><th class="h">I dag</th><th class="h">Totalt</th></tr>${nokler.filter(k => tot[k] || idag[k]).map(k => `<tr><td>${esc(N[k] || k)}</td><td class="tall">${tall(idag[k] || 0)}</td><td class="tall">${tall(tot[k] || 0)}</td></tr>`).join('') || '<tr><td colspan="3" class="dim">Ingenting ennå</td></tr>'}</table>`;
+    const rente = r.rente[0];
+    return `<div class="banner gul" style="margin-bottom:12px"><span class="adminmerke">Admin</span><div>Bare du ser denne siden. Andre spillere ser ikke statistikken til botene.</div></div>`
+      + `<div class="nokkeltall"><div><span>Spillere</span><b>${tall(r.spillere)}</b></div><div><span>Online nå</span><b class="ok">${tall(r.online)}</b></div><div><span>Nye i dag</span><b>${tall(r.nye_idag)}</b></div><div><span>Boter</span><b>${tall(r.boter)}</b></div></div>`
+      + seksjon('Økonomi', `<div class="liste">${[['Penger hos spillere', kr(r.penger_spillere)], ['Penger hos boter', kr(r.penger_boter)], ['Lottopott nå', kr(r.lottopott)], ['Siste bankrente', rente ? `${kr(rente.utbetalt)} til ${rente.spillere} (${esc(rente.dato)})` : 'Ikke utbetalt ennå']].map(([a, b]) => `<div class="linjeel"><div class="info dim">${a}</div><b>${b}</b></div>`).join('')}</div>`)
+      + seksjon('Alle botene samlet', statTabell(r.bot_idag, r.bot_totalt))
+      + seksjon(`Hver bot (${r.botliste.length})`, `<div class="liste">${r.botliste.map(b => `<details class="botdetalj"><summary class="linjeel">${avatar(b.navn, 1)}<div class="info"><b>${esc(b.navn)}${b.gjeng ? ` <span class="dim">[${esc(b.gjeng)}]</span>` : ''}${b.fengsel ? ' <span class="merke">I fengsel</span>' : ''}</b><small>${esc(b.rank)} · ${tall(b.exp)} erfaring · ${esc(b.sted)} · sist aktiv ${dato(b.sist_aktiv)}</small></div></summary>
+          <div class="nokkeltall" style="padding:10px 12px"><div><span>Kontanter</span><b>${kr(b.penger)}</b></div><div><span>Bank</span><b>${kr(b.bank)}</b></div><div><span>Kuler</span><b>${tall(b.kuler)}</b></div><div><span>Drap</span><b>${tall(b.drap)}</b></div></div>
+          ${statTabell(b.idag, b.stat)}<div class="rad" style="justify-content:flex-end;padding:8px 16px 14px"><button class="knapp sek liten" data-profil="${esc(b.navn)}">Profil</button></div></details>`).join('')}</div>`)
+      + seksjon(`Ekte spillere (${r.spillerliste.length})`, r.spillerliste.length ? `<div class="liste">${r.spillerliste.map(x => `<div class="linjeel">${avatar(x.navn, 1)}<div class="info"><b><button class="lenke" data-profil="${esc(x.navn)}">${esc(x.navn)}</button></b><small>${esc(x.rank)} · ${kr(x.penger)} · registrert ${dato(x.opprettet)} · sist aktiv ${dato(x.sist_aktiv)}</small></div></div>`).join('')}</div>` : '<p class="tom">Ingen ennå.</p>')
+      + `<div class="rad" style="justify-content:center;margin:14px 0"><button class="knapp sek" data-gaa="botrapport">Botrapport (feil)</button><button class="knapp sek" data-gaa="forum" data-param="Regler">Rediger regler</button></div>`;
   } },
 
   botrapport: { fane: 'sosial', tittel: 'Botrapport', kort: 'Feil funnet av de 20 botene', oppfrisk: 60, async vis() {
