@@ -13,11 +13,20 @@ const COOKIE = "ug_okt";
 const OKT_DAGER = 30;
 
 const env = (k) => (globalThis.Netlify?.env?.get(k) ?? process.env[k]);
-const hemmelig = () => {
-  const s = env("SESSION_SECRET");
-  if (!s || s.length < 32) throw new Error("SESSION_SECRET mangler på serveren");
-  return s;
-};
+// Nøkkel for å signere innloggings-cookies: miljøvariabel hvis den finnes, ellers lagret i databasen.
+let _hemmelig;
+async function hemmelig() {
+  if (_hemmelig) return _hemmelig;
+  const fraEnv = env("SESSION_SECRET");
+  if (fraEnv && fraEnv.length >= 32) return (_hemmelig = fraEnv);
+  const [rad] = await q`select verdi from app_hemmelighet where id = 1`;
+  if (!rad || !rad.verdi || rad.verdi.length < 32) throw new Error("Fant ingen hemmelig nøkkel i databasen");
+  return (_hemmelig = rad.verdi);
+}
+
+// Feilkode fra Postgres, uansett hvordan driveren pakker den inn
+const pgKode = (e) => e && (e.code ?? e.cause?.code ?? e.originalError?.code);
+const pgMelding = (e) => String((e && (e.message || e.cause?.message)) || e).replace(/^error:\s*/i, "");
 
 // ---------- passord (scrypt) ----------
 const scryptP = (pw, salt) => new Promise((ok, feil) =>
@@ -36,19 +45,19 @@ async function sjekkPassord(pw, lagret) {
 }
 
 // ---------- signert økt-cookie ----------
-const signer = (data) => createHmac("sha256", hemmelig()).update(data).digest("base64url");
+const signer = async (data) => createHmac("sha256", await hemmelig()).update(data).digest("base64url");
 
-function lagOkt(uid) {
+async function lagOkt(uid) {
   const data = `${uid}.${Date.now() + OKT_DAGER * 864e5}`;
-  return `${data}.${signer(data)}`;
+  return `${data}.${await signer(data)}`;
 }
-function lesOkt(req) {
+async function lesOkt(req) {
   const c = req.headers.get("cookie") || "";
   const m = c.match(new RegExp(`(?:^|;\\s*)${COOKIE}=([^;]+)`));
   if (!m) return null;
   const [uid, exp, sig] = decodeURIComponent(m[1]).split(".");
   if (!uid || !exp || !sig) return null;
-  const forventet = Buffer.from(signer(`${uid}.${exp}`));
+  const forventet = Buffer.from(await signer(`${uid}.${exp}`));
   const fikk = Buffer.from(sig);
   if (forventet.length !== fikk.length || !timingSafeEqual(forventet, fikk)) return null;
   if (Number(exp) < Date.now()) return null;
@@ -67,9 +76,12 @@ const feil = (melding, status = 400) => json({ error: melding }, status);
 export default async (req) => {
   const sti = new URL(req.url).pathname.replace(/^\/api\/?/, "");
   if (sti === "helse") {
-    const svar = { hemmelighet: !!(env("SESSION_SECRET") && env("SESSION_SECRET").length >= 32) };
-    try { const r = await q`select count(*)::int as n from kontoer`; svar.database = "ok"; svar.kontoer = r[0]?.n; }
-    catch (e) { svar.database = String(e && (e.message || e)).slice(0, 300); }
+    const svar = {};
+    try { const r = await q`select count(*)::int as n from kontoer`; svar.database = "ok"; svar.kontoer = Number(r[0]?.n); }
+    catch (e) { svar.database = pgMelding(e).slice(0, 300); }
+    try { await hemmelig(); svar.hemmelighet = true; } catch (e) { svar.hemmelighet = pgMelding(e).slice(0, 300); }
+    try { const [r] = await q`select public.api(null, 'spill_data', '{}'::jsonb) as r`; svar.spill = typeof r?.r === "string" ? "tekst" : (r?.r?.byer ? "ok" : "ukjent"); }
+    catch (e) { svar.spill = pgMelding(e).slice(0, 300); }
     return json(svar);
   }
   if (req.method !== "POST") return feil("Kun POST", 405);
@@ -86,35 +98,39 @@ export default async (req) => {
       if (sti === "registrer") {
         const finnes = await q`select 1 from kontoer where lower(epost) = ${epost}`;
         if (finnes.length) return feil("E-posten er allerede registrert.");
+        await hemmelig(); // sjekk at innlogging kan fullføres før kontoen lagres
         const hash = await hashPassord(passord);
         const [k] = await q`insert into kontoer (epost, passord_hash) values (${epost}, ${hash}) returning id`;
-        return json({ ok: true }, 200, { "set-cookie": cookie(lagOkt(k.id), OKT_DAGER * 86400) });
+        return json({ ok: true }, 200, { "set-cookie": cookie(await lagOkt(k.id), OKT_DAGER * 86400) });
       }
       const [k] = await q`select id, passord_hash from kontoer where lower(epost) = ${epost}`;
       if (!k || !(await sjekkPassord(passord, k.passord_hash))) return feil("Feil e-post eller passord.", 401);
-      return json({ ok: true }, 200, { "set-cookie": cookie(lagOkt(k.id), OKT_DAGER * 86400) });
+      return json({ ok: true }, 200, { "set-cookie": cookie(await lagOkt(k.id), OKT_DAGER * 86400) });
     }
 
     if (sti === "loggut") return json({ ok: true }, 200, { "set-cookie": cookie("", 0) });
 
     if (sti === "rpc") {
-      const uid = lesOkt(req);
+      const uid = await lesOkt(req);
       if (!uid) return feil("Du er ikke innlogget", 401);
       const fn = String(body.fn || "");
       if (!/^[a-z_]{1,40}$/.test(fn)) return feil("Ukjent handling");
       const args = JSON.stringify(body.args && typeof body.args === "object" ? body.args : {});
       const [rad] = await q`select public.api(${uid}::uuid, ${fn}, ${args}::jsonb) as r`;
-      return json({ data: rad ? rad.r : null });
+      let data = rad ? rad.r : null;
+      if (typeof data === "string") { try { data = JSON.parse(data); } catch { /* vanlig tekst */ } }
+      return json({ data });
     }
 
     return feil("Ikke funnet", 404);
   } catch (e) {
     // Spillfeil fra databasen (raise exception) sendes rett til spilleren.
-    if (e && e.code === "P0001") return feil(e.message);
-    if (e && (e.code === "22P02" || e.code === "22003")) return feil("Ugyldig verdi.");
-    if (e && e.code === "23505") return feil("Navnet er opptatt.");
+    const kode = pgKode(e);
+    if (kode === "P0001") return feil(pgMelding(e));
+    if (kode === "22P02" || kode === "22003") return feil("Ugyldig verdi.");
+    if (kode === "23505") return feil("Navnet eller e-posten er opptatt.");
     console.error("api-feil", sti, e);
-    return json({ error: "Noe gikk galt på serveren. Prøv igjen.", detalj: String(e && (e.message || e)).slice(0, 300), kode: e && e.code }, 500);
+    return json({ error: "Noe gikk galt på serveren. Prøv igjen.", detalj: pgMelding(e).slice(0, 300), kode }, 500);
   }
 };
 
