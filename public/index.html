@@ -145,20 +145,38 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .kort::after{content:"";position:absolute;right:14px;top:17px;width:8px;height:8px;border-top:2px solid var(--signal2);border-right:2px solid var(--signal2);transform:rotate(45deg)}
 .kort.bred{grid-column:1/-1;min-height:0}
 .kort.av{opacity:.55;cursor:default}
-/* Bilder (Unsplash, fri lisens). Mørk toning gjør teksten lesbar; feiler bildet, vises vanlig kort. */
-.kort.medbilde{justify-content:flex-end;min-height:132px;border-color:var(--line2);background:linear-gradient(180deg,rgba(6,8,12,.05) 0%,rgba(6,8,12,.5) 48%,rgba(6,8,12,.94) 100%),var(--img) center/cover no-repeat,var(--panel2);overflow:hidden}
-.kort.medbilde:hover{filter:brightness(1.12)}
-.kort.medbilde b{color:#fff;font-size:1.12rem;text-shadow:0 1px 4px rgba(0,0,0,.8)}
-.kort.medbilde span{color:#dfe3ea;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+/* Bilder (Unsplash, fri lisens). Mørk «gangster»-stil: bildet tones ned (sort-hvitt, sepia, hard kontrast),
+   med vignett og et svakt rødt skjær. Feiler bildet, vises vanlig mørk bakgrunn. */
+.medbilde{position:relative;overflow:hidden;isolation:isolate}
+.bildelag{position:absolute;inset:0;z-index:0;background:var(--img) center/cover no-repeat;filter:grayscale(.75) sepia(.3) contrast(1.4) brightness(.5);transform:scale(1.03);transition:transform .6s ease,filter .6s ease}
+.tone{position:absolute;inset:0;z-index:1;background:radial-gradient(130% 95% at 50% 25%,transparent 30%,rgba(0,0,0,.72) 100%),linear-gradient(180deg,rgba(0,0,0,0) 15%,rgba(4,4,6,.55) 55%,rgba(4,4,6,.95) 100%),linear-gradient(rgba(120,6,16,.18),rgba(120,6,16,.18))}
+.medbilde>:not(.bildelag):not(.tone){position:relative;z-index:2}
+.kort.medbilde{justify-content:flex-end;min-height:132px;border-color:#2a2a30;background:#0c0c0e}
+.kort.medbilde::after{z-index:3;filter:drop-shadow(0 1px 2px rgba(0,0,0,.9))}
+.kort.medbilde:hover .bildelag{transform:scale(1.09);filter:grayscale(.6) sepia(.3) contrast(1.4) brightness(.62)}
+.kort.medbilde b{color:#fff;font-size:1.15rem;letter-spacing:.01em;text-shadow:0 2px 6px rgba(0,0,0,.95)}
+.kort.medbilde span{color:#d9d4cc;text-shadow:0 1px 4px rgba(0,0,0,.95)}
 .kort.medbilde span.merke{text-shadow:none}
-.kort.medbilde::after{filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))}
 .kort.medbilde.bred{min-height:128px}
-.panelhode.medbilde{min-height:132px;border-bottom-color:var(--line2);background:linear-gradient(180deg,rgba(6,8,12,.1) 0%,rgba(6,8,12,.55) 50%,rgba(6,8,12,.95) 100%),var(--img) center/cover no-repeat,var(--panel)}
-.panelhode.medbilde h1{color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.8)}
-.panelhode.medbilde .over{color:#cfd5de}
-.panelhode.medbilde .status{text-shadow:0 1px 4px rgba(0,0,0,.9)}
-.hubbilde{height:118px;margin:12px 12px 0;border-radius:var(--r2);border:1px solid var(--line2);background:linear-gradient(180deg,rgba(6,8,12,0) 30%,rgba(6,8,12,.75)),var(--img) center/cover no-repeat,var(--panel)}
-@media (min-width:640px){.kort.medbilde{min-height:150px}.hubbilde{height:170px}.panelhode.medbilde{min-height:170px}}
+.panelhode.medbilde{min-height:136px;border-bottom-color:#2a2a30;background:#0c0c0e}
+.panelhode.medbilde h1{color:#fff;font-size:2rem;text-shadow:0 2px 8px rgba(0,0,0,.95)}
+.panelhode.medbilde .over{color:#c9c2b8}
+.panelhode.medbilde .status{text-shadow:0 1px 6px rgba(0,0,0,.95)}
+.hubbilde{height:120px;margin:12px 12px 0;border-radius:var(--r2);border:1px solid #2a2a30;background:#0c0c0e}
+/* Resultatbilde etter en handling */
+.resultat{display:flex;align-items:flex-end;min-height:150px;margin:0 0 12px;border-radius:var(--r2);border:1px solid #2a2a30;background:#0c0c0e;animation:resInn .45s ease}
+.resultat .rtekst{padding:14px 16px}
+.resultat small{display:block;font-weight:700;font-size:.8rem;letter-spacing:.06em;color:#c9c2b8}
+.resultat b{display:block;color:#fff;font-size:1.05rem;line-height:1.35;text-shadow:0 2px 6px rgba(0,0,0,.95)}
+.resultat.ok{border-color:#1f5a44}.resultat.ok small{color:var(--mint)}
+.resultat.fengsel{border-color:#6a1d26}.resultat.fengsel small{color:#ff6b75}
+.resultat.feil small{color:var(--gul)}
+.resultat.ok .tone{background:radial-gradient(130% 95% at 50% 25%,transparent 30%,rgba(0,0,0,.72) 100%),linear-gradient(180deg,rgba(0,0,0,0) 15%,rgba(4,4,6,.95) 100%),linear-gradient(rgba(10,90,60,.16),rgba(10,90,60,.16))}
+.resultat.fengsel .bildelag{filter:grayscale(.2) contrast(1.35) brightness(.55)}
+.resultat.medbilde>.lukk{position:absolute;top:8px;right:8px;z-index:3;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.45);color:#fff;cursor:pointer;font-size:1rem;line-height:1}
+@keyframes resInn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.resultat{animation:none}.bildelag{transition:none}}
+@media (min-width:640px){.kort.medbilde{min-height:150px}.hubbilde{height:170px}.panelhode.medbilde{min-height:170px}.resultat{min-height:190px}}
 .kort.av::after{display:none}
 .merke{display:inline-block;align-self:flex-start;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:.04em;background:var(--signal-bg);color:var(--signal2);border:1px solid #4a2128}
 .merke.mint{background:var(--mint-bg);color:var(--mint);border-color:#1d4a3b}
@@ -467,6 +485,7 @@ function varsel(tekst, type = 'ok') {
 async function handling(fn, args) {
   try {
     const r = await rpc(fn, args);
+    huskResultat(fn, r);
     if (r && r.melding) varsel(r.melding, r.ok || r.uavgjort ? 'ok' : 'bad');
     if (r && r.rankopp) setTimeout(() => varsel(`Gratulerer! Du er nå ${r.rankopp}.`, 'ok'), 2200);
     await oppdater();
@@ -707,17 +726,41 @@ const BILDER = {
   blackjack: 'photo-1592398191627-25b41eeaa398', terninger: 'photo-1626775238053-4315516eedc9', lotto: 'photo-1566563255308-753861417000',
   hub_handel: 'photo-1647462659133-7126b04b52ba', hub_sosial: 'photo-1642919794897-146bf10bff9e', hub_casino: 'photo-1509478861672-91e9a2f90c04',
 };
-const bildeStil = (k, w = 640) => BILDER[k] ? `style="--img:url('https://images.unsplash.com/${BILDER[k]}?auto=format&fit=crop&w=${w}&q=60')"` : '';
+const LAG = '<i class="bildelag" aria-hidden="true"></i><i class="tone" aria-hidden="true"></i>';
+const bildeUrl = (id, w) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=60`;
+// Bilde for resultatet av en handling: lyktes (ok), tatt av politiet (fengsel), mislyktes men slapp unna (feil)
+const RESULTATER = {
+  begaa_krim: { ok: ['photo-1518458028785-8fbcd101ebb9', 'Det gikk!'], fengsel: ['photo-1521437100987-e1cb2178879b', 'Tatt av politiet'], feil: ['photo-1614982488537-c817e24a94ce', 'Mislyktes – du slapp unna'] },
+  stjel_bil:  { ok: ['photo-1642268565002-729f4e3dad5b', 'Bilen er din'], fengsel: ['photo-1608095476825-d4e0f916372f', 'Alarmen gikk'], feil: ['photo-1680642317243-5bc0f225181a', 'Fikk ikke bilen i gang'] },
+  ran_spiller:{ ok: ['photo-1553729459-efe14ef6055d', 'Ranet lyktes'], fengsel: ['photo-1675430428387-376cabac44dc', 'Tatt på fersk gjerning'], feil: ['photo-1614982488537-c817e24a94ce', 'Offeret slapp unna'] },
+  bryt_ut:    { ok: ['photo-1579109489311-4f1ae01fd83d', 'Utbruddet lyktes'], fengsel: ['photo-1646297804981-1cefdf960180', 'Vakten så deg'], feil: ['photo-1543536833-6d65fcc64f66', 'Utbruddet mislyktes'] },
+  kjop_deg_ut:{ ok: ['photo-1579109489311-4f1ae01fd83d', 'Du er fri'] },
+  angrip:     { drept: ['photo-1564993719576-7b00be6317cd', 'Drept'], ok: ['photo-1602432140723-b88c8b054b26', 'Treff'], feil: ['photo-1453413453658-27fec8f43f29', 'Bom'] },
+  reis:       { ok: ['photo-1507812984078-917a274065be', 'Du har landet'] },
+};
+let sisteResultat = null;
+function huskResultat(fn, r) {
+  const sett = RESULTATER[fn]; if (!sett || !r || !r.melding) return;
+  const utfall = r.drept ? 'drept' : r.ok ? 'ok' : r.fengsel ? 'fengsel' : 'feil';
+  const valg = sett[utfall] || sett.feil || sett.ok; if (!valg) return;
+  sisteResultat = { side: ruter.handling, utfall: utfall === 'drept' ? 'ok' : utfall, bilde: valg[0], tittel: valg[1], melding: r.melding, tid: Date.now() };
+}
+function resultatKort() {
+  const x = sisteResultat;
+  if (!x || x.side !== ruter.handling || Date.now() - x.tid > 120000) return '';
+  return `<div class="resultat medbilde ${x.utfall}" style="--img:url('${bildeUrl(x.bilde, 900)}')" role="status">${LAG}<button class="lukk" data-lukk-resultat aria-label="Skjul">×</button><div class="rtekst"><small>${esc(x.tittel)}</small><b>${esc(x.melding)}</b></div></div>`;
+}
+const bildeStil = (k, w = 640) => BILDER[k] ? `style="--img:url('${bildeUrl(BILDER[k], w)}')"` : '';
 function tegnHub(id) {
   if (id === 'oppdrag') return '';
   const h = { ...HUBER[id] }, v = st.varsler || {};
   if (id === 'sosial' && st.admin && !h.seksjoner.some(x => x[0] === 'Admin')) h.seksjoner = [...h.seksjoner, ['Admin', ['adminpanel', 'botrapport']]];
-  return sidehode(h.tittel, h.under) + (BILDER['hub_' + id] ? `<div class="hubbilde" ${bildeStil('hub_' + id, 1000)} role="img" aria-label="${esc(h.tittel)}"></div>` : '') + `<div class="innside">${fengselBanner()}${h.seksjoner.map(([tittel, sider]) => seksjon(tittel, `<div class="rutenett">${sider.map(x => {
+  return sidehode(h.tittel, h.under) + (BILDER['hub_' + id] ? `<div class="hubbilde medbilde" ${bildeStil('hub_' + id, 1000)} role="img" aria-label="${esc(h.tittel)}">${LAG}</div>` : '') + `<div class="innside">${fengselBanner()}${h.seksjoner.map(([tittel, sider]) => seksjon(tittel, `<div class="rutenett">${sider.map(x => {
     const [k, bred] = x.split(':'); const d = SIDER[k];
     const merke = d.kommer ? '<span class="merke gul">Kommer</span>'
       : k === 'meldinger' && (st.uleste || st.uleste_logg) ? `<span class="merke">${st.uleste + (st.uleste_logg || 0)} nye</span>`
       : k === 'prestasjoner' && v.prestasjoner ? `<span class="merke mint">${v.prestasjoner} klar</span>` : '';
-    return `<button class="kort ${bred ? 'bred' : ''} ${d.kommer ? 'av' : ''} ${BILDER[k] ? 'medbilde' : ''}" ${bildeStil(k, bred ? 900 : 480)} ${d.kommer ? 'disabled' : `data-gaa="${k}"`}><b>${esc(d.tittel)}</b><span>${esc(d.kort)}</span>${merke}</button>`;
+    return `<button class="kort ${bred ? 'bred' : ''} ${d.kommer ? 'av' : ''} ${BILDER[k] ? 'medbilde' : ''}" ${bildeStil(k, bred ? 900 : 480)} ${d.kommer ? 'disabled' : `data-gaa="${k}"`}>${BILDER[k] ? LAG : ''}<b>${esc(d.tittel)}</b><span>${esc(d.kort)}</span>${merke}</button>`;
   }).join('')}</div>`)).join('')}</div>`;
 }
 
@@ -742,8 +785,8 @@ async function tegnHandlinger(def) {
   const felt = SKINNE.find(x => x[0] === ruter.handling)?.[2];
   const status = felt ? `<span class="status" data-til="${st.spiller[felt]}" data-klar="Klar"></span>` : '';
   return `<div class="handlinger"><nav class="skinne" aria-label="Handlinger">${skinne}</nav>
-    <div class="panel"><div class="panelhode ${BILDER[ruter.handling] ? 'medbilde' : ''}" ${bildeStil(ruter.handling, 900)}><div><div class="over">Handling</div><h1>${esc(def.tittel)}</h1></div>${status}</div>
-    <div class="innside">${def === SIDER.fengsel ? '' : fengselBanner()}${await def.vis()}</div></div></div>`;
+    <div class="panel"><div class="panelhode ${BILDER[ruter.handling] ? 'medbilde' : ''}" ${bildeStil(ruter.handling, 900)}>${BILDER[ruter.handling] ? LAG : ''}<div><div class="over">Handling</div><h1>${esc(def.tittel)}</h1></div>${status}</div>
+    <div class="innside">${resultatKort()}${def === SIDER.fengsel ? '' : fengselBanner()}${await def.vis()}</div></div></div>`;
 }
 
 // ---------- felles byggeklosser ----------
@@ -1265,6 +1308,7 @@ document.addEventListener('click', async (e) => {
   const fa = t.closest('[data-fane]'); if (fa) return fane(fa.dataset.fane);
   const g = t.closest('[data-gaa]'); if (g && !t.closest('[data-act]')) { $('#modal').classList.add('hidden'); return gaa(g.dataset.gaa, g.dataset.param ?? null); }
   if (t.closest('[data-utvid]')) { detaljerApen = !detaljerApen; lagre('ug_detaljer', detaljerApen ? '1' : '0'); return tegnTopp(); }
+  if (t.closest('[data-lukk-resultat]')) { sisteResultat = null; t.closest('.resultat')?.remove(); return; }
   const act = t.closest('[data-act]');
   if (act) {
     if (act.disabled || act.dataset.jobber) return;
