@@ -38,7 +38,7 @@ export default async () => {
       return r;
     } catch (e) {
       const kode = e?.code ?? e?.cause?.code;
-      const melding = String(e?.message || e);
+      const melding = String(e?.cause?.message || e?.message || e);
       if (kode === "P0001" && /sitter i fengsel/.test(melding)) bot.inne = true;
       if (kode === "P0001") { const k = fn + ": " + melding.replace(/\d[\d\s]*/g, "#"); regelfeil[k] = (regelfeil[k] || 0) + 1; }
       else notat(bot.navn, fn, args, melding, kode);

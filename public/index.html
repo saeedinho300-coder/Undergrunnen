@@ -156,6 +156,12 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .spill:hover{background:var(--signal2)}
 .spill:disabled{background:var(--line2);box-shadow:none;cursor:not-allowed}
 .spill svg{width:16px;height:16px;margin-left:2px}
+.ventevrapper{position:relative;display:inline-flex;flex:0 0 auto}
+.ventetid{position:absolute;inset:0;display:grid;place-items:center;font-size:.72rem;font-weight:700;color:var(--gul);pointer-events:none;font-variant-numeric:tabular-nums}
+.ventevrapper .spill:disabled svg{opacity:0}
+.ventevrapper .ventetid:empty{display:none}
+.ranknapp:disabled{color:transparent;background:var(--panel2);border:1px solid var(--line2)}
+.ranknapp{width:100%;min-height:64px;font-size:1.15rem;font-family:var(--display);letter-spacing:.06em}
 .aksje{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
 .aksje:first-child{border-top:0}
 .aksjetopp{display:flex;gap:12px;align-items:flex-start}
@@ -417,8 +423,12 @@ async function post(sti, body = {}) {
   let d = {};
   try { d = await r.json(); } catch {}
   if (r.status === 401 && sti === 'rpc') throw new IkkeInnlogget(d.error || 'Du er ikke innlogget');
-  if (!r.ok) throw new Error(d.error || 'Noe gikk galt. Prøv igjen.');
+  if (!r.ok) throw new Error(vennlig(d.error || 'Noe gikk galt. Prøv igjen.'));
   return d;
+}
+// Gjør ventemeldinger lettere å lese: «Du må vente 226 sekunder» → «Du må vente 3:46»
+function vennlig(m) {
+  return String(m).replace(/(\d+) sekunder/g, (x, n) => tid(Number(n))).replace(/^Failed query:.*$/s, 'Noe gikk galt. Prøv igjen om litt.');
 }
 const rpc = async (fn, args = {}) => (await post('rpc', { fn, args })).data;
 
@@ -689,6 +699,8 @@ async function tegnHandlinger(def) {
 
 // ---------- felles byggeklosser ----------
 const knappRad = (fn, args, tekst = '', ekstra = '') => `<button class="spill" data-act="${fn}" data-args='${arg(args)}' aria-label="${esc(tekst || 'Utfør')}" ${ekstra}>${IK.spill}</button>`;
+// Knapp som er grå med nedtelling til ventetiden (felt) er ute
+const venteKnapp = (felt, fn, args, tekst, laast) => laast ? knappRad(fn, args, tekst, 'disabled') : `<span class="ventevrapper">${knappRad(fn, args, tekst, `data-vent="${felt}" ${sekIgjen(st.spiller[felt]) || fengslet() ? 'disabled' : ''}`)}<small class="ventetid" data-ventetid="${felt}"></small></span>`;
 function sparkline(verdier, bredde = 300, hoyde = 34) {
   if (!verdier?.length) return '';
   const min = Math.min(...verdier), max = Math.max(...verdier), sp = max - min || 1;
@@ -714,22 +726,22 @@ const SIDER = {
     return seksjon('Handling', `<div class="liste">${data.krim.map(k => {
       const laast = ri() < k.min_rank, sjanse = Math.min(95, k.sjanse + ri() * 4);
       return `<div class="linjeel ${laast ? 'laast' : ''}"><div class="info"><b>${esc(k.navn)}</b><small>${laast ? 'Krever ' + esc(data.ranker[k.min_rank].navn) : `${kr(k.min_gevinst)}–${kr(k.max_gevinst)} · +${k.exp} erfaring`}</small></div>
-        <span class="sjanse">${laast ? '' : sjanse + ' %'}</span>${knappRad('begaa_krim', { p_id: k.id }, k.navn, laast ? 'disabled' : '')}</div>`;
+        <span class="sjanse">${laast ? '' : sjanse + ' %'}</span>${venteKnapp('krim_klar', 'begaa_krim', { p_id: k.id }, k.navn, laast)}</div>`;
     }).join('')}</div>`, 'Sjanse') + `<p class="dim" style="text-align:center;margin:0;font-size:.88rem">Mislykkes du, får du likevel +1 erfaring.</p>`;
   } },
   bil: { fane: 'handlinger', tittel: 'Biltyveri', async vis() {
     return seksjon('Sted', `<div class="liste">${data.bil_steder.map(b => {
       const laast = ri() < b.min_rank;
       return `<div class="linjeel ${laast ? 'laast' : ''}"><div class="info"><b>${esc(b.navn)}</b><small>${laast ? 'Krever ' + esc(data.ranker[b.min_rank].navn) : `+${2 + b.tier * 2} erfaring · ${['', 'billige biler', 'mellomklasse', 'luksusbiler'][b.tier]}`}</small></div>
-        <span class="sjanse">${laast ? '' : Math.min(90, b.sjanse + ri() * 3) + ' %'}</span>${knappRad('stjel_bil', { p_id: b.id }, b.navn, laast ? 'disabled' : '')}</div>`;
+        <span class="sjanse">${laast ? '' : Math.min(90, b.sjanse + ri() * 3) + ' %'}</span>${venteKnapp('bil_klar', 'stjel_bil', { p_id: b.id }, b.navn, laast)}</div>`;
     }).join('')}</div>`, 'Sjanse') + `<button class="knapp sek full" data-gaa="garasje">Gå til garasjen (${st.biler} biler)</button>`;
   } },
-  ran: { fane: 'handlinger', tittel: 'Ran en spiller', kortnavn: 'Ran', async vis() {
-    const pa = (await rpc('palogget_liste')).filter(p => p.sted === st.spiller.sted && p.navn !== st.spiller.navn);
-    return seksjon('Velg offer', kropp(`<p class="dim">Ran noen i samme by som deg (${esc(st.spiller.sted)}). Du kan ta 5–10 % av kontantene deres. Høyere rank enn offeret gir bedre sjanse.</p>
-      <form data-rpc="ran_spiller" class="rad"><div><label for="ranNavn">Spillernavn</label><input id="ranNavn" name="p_navn" required list="ranListe"></div><button class="knapp">Ran</button></form>
-      <datalist id="ranListe">${pa.map(p => `<option value="${esc(p.navn)}">`).join('')}</datalist>`))
-      + seksjon(`Pålogget i ${esc(st.spiller.sted)}`, pa.length ? `<div class="liste">${pa.map(p => `<div class="linjeel">${avatar(p.navn, 1)}<div class="info"><b>${esc(p.navn)}</b><small>${esc(p.rank)}${p.tag ? ' · [' + esc(p.tag) + ']' : ''}</small></div>${knappRad('ran_spiller', { p_navn: p.navn }, 'Ran ' + p.navn)}</div>`).join('')}</div>` : '<p class="tom">Ingen andre er pålogget i byen nå.</p>');
+  ran: { fane: 'handlinger', tittel: 'Ran', kortnavn: 'Ran', async vis() {
+    const s = st.spiller;
+    return seksjon('Ran noen på gata', kropp(`<p class="dim" style="margin-top:0">Du går ut i ${esc(s.sted)} og raner den første du finner. Lykkes du, tar du 5–10 % av kontantene deres. Offerets rank påvirker sjansen, og høyere rank enn offeret gjør det lettere.</p>
+      <span class="ventevrapper" style="display:flex"><button class="knapp ranknapp" data-act="ran_spiller" data-args='${arg({})}' data-vent="ran_klar" ${sekIgjen(s.ran_klar) || fengslet() ? 'disabled' : ''}>Ran en tilfeldig spiller</button><small class="ventetid" data-ventetid="ran_klar" style="font-size:1rem"></small></span>
+      <p class="dim" style="margin-bottom:0;font-size:.85rem">Ventetid etter ran: 3 minutter. Lykkes: +3 erfaring. Mislykkes: +1 erfaring, og du kan havne i fengsel.</p>`))
+      + `<div class="banner gul"><div>Tips: Ha pengene dine i banken. Det er bare kontanter som kan ranes.</div><button class="knapp sek liten" data-gaa="bank">Til banken</button></div>`;
   } },
   fengsel: { fane: 'handlinger', tittel: 'Fengsel', oppfrisk: 10, async vis() {
     const liste = await rpc('fengsel_liste');
@@ -1154,6 +1166,9 @@ function tikk() {
     if (el.classList.contains('status')) el.classList.toggle('vent', s > 0);
   });
   document.querySelectorAll('[data-kausjon]').forEach(el => { el.textContent = kr(sekIgjen(st.spiller.fengsel_til) * 25); });
+  const inne = fengslet();
+  document.querySelectorAll('[data-vent]').forEach(el => { if (!el.dataset.jobber) el.disabled = inne || sekIgjen(st.spiller[el.dataset.vent]) > 0; });
+  document.querySelectorAll('[data-ventetid]').forEach(el => { const v = sekIgjen(st.spiller[el.dataset.ventetid]); el.textContent = inne ? 'Inne' : v ? tid(v) : ''; });
   document.querySelectorAll('.stopp[data-ring]').forEach(el => {
     const felt = el.dataset.ring; if (!felt) return;
     const r = ringStil(felt, Number(el.dataset.total)), ring = el.querySelector('.ring'), lbl = el.querySelector('small');
@@ -1173,7 +1188,13 @@ document.addEventListener('click', async (e) => {
   const g = t.closest('[data-gaa]'); if (g && !t.closest('[data-act]')) { $('#modal').classList.add('hidden'); return gaa(g.dataset.gaa, g.dataset.param ?? null); }
   if (t.closest('[data-utvid]')) { detaljerApen = !detaljerApen; lagre('ug_detaljer', detaljerApen ? '1' : '0'); return tegnTopp(); }
   const act = t.closest('[data-act]');
-  if (act) { act.disabled = true; await handling(act.dataset.act, act.dataset.args ? JSON.parse(act.dataset.args) : {}); act.disabled = false; return; }
+  if (act) {
+    if (act.disabled || act.dataset.jobber) return;
+    act.dataset.jobber = '1'; act.disabled = true;
+    await handling(act.dataset.act, act.dataset.args ? JSON.parse(act.dataset.args) : {});
+    delete act.dataset.jobber; if (!act.dataset.vent) act.disabled = false; tikk();
+    return;
+  }
   const bj = t.closest('[data-bj]');
   if (bj) { bj.disabled = true; try { const r = await rpc(bj.dataset.bj); if (r.ferdig) { varsel(r.melding, r.ok || r.uavgjort ? 'ok' : 'bad'); await oppdater(); } $('#innhold .innside').innerHTML = bjVisning(r); } catch (err) { varsel(err.message, 'bad'); } return; }
   const sa = t.closest('[data-selg-aksje]');

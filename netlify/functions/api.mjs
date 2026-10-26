@@ -26,7 +26,7 @@ async function hemmelig() {
 
 // Feilkode fra Postgres, uansett hvordan driveren pakker den inn
 const pgKode = (e) => e && (e.code ?? e.cause?.code ?? e.originalError?.code);
-const pgMelding = (e) => String((e && (e.message || e.cause?.message)) || e).replace(/^error:\s*/i, "");
+const pgMelding = (e) => String((e && (e.cause?.message || e.originalError?.message || e.message)) || e).replace(/^error:\s*/i, "");
 
 // ---------- passord (scrypt) ----------
 const scryptP = (pw, salt) => new Promise((ok, feil) =>
