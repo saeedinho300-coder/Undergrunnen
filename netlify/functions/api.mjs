@@ -214,7 +214,7 @@ export default async (req) => {
     if (kode === "22P02" || kode === "22003") return feil("Ugyldig verdi.");
     if (kode === "23505") return feil("Navnet eller e-posten er opptatt.");
     console.error("api-feil", sti, e);
-    return json({ error: "Noe gikk galt på serveren. Prøv igjen.", detalj: pgMelding(e).slice(0, 300), kode }, 500);
+    return feil("Noe gikk galt på serveren. Prøv igjen.", 500);
   }
 };
 
