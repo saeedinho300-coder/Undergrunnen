@@ -6,19 +6,16 @@
 <meta name="theme-color" content="#0b0f15">
 <title>Undergrunnen</title>
 <script>try { const t = localStorage.getItem('ug_tema'); if (t && t !== 'midnatt') document.documentElement.dataset.tema = t; } catch {}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 /* Tema: T-banen om natten. Asfaltblått, signalrødt for handling, mintgrønt for «klar». */
 :root{
   --bg:#0b0f15; --bg2:#0f141c; --panel:#141b25; --panel2:#19222e; --hover:#1f2a38; --line:#243041; --line2:#2e3c50;
   --text:#e8edf3; --dim:#8b98aa; --dim2:#5f6c7e;
-  --signal:#ff4d5a; --signal2:#ff6f79; --signal-bg:#2a1418;
+  --signal:#c92a36; --signal2:#de4651; --signal-bg:#240f12;
   --mint:#3ee3a6; --mint-bg:#0f2a22; --gul:#ffc94d; --blaa:#5cc6ff;
   --r:10px; --r2:14px;
-  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
-  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --display:"Times New Roman",Times,"Liberation Serif",serif;
+  --body:"Times New Roman",Times,"Liberation Serif",serif;
   --navh:64px;
   --paa-signal:#fff; --kort-bg:var(--panel2);
   color-scheme:dark;
@@ -62,7 +59,7 @@ form .felt{margin-bottom:12px}
 .inngang{max-width:440px;margin:0 auto;padding:7vh max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
 .logo{text-align:center;margin-bottom:26px}
 .logo .merke{display:inline-flex;align-items:center;gap:12px}
-.logo h1{font-size:2.8rem;letter-spacing:.06em;text-transform:uppercase}
+.logo h1{font-size:2.8rem;letter-spacing:.01em;text-transform:none}
 .logo p{margin:6px 0 0;color:var(--dim)}
 .skilt{width:44px;height:44px;border-radius:50%;background:var(--signal);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.6rem;color:#fff;box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--signal)}
 .boks{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);padding:18px}
@@ -108,14 +105,14 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .utvid.apen svg{transform:rotate(180deg)}
 .detaljer{padding:4px max(14px,env(safe-area-inset-right,0px)) 12px max(14px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .detaljer .d{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 9px;min-width:0}
-.detaljer .d span{display:block;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim2)}
+.detaljer .d span{display:block;font-size:.68rem;letter-spacing:.01em;text-transform:none;color:var(--dim2)}
 .detaljer .d b{font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .detaljer .full{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 /* ======================= BUNNMENY ======================= */
 #bunn{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--bg2);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 #bunn .indre{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-#bunn button{position:relative;height:var(--navh);border:0;background:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+#bunn button{position:relative;height:var(--navh);border:0;background:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.01em;text-transform:none;cursor:pointer}
 #bunn button svg{width:24px;height:24px}
 #bunn button.aktiv{color:var(--signal2);background:linear-gradient(180deg,var(--signal-bg),transparent)}
 #bunn button.aktiv::before{content:"";position:absolute;top:0;left:18%;right:18%;height:3px;border-radius:0 0 3px 3px;background:var(--signal)}
@@ -132,7 +129,7 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .tilbake svg{width:18px;height:18px}
 .innside{padding:14px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
 .seksjon{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
-.seksjon>h2{font-size:.95rem;letter-spacing:.14em;text-transform:uppercase;color:var(--signal2);padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.seksjon>h2{font-size:.95rem;letter-spacing:.01em;text-transform:none;color:var(--signal2);padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
 .seksjon>h2 .ekstra{margin-left:auto;color:var(--dim);letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:500;font-size:.85rem}
 .seksjon .kropp{padding:14px 16px}
 .seksjon .kropp>p:first-child{margin-top:0}
@@ -176,7 +173,7 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .aksjetopp .info small{display:block}
 .spark{width:100%;height:34px;display:block}
 .tabell{width:100%;border-collapse:collapse}
-.tabell th{font-family:var(--display);font-weight:600;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);text-align:left;padding:10px 16px 6px}
+.tabell th{font-family:var(--display);font-weight:600;font-size:.8rem;letter-spacing:.01em;text-transform:none;color:var(--dim2);text-align:left;padding:10px 16px 6px}
 .tabell td{padding:10px 16px;border-top:1px solid var(--line);vertical-align:middle}
 .tabell .tall,.tabell td.h{text-align:right}
 .tabell tr.meg td{background:var(--hover)}
@@ -186,7 +183,7 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .bar.mint i{background:var(--mint)}
 .nokkeltall{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .nokkeltall div{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
-.nokkeltall span{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim2)}
+.nokkeltall span{display:block;font-size:.7rem;letter-spacing:.01em;text-transform:none;color:var(--dim2)}
 .nokkeltall b{font-size:1.15rem;font-variant-numeric:tabular-nums}
 .banner{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r);border:1px solid #4a2128;background:var(--signal-bg)}
 .banner.gul{border-color:#4d3f17;background:#221c0c}
@@ -198,7 +195,7 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .handlinger{display:grid;grid-template-columns:88px minmax(0,1fr);min-height:calc(100vh - 220px)}
 .skinne{border-right:1px solid var(--line);background:var(--bg2);padding:6px 0;display:flex;flex-direction:column}
 .stopp{position:relative;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:12px 8px 10px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;cursor:pointer;color:var(--dim);text-align:left}
-.stopp b{font-family:var(--display);font-weight:700;font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase;color:var(--text);line-height:1}
+.stopp b{font-family:var(--display);font-weight:700;font-size:1.05rem;letter-spacing:.01em;text-transform:none;color:var(--text);line-height:1}
 .stopp.aktiv{background:var(--panel)}
 .stopp.aktiv b{color:var(--signal2)}
 .stopp.aktiv::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--signal)}
@@ -208,7 +205,7 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .framdrift i{display:block;height:100%;border-radius:2px}
 .panel{min-width:0}
 .panelhode{display:flex;align-items:flex-end;gap:10px;padding:16px 16px 12px;border-bottom:1px solid var(--line)}
-.panelhode .over{font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase}
+.panelhode .over{font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.01em;color:var(--dim2);text-transform:none}
 .panelhode h1{font-size:1.75rem;line-height:1.05}
 .panelhode .status{margin-left:auto;font-family:var(--display);font-weight:700;font-size:1.2rem;color:var(--mint);font-variant-numeric:tabular-nums}
 .panelhode .status.vent{color:var(--gul)}
@@ -274,7 +271,7 @@ button.linjeel{width:100%;background:none;border-left:0;border-right:0;border-bo
 .verktoy{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 8px}
 .verktoy button{width:40px;height:38px;border-radius:8px;border:1px solid var(--line2);background:var(--bg2);color:var(--text);font-size:1rem;cursor:pointer;display:grid;place-items:center}
 .verktoy button:hover{border-color:var(--dim)}
-.fargeprikk{display:block;width:16px;height:16px;border-radius:50%;background:#ff4d5a}
+.fargeprikk{display:block;width:16px;height:16px;border-radius:50%;background:#c92a36}
 .biotekst{display:block;width:calc(100% - 32px);margin:0 16px;font-family:ui-monospace,Menlo,monospace;font-size:.88rem}
 .forhand{margin:12px 16px 16px;padding:12px;border:1px dashed var(--line2);border-radius:var(--r);background:var(--bg2)}
 .bb{line-height:1.6;word-break:break-word}
@@ -593,7 +590,7 @@ function klarNoe() {
   const s = st.spiller; if (fengslet()) return false;
   return ['krim_klar', 'bil_klar', 'ran_klar'].some(k => sekIgjen(s[k]) === 0);
 }
-const TEMAER = [['midnatt', 'Midnatt', '#0b0f15', '#ff4d5a', '#3ee3a6'], ['noir', 'Noir', '#0c0c0e', '#d6a441', '#f3efe7'], ['bordeaux', 'Bordeaux', '#120a0d', '#c23b5a', '#e9b96c'], ['smaragd', 'Smaragd', '#06120e', '#d8b24b', '#5fe1a1'], ['neon', 'Neon', '#0b0715', '#ff3ea5', '#2be8d6']];
+const TEMAER = [['midnatt', 'Midnatt', '#0b0f15', '#c92a36', '#3ee3a6'], ['noir', 'Noir', '#0c0c0e', '#d6a441', '#f3efe7'], ['bordeaux', 'Bordeaux', '#120a0d', '#c23b5a', '#e9b96c'], ['smaragd', 'Smaragd', '#06120e', '#d8b24b', '#5fe1a1'], ['neon', 'Neon', '#0b0715', '#ff3ea5', '#2be8d6']];
 function settTema(t) {
   if (t === 'midnatt') delete document.documentElement.dataset.tema; else document.documentElement.dataset.tema = t;
   lagre('ug_tema', t);
@@ -1098,7 +1095,7 @@ const VERKTOY = [
   ['color', 'Farge', '<span class="fargeprikk"></span>'], ['size', 'Størrelse', 'Aa'], ['list', 'Liste', '☰'], ['quote', 'Sitat', '❝'],
   ['left', 'Venstrejuster', '⇤'], ['center', 'Midtstill', '↔'], ['right', 'Høyrejuster', '⇥'], ['url', 'Lenke', '🔗'],
   ['img', 'Bilde', '🖼'], ['code', 'Kode', '&lt;/&gt;'], ['hr', 'Strek', '—'], ['emoji', 'Emoji', '🙂']];
-const FARGER = ['#ff4d5a', '#ffc94d', '#3ee3a6', '#5cc6ff', '#c084fc', '#ffffff'];
+const FARGER = ['#c92a36', '#ffc94d', '#3ee3a6', '#5cc6ff', '#c084fc', '#ffffff'];
 let profilUtkast = {};
 function settInn(ta, før, etter = '') {
   const a = ta.selectionStart, b = ta.selectionEnd, valgt = ta.value.slice(a, b);
