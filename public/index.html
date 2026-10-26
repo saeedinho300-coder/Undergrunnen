@@ -174,7 +174,7 @@ async function post(sti, body = {}) {
   let d = {};
   try { d = await r.json(); } catch { /* ikke json */ }
   if (r.status === 401 && sti === 'rpc') throw new IkkeInnlogget(d.error || 'Du er ikke innlogget');
-  if (!r.ok) throw new Error(d.error || 'Noe gikk galt. Prøv igjen.');
+  if (!r.ok) throw new Error((d.error || 'Noe gikk galt. Prøv igjen.') + (d.detalj ? ' (' + d.detalj + ')' : ''));
   return d;
 }
 async function rpc(fn, args = {}) {

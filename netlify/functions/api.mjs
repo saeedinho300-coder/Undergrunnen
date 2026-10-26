@@ -2,7 +2,13 @@
 import { getDatabase } from "@netlify/database";
 import { scrypt, randomBytes, timingSafeEqual, createHmac } from "node:crypto";
 
-const db = getDatabase();
+let _db;
+const db = () => (_db ??= getDatabase());
+// Tåler både array og { rows } som svar fra driveren
+async function q(strings, ...vals) {
+  const r = await db().sql(strings, ...vals);
+  return Array.isArray(r) ? r : (r?.rows ?? []);
+}
 const COOKIE = "ug_okt";
 const OKT_DAGER = 30;
 
@@ -59,8 +65,14 @@ const feil = (melding, status = 400) => json({ error: melding }, status);
 
 // ---------- handler ----------
 export default async (req) => {
-  if (req.method !== "POST") return feil("Kun POST", 405);
   const sti = new URL(req.url).pathname.replace(/^\/api\/?/, "");
+  if (sti === "helse") {
+    const svar = { hemmelighet: !!(env("SESSION_SECRET") && env("SESSION_SECRET").length >= 32) };
+    try { const r = await q`select count(*)::int as n from kontoer`; svar.database = "ok"; svar.kontoer = r[0]?.n; }
+    catch (e) { svar.database = String(e && (e.message || e)).slice(0, 300); }
+    return json(svar);
+  }
+  if (req.method !== "POST") return feil("Kun POST", 405);
   let body = {};
   try { body = await req.json(); } catch { /* tom body er greit */ }
 
@@ -72,13 +84,13 @@ export default async (req) => {
       if (passord.length < 6 || passord.length > 200) return feil("Passordet må ha minst 6 tegn.");
 
       if (sti === "registrer") {
-        const finnes = await db.sql`select 1 from kontoer where lower(epost) = ${epost}`;
+        const finnes = await q`select 1 from kontoer where lower(epost) = ${epost}`;
         if (finnes.length) return feil("E-posten er allerede registrert.");
         const hash = await hashPassord(passord);
-        const [k] = await db.sql`insert into kontoer (epost, passord_hash) values (${epost}, ${hash}) returning id`;
+        const [k] = await q`insert into kontoer (epost, passord_hash) values (${epost}, ${hash}) returning id`;
         return json({ ok: true }, 200, { "set-cookie": cookie(lagOkt(k.id), OKT_DAGER * 86400) });
       }
-      const [k] = await db.sql`select id, passord_hash from kontoer where lower(epost) = ${epost}`;
+      const [k] = await q`select id, passord_hash from kontoer where lower(epost) = ${epost}`;
       if (!k || !(await sjekkPassord(passord, k.passord_hash))) return feil("Feil e-post eller passord.", 401);
       return json({ ok: true }, 200, { "set-cookie": cookie(lagOkt(k.id), OKT_DAGER * 86400) });
     }
@@ -91,7 +103,7 @@ export default async (req) => {
       const fn = String(body.fn || "");
       if (!/^[a-z_]{1,40}$/.test(fn)) return feil("Ukjent handling");
       const args = JSON.stringify(body.args && typeof body.args === "object" ? body.args : {});
-      const [rad] = await db.sql`select public.api(${uid}::uuid, ${fn}, ${args}::jsonb) as r`;
+      const [rad] = await q`select public.api(${uid}::uuid, ${fn}, ${args}::jsonb) as r`;
       return json({ data: rad ? rad.r : null });
     }
 
@@ -101,8 +113,8 @@ export default async (req) => {
     if (e && e.code === "P0001") return feil(e.message);
     if (e && (e.code === "22P02" || e.code === "22003")) return feil("Ugyldig verdi.");
     if (e && e.code === "23505") return feil("Navnet er opptatt.");
-    console.error(e);
-    return feil("Noe gikk galt på serveren. Prøv igjen.", 500);
+    console.error("api-feil", sti, e);
+    return json({ error: "Noe gikk galt på serveren. Prøv igjen.", detalj: String(e && (e.message || e)).slice(0, 300), kode: e && e.code }, 500);
   }
 };
 
