@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0f15">
 <title>Undergrunnen</title>
+<script>try { const t = localStorage.getItem('ug_tema'); if (t && t !== 'midnatt') document.documentElement.dataset.tema = t; } catch {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -19,8 +20,14 @@
   --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --navh:64px;
+  --paa-signal:#fff; --kort-bg:var(--panel2);
   color-scheme:dark;
 }
+/* Fargetemaer (velges under Din profil → Utseende) */
+:root[data-tema="noir"]{--bg:#0c0c0e;--bg2:#111113;--panel:#17171a;--panel2:#1e1e22;--hover:#26262b;--line:#29292f;--line2:#36363d;--text:#f3efe7;--dim:#a39d92;--dim2:#6d685f;--signal:#d6a441;--signal2:#ecbe5c;--signal-bg:#28200f;--paa-signal:#17120a;--mint:#82d89c;--mint-bg:#12241a;--gul:#ecbe5c;--blaa:#9cbcff}
+:root[data-tema="bordeaux"]{--bg:#120a0d;--bg2:#170d11;--panel:#1f1217;--panel2:#28171e;--hover:#321d26;--line:#3a2530;--line2:#4a2f3c;--text:#f6ebe7;--dim:#b99fa6;--dim2:#7e6670;--signal:#c23b5a;--signal2:#de5a77;--signal-bg:#2e1018;--paa-signal:#fff;--mint:#8fd6b0;--mint-bg:#13261d;--gul:#e9b96c;--blaa:#a6c6ff}
+:root[data-tema="smaragd"]{--bg:#06120e;--bg2:#091712;--panel:#0e1f19;--panel2:#132a21;--hover:#19352a;--line:#1d392f;--line2:#29493d;--text:#ebf4ef;--dim:#94afa3;--dim2:#5f7b6f;--signal:#d8b24b;--signal2:#ebc662;--signal-bg:#262410;--paa-signal:#14110a;--mint:#5fe1a1;--mint-bg:#0e2a1f;--gul:#ebc662;--blaa:#82c9ff}
+:root[data-tema="neon"]{--bg:#0b0715;--bg2:#100a1d;--panel:#170f28;--panel2:#1e1533;--hover:#281c43;--line:#2c2148;--line2:#3b2c5f;--text:#f1edff;--dim:#a99ec9;--dim2:#706691;--signal:#ff3ea5;--signal2:#ff6dbd;--signal-bg:#2d0d22;--paa-signal:#fff;--mint:#2be8d6;--mint-bg:#0a2a2a;--gul:#ffd447;--blaa:#7fa9ff}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 var(--body);-webkit-text-size-adjust:100%}
 body{min-height:100vh}
@@ -36,7 +43,7 @@ input,select,textarea{width:100%;background:var(--bg2);border:1px solid var(--li
 input:focus,select:focus,textarea:focus{outline:2px solid var(--signal);outline-offset:-1px;border-color:transparent}
 textarea{resize:vertical}
 label{display:block;font-size:.8rem;color:var(--dim);margin:0 0 4px}
-.knapp,button.knapp{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--r);padding:.65em 1.1em;background:var(--signal);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none}
+.knapp,button.knapp{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--r);padding:.65em 1.1em;background:var(--signal);color:var(--paa-signal);font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none}
 .knapp:hover{background:var(--signal2)}
 .knapp:disabled{opacity:.4;cursor:not-allowed}
 .knapp.sek{background:var(--panel2);border:1px solid var(--line2);color:var(--text)}
@@ -152,7 +159,7 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .linjeel .info small{display:block;color:var(--dim);font-size:.82rem}
 .linjeel .sjanse{color:var(--dim);font-size:.9rem;white-space:nowrap;font-variant-numeric:tabular-nums}
 .linjeel.laast{opacity:.45}
-.spill{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:0;background:var(--signal);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 0 0 3px var(--signal-bg)}
+.spill{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:0;background:var(--signal);color:var(--paa-signal);display:grid;place-items:center;cursor:pointer;box-shadow:0 0 0 3px var(--signal-bg)}
 .spill:hover{background:var(--signal2)}
 .spill:disabled{background:var(--line2);box-shadow:none;cursor:not-allowed}
 .spill svg{width:16px;height:16px;margin-left:2px}
@@ -188,20 +195,17 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .pre{white-space:pre-wrap;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.88rem;margin:6px 0 0}
 
 /* ======================= HANDLINGER: ikonrad ======================= */
-.handlinger{display:grid;grid-template-columns:76px minmax(0,1fr);min-height:calc(100vh - 220px)}
-.skinne{border-right:1px solid var(--line);background:var(--bg2);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:4px}
-.stopp{position:relative;width:100%;border:0;background:none;padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:var(--text)}
+.handlinger{display:grid;grid-template-columns:88px minmax(0,1fr);min-height:calc(100vh - 220px)}
+.skinne{border-right:1px solid var(--line);background:var(--bg2);padding:6px 0;display:flex;flex-direction:column}
+.stopp{position:relative;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:12px 8px 10px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;cursor:pointer;color:var(--dim);text-align:left}
+.stopp b{font-family:var(--display);font-weight:700;font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase;color:var(--text);line-height:1}
 .stopp.aktiv{background:var(--panel)}
-.stopp.aktiv::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--signal)}
-.ring{--p:1;--f:var(--mint);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--f) calc(var(--p)*1turn),var(--line) 0)}
-.ring>span{width:44px;height:44px;border-radius:50%;background:var(--bg2);display:grid;place-items:center}
-.stopp.aktiv .ring>span{background:var(--panel)}
-.ring svg{width:22px;height:22px}
-.stopp small{font-size:.72rem;font-weight:700;color:var(--mint);font-variant-numeric:tabular-nums;line-height:1}
+.stopp.aktiv b{color:var(--signal2)}
+.stopp.aktiv::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--signal)}
+.stopp small{font-size:.74rem;font-weight:700;color:var(--mint);font-variant-numeric:tabular-nums;line-height:1}
 .stopp small.vent{color:var(--gul)}
-.stopp em{display:none;font-style:normal;font-size:.72rem;color:var(--dim)}
-.stopp.aktiv em{color:var(--text)}
-@media (min-width:640px){.stopp em{display:block}}
+.framdrift{display:block;width:100%;height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:3px}
+.framdrift i{display:block;height:100%;border-radius:2px}
 .panel{min-width:0}
 .panelhode{display:flex;align-items:flex-end;gap:10px;padding:16px 16px 12px;border-bottom:1px solid var(--line)}
 .panelhode .over{font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase}
@@ -240,6 +244,12 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .meldingkropp{white-space:pre-wrap;padding:0 16px 14px;color:var(--text)}
 
 
+/* temavalg */
+.temavalg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;padding:12px}
+.temavalg button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:var(--r);border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-weight:600;cursor:pointer}
+.temavalg button.aktiv{border-color:var(--signal);box-shadow:inset 0 0 0 1px var(--signal)}
+.prover{display:flex;gap:4px}
+.prover i{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.15)}
 /* profil */
 .profiltopp{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:8px 0 4px}
 .profiltopp h2{font-size:1.8rem;margin-top:6px}
@@ -286,7 +296,7 @@ button.linjeel{width:100%;background:none;border-left:0;border-right:0;border-bo
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (min-width:640px){
   .rutenett{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .handlinger{grid-template-columns:96px minmax(0,1fr)}
+  .handlinger{grid-template-columns:120px minmax(0,1fr)}
   .nokkeltall{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 @media (max-width:440px){
@@ -583,6 +593,12 @@ function klarNoe() {
   const s = st.spiller; if (fengslet()) return false;
   return ['krim_klar', 'bil_klar', 'ran_klar'].some(k => sekIgjen(s[k]) === 0);
 }
+const TEMAER = [['midnatt', 'Midnatt', '#0b0f15', '#ff4d5a', '#3ee3a6'], ['noir', 'Noir', '#0c0c0e', '#d6a441', '#f3efe7'], ['bordeaux', 'Bordeaux', '#120a0d', '#c23b5a', '#e9b96c'], ['smaragd', 'Smaragd', '#06120e', '#d8b24b', '#5fe1a1'], ['neon', 'Neon', '#0b0715', '#ff3ea5', '#2be8d6']];
+function settTema(t) {
+  if (t === 'midnatt') delete document.documentElement.dataset.tema; else document.documentElement.dataset.tema = t;
+  lagre('ug_tema', t);
+  const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = getComputedStyle(document.documentElement).getPropertyValue('--bg2').trim();
+}
 const skjulCasino = () => hent('ug_skjul_casino') === '1';
 function tegnBunn() {
   const v = st.varsler || {};
@@ -674,21 +690,21 @@ function tegnHub(id) {
 
 // ---------- Handlinger: ikonrad + panel ----------
 const SKINNE = [
-  ['krim', 'krim', 'krim_klar', 180], ['bil', 'bil', 'bil_klar', 240], ['ran', 'ran', 'ran_klar', 180],
-  ['fengsel', 'fengsel', 'utbrudd_klar', 30], ['drap', 'drap', 'angrep_klar', 300], ['reise', 'reise', 'reise_klar', 300],
-  ['sykehus', 'sykehus', null, 0], ['garasje', 'garasje', null, 0]];
+  ['krim', 'Krim', 'krim_klar', 180], ['bil', 'Biler', 'bil_klar', 240], ['ran', 'Ran', 'ran_klar', 180],
+  ['fengsel', 'Fengsel', 'utbrudd_klar', 30], ['drap', 'Drap', 'angrep_klar', 300], ['reise', 'Reise', 'reise_klar', 300],
+  ['sykehus', 'Sykehus', null, 0], ['garasje', 'Garasje', null, 0]];
 function ringStil(felt, total) {
   const s = felt ? sekIgjen(st.spiller[felt]) : 0;
   if (!s) return { p: 1, f: 'var(--mint)', tekst: '✓', vent: false };
   return { p: Math.max(.04, 1 - s / Math.max(total, s)), f: 'var(--gul)', tekst: tidKort(s), vent: true };
 }
 async function tegnHandlinger(def) {
-  const skinne = SKINNE.map(([id, ikon, felt, total]) => {
+  const skinne = SKINNE.map(([id, navn, felt, total]) => {
     const r = ringStil(felt, total);
     const fengselsVent = id === 'fengsel' && fengslet();
-    return `<button class="stopp ${ruter.handling === id ? 'aktiv' : ''}" data-gaa="${id}" aria-label="${esc(SIDER[id].tittel)}" data-ring="${felt || ''}" data-total="${total}">
-      <span class="ring" style="--p:${fengselsVent ? .5 : r.p};--f:${fengselsVent ? 'var(--signal)' : r.f}"><span>${IK[ikon]}</span></span>
-      <small class="${r.vent || fengselsVent ? 'vent' : ''}">${fengselsVent ? 'Inne' : r.tekst}</small><em>${esc(SIDER[id].kortnavn || SIDER[id].tittel)}</em></button>`;
+    return `<button class="stopp ${ruter.handling === id ? 'aktiv' : ''}" data-gaa="${id}" data-ring="${felt || ''}" data-total="${total}">
+      <b>${navn}</b><small class="${r.vent || fengselsVent ? 'vent' : ''}">${felt ? (fengselsVent ? 'Inne' : r.vent ? r.tekst : 'Klar') : '&nbsp;'}</small>
+      ${felt ? `<span class="framdrift"><i style="width:${(fengselsVent ? .5 : r.p) * 100}%;background:${fengselsVent ? 'var(--signal)' : r.f}"></i></span>` : ''}</button>`;
   }).join('');
   const felt = SKINNE.find(x => x[0] === ruter.handling)?.[2];
   const status = felt ? `<span class="status" data-til="${st.spiller[felt]}" data-klar="Klar"></span>` : '';
@@ -949,10 +965,13 @@ const SIDER = {
     return `<div class="profiltopp">${avatar(s.navn, 0, 1)}<h2>${esc(s.navn)}</h2><span class="dim">${esc(st.rank)} · ${rankProsent()} %</span></div>`
       + seksjon('Utstyr', `<div class="liste"><div class="linjeel"><div class="info dim">Våpen</div><b>${esc(vapenNavn(s.vapen))}</b></div><div class="linjeel"><div class="info dim">Beskyttelse</div><b>${esc(beskNavn(s.beskyttelse))}</b></div><div class="linjeel"><div class="info dim">Kuler</div><b class="tall">${tall(s.kuler)}</b></div></div>`)
       + seksjon('Andre seksjoner', `<div class="liste">${[['profil', 'Se offentlig profil', s.navn], ['prestasjoner', 'Prestasjoner'], ['statistikk', 'Din statistikk'], ['ranker', 'Ranker og regler'], ['meldinger', 'Handlingslogg', 'logg']].map(([g, t, pa]) => `<button class="linjeel pil" data-gaa="${g}" ${pa ? `data-param="${esc(pa)}"` : ''}><div class="info"><b>${t}</b></div></button>`).join('')}</div>`)
+      + seksjon('Utseende', `<div class="temavalg">${TEMAER.map(([id, navn, a, b, c]) => `<button type="button" data-velg-tema="${id}" class="${(hent('ug_tema') || 'midnatt') === id ? 'aktiv' : ''}"><span class="prover"><i style="background:${a}"></i><i style="background:${b}"></i><i style="background:${c}"></i></span>${navn}</button>`).join('')}</div>`)
       + seksjon('Innstillinger', `<div class="liste"><button class="linjeel pil" data-gaa="rediger_profil"><div class="info"><b>Rediger profil</b><small>Bilde, kjønn, musikk og om meg</small></div></button>
         <label class="linjeel bryter"><div class="info"><b>Skjul casino</b><small>Tar casino-fanen bort fra menyen nederst. Gjelder bare denne enheten.</small></div><input type="checkbox" id="skjulCasino" ${skjulCasino() ? 'checked' : ''}><span class="spor" aria-hidden="true"></span></label>
         <button class="linjeel" data-loggut><div class="info"><b class="bad">Logg ut</b></div></button></div>`);
-  }, etter() { $('#skjulCasino').onchange = (e) => { lagre('ug_skjul_casino', e.target.checked ? '1' : '0'); if (e.target.checked && ruter.fane === 'casino') ruter.fane = 'sosial'; tegnBunn(); varsel(e.target.checked ? 'Casino er skjult fra menyen.' : 'Casino vises igjen i menyen.'); }; } },
+  }, etter() {
+    document.querySelectorAll('[data-velg-tema]').forEach(k => k.onclick = () => { settTema(k.dataset.velgTema); document.querySelectorAll('[data-velg-tema]').forEach(x => x.classList.toggle('aktiv', x === k)); });
+    $('#skjulCasino').onchange = (e) => { lagre('ug_skjul_casino', e.target.checked ? '1' : '0'); if (e.target.checked && ruter.fane === 'casino') ruter.fane = 'sosial'; tegnBunn(); varsel(e.target.checked ? 'Casino er skjult fra menyen.' : 'Casino vises igjen i menyen.'); }; } },
 
   rediger_profil: { fane: 'sosial', tittel: 'Profilinnstillinger', async vis() {
     const p = await rpc('min_profil');
@@ -1171,9 +1190,9 @@ function tikk() {
   document.querySelectorAll('[data-ventetid]').forEach(el => { const v = sekIgjen(st.spiller[el.dataset.ventetid]); el.textContent = inne ? 'Inne' : v ? tid(v) : ''; });
   document.querySelectorAll('.stopp[data-ring]').forEach(el => {
     const felt = el.dataset.ring; if (!felt) return;
-    const r = ringStil(felt, Number(el.dataset.total)), ring = el.querySelector('.ring'), lbl = el.querySelector('small');
-    if (el.dataset.gaa === 'fengsel' && fengslet()) { ring.style.setProperty('--p', .5); ring.style.setProperty('--f', 'var(--signal)'); lbl.textContent = 'Inne'; lbl.className = 'vent'; return; }
-    ring.style.setProperty('--p', r.p); ring.style.setProperty('--f', r.f); lbl.textContent = r.tekst; lbl.className = r.vent ? 'vent' : '';
+    const r = ringStil(felt, Number(el.dataset.total)), bar = el.querySelector('.framdrift i'), lbl = el.querySelector('small');
+    if (el.dataset.gaa === 'fengsel' && fengslet()) { bar.style.width = '50%'; bar.style.background = 'var(--signal)'; lbl.textContent = 'Inne'; lbl.className = 'vent'; return; }
+    bar.style.width = r.p * 100 + '%'; bar.style.background = r.f; lbl.textContent = r.vent ? r.tekst : 'Klar'; lbl.className = r.vent ? 'vent' : '';
   });
 }
 setInterval(tikk, 1000);
