@@ -24,6 +24,10 @@ export default async () => {
   const q = async (strings, ...vals) => { const r = await db.sql(strings, ...vals); return Array.isArray(r) ? r : (r?.rows ?? []); };
   const regelfeil = {}; const uventet = []; let kall = 0; let aktive = 0;
 
+  // Daglig bankrente (2 %). Databasen sørger for at den bare utbetales én gang per dato.
+  try { await q`select public.daglig_rente()`; }
+  catch (e) { uventet.push({ tid: new Date().toISOString(), bot: "system", fn: "daglig_rente", args: {}, feil: String(e?.cause?.message || e?.message || e).slice(0, 300), kode: e?.cause?.code ?? null }); }
+
   const notat = (bot, fn, args, feil, kode) => {
     uventet.push({ tid: new Date().toISOString(), bot, fn, args, feil: String(feil).slice(0, 300), kode: kode ?? null });
   };

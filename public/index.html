@@ -787,7 +787,7 @@ const SIDER = {
   bank: { fane: 'handel', tittel: 'Bank', kort: 'Sett inn, ta ut, overfør', async vis() {
     const s = st.spiller;
     return `<div class="nokkeltall"><div><span>Kontanter</span><b class="ok">${kr(s.penger)}</b></div><div><span>I banken</span><b>${kr(s.bank)}</b></div></div>`
-      + seksjon('Sett inn og ta ut', kropp(`<p class="dim">Penger i banken kan ikke ranes eller tas av den som dreper deg.</p>
+      + seksjon('Sett inn og ta ut', kropp(`<p class="dim">Penger i banken kan ikke ranes eller tas av den som dreper deg.</p><div class="banner" style="margin-bottom:12px"><div>Banken gir <b>2 % rente hver dag</b>, utbetalt like etter midnatt. ${s.bank >= 50 ? `Neste rente: <b class="ok">${kr(Math.floor(s.bank * 0.02))}</b>` : 'Sett inn penger for å få rente.'}</div></div>
         <form data-rpc="bank_sett_inn" class="rad" style="margin-bottom:10px"><div><label for="inn">Sett inn</label><input id="inn" name="p_belop" type="number" min="1" required data-num></div><button class="knapp">Sett inn</button><button type="button" class="knapp sek" data-act="bank_sett_inn" data-args='${arg({ p_belop: s.penger })}' ${s.penger ? '' : 'disabled'}>Alt</button></form>
         <form data-rpc="bank_ta_ut" class="rad"><div><label for="ut">Ta ut</label><input id="ut" name="p_belop" type="number" min="1" required data-num></div><button class="knapp sek">Ta ut</button></form>`))
       + seksjon('Overfør til spiller', kropp(`<form data-rpc="overfor" class="rad"><div><label for="ovNavn">Spiller</label><input id="ovNavn" name="p_navn" required></div><div><label for="ovBel">Beløp</label><input id="ovBel" name="p_belop" type="number" min="1" required data-num></div><button class="knapp">Overfør</button></form>`));
