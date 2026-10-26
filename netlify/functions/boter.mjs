@@ -158,9 +158,10 @@ export default async () => {
         and (fengsel_til is null or fengsel_til < now()) and (beskyttet_til is null or beskyttet_til < now()) order by random() limit 1`;
       if (m) await api(bot, "ran_spiller", { p_navn: m.navn });
     }
-    if (s.vapen > 0 && s.kuler > 60 && klar("angrep_klar") && sjanse(0.03)) {
+    // Bare Hitman og over kan drepe, og bare andre Hitman-er og over kan drepes
+    if (s.vapen > 0 && s.kuler > 60 && st.rank_indeks >= 3 && klar("angrep_klar") && sjanse(0.03)) {
       const [m] = await q`select navn from spillere where er_bot and sted = ${s.sted} and id <> ${bot.id}::uuid and helse > 60
-        and (fengsel_til is null or fengsel_til < now()) and (beskyttet_til is null or beskyttet_til < now()) order by random() limit 1`;
+        and rank_indeks(exp) >= _hitman() and (fengsel_til is null or fengsel_til < now()) order by random() limit 1`;
       if (m) await api(bot, "angrip", { p_navn: m.navn, p_kuler: 30 });
     }
     if (s.penger > 10000 && sjanse(0.02)) await api(bot, "detektiv", { p_navn: tilfeldig(boter).navn });

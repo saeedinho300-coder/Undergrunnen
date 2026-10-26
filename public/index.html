@@ -6,6 +6,9 @@
 <meta name="theme-color" content="#0b0f15">
 <title>Undergrunnen</title>
 <script>try { const t = localStorage.getItem('ug_tema'); if (t && t !== 'midnatt') document.documentElement.dataset.tema = t; } catch {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 /* Tema: T-banen om natten. Asfaltblått, signalrødt for handling, mintgrønt for «klar». */
 :root{
@@ -14,8 +17,9 @@
   --signal:#c92a36; --signal2:#de4651; --signal-bg:#240f12;
   --mint:#3ee3a6; --mint-bg:#0f2a22; --gul:#ffc94d; --blaa:#5cc6ff;
   --r:10px; --r2:14px;
-  --display:"Times New Roman",Times,"Liberation Serif",serif;
-  --body:"Times New Roman",Times,"Liberation Serif",serif;
+  --display:"Libre Baskerville",Baskerville,"Baskerville Old Face","GFS Baskerville",Georgia,serif;
+  --body:"Libre Baskerville",Baskerville,"Baskerville Old Face","GFS Baskerville",Georgia,serif;
+  --gull:#d6a441; --gull-mork:#6e5626;
   --navh:64px;
   --paa-signal:#fff; --kort-bg:var(--panel2);
   color-scheme:dark;
@@ -27,7 +31,7 @@
 :root[data-tema="neon"]{--bg:#0b0715;--bg2:#100a1d;--panel:#170f28;--panel2:#1e1533;--hover:#281c43;--line:#2c2148;--line2:#3b2c5f;--text:#f1edff;--dim:#a99ec9;--dim2:#706691;--signal:#ff3ea5;--signal2:#ff6dbd;--signal-bg:#2d0d22;--paa-signal:#fff;--mint:#2be8d6;--mint-bg:#0a2a2a;--gul:#ffd447;--blaa:#7fa9ff}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 var(--body);-webkit-text-size-adjust:100%}
-body{min-height:100vh}
+body{min-height:100vh;font-variant-numeric:lining-nums}
 button,input,select,textarea{font:inherit;color:inherit}
 a{color:var(--blaa)}
 .hidden{display:none!important}
@@ -228,16 +232,18 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 
 /* ======================= HANDLINGER: ikonrad ======================= */
 .handlinger{display:grid;grid-template-columns:88px minmax(0,1fr);min-height:calc(100vh - 220px)}
-.skinne{border-right:1px solid var(--line);background:var(--bg2);padding:6px 0;display:flex;flex-direction:column}
-.stopp{position:relative;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:12px 8px 10px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;cursor:pointer;color:var(--dim);text-align:left}
-.stopp b{font-family:var(--display);font-weight:700;font-size:1.05rem;letter-spacing:.01em;text-transform:none;color:var(--text);line-height:1}
-.stopp.aktiv{background:var(--panel)}
-.stopp.aktiv b{color:var(--signal2)}
-.stopp.aktiv::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--signal)}
-.stopp small{font-size:.74rem;font-weight:700;color:var(--mint);font-variant-numeric:tabular-nums;line-height:1}
-.stopp small.vent{color:var(--gul)}
-.framdrift{display:block;width:100%;height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:3px}
-.framdrift i{display:block;height:100%;border-radius:2px}
+.skinne{border-right:1px solid #26221c;background:#0c0c0e;padding:4px 0;display:flex;flex-direction:column}
+/* Gullkant: navn i Baskerville, status i kursiv, tynn gullstripe til venstre som fylles mens du venter */
+.stopp{position:relative;width:100%;border:0;border-bottom:1px solid #1d1a16;background:none;padding:13px 8px 12px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;cursor:pointer;color:#a39d92;text-align:left}
+.stopp:hover{background:#141210}
+.stopp b{font-family:var(--display);font-weight:400;font-size:1rem;letter-spacing:.01em;text-transform:none;color:#efe6d6;line-height:1.1}
+.stopp.aktiv{background:linear-gradient(90deg,#2a2213,rgba(42,34,19,0))}
+.stopp.aktiv b{color:var(--gull);font-weight:700}
+.stopp small{font-family:var(--body);font-style:italic;font-size:.78rem;font-weight:400;color:var(--gull);font-variant-numeric:tabular-nums;line-height:1}
+.stopp small.vent{color:#a39d92}
+.stopp small.inne{color:var(--signal2)}
+.framdrift{position:absolute;left:0;top:0;bottom:0;width:3px;background:#221d15;overflow:hidden}
+.framdrift i{position:absolute;left:0;right:0;bottom:0;display:block;transition:height .9s linear}
 .panel{min-width:0}
 .panelhode{display:flex;align-items:flex-end;gap:10px;padding:16px 16px 12px;border-bottom:1px solid var(--line)}
 .panelhode .over{font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.01em;color:var(--dim2);text-transform:none}
@@ -592,9 +598,8 @@ function tegnTopp() {
         <b>${esc(s.navn)}${st.admin && s.navn !== 'Admin' ? ' <span class="adminmerke">Admin</span>' : ''}${st.gjeng_tag ? ` <span class="dim" style="font-size:.85rem">[${esc(st.gjeng_tag)}]</span>` : ''}</b>
         <span>${esc(st.rank)} · <span class="pst">${st.neste_rank ? rankProsent() + ' %' : 'MAKS'}</span><span class="by"> · ${esc(s.sted)}</span></span>
       </button>
-      <div class="statboks" aria-label="Kontanter, poeng og kuler">
+      <div class="statboks" aria-label="Kontanter og kuler">
         <div class="penger" title="Kontanter: ${kr(s.penger)}">${IK.penger}<b>${kompakt(s.penger)}</b></div>
-        <div title="Poeng: ${tall(s.poeng)}">${IK.poeng}<b>${kompakt(s.poeng)}</b></div>
         <div title="Kuler: ${tall(s.kuler)}">${IK.kuler}<b>${kompakt(s.kuler)}</b></div>
       </div>
       <button class="bjelle" data-gaa="meldinger" data-param="${!st.uleste && st.uleste_logg ? 'logg' : ''}" aria-label="Meldinger og logg">${IK.bjelle}${(st.uleste + (st.uleste_logg || 0)) ? `<span class="prikk">${(st.uleste + (st.uleste_logg || 0)) > 9 ? '9+' : st.uleste + (st.uleste_logg || 0)}</span>` : ''}</button>
@@ -608,7 +613,7 @@ function tegnTopp() {
       <div class="d"><span>Våpen</span><b>${esc(vapenNavn(s.vapen))}</b></div>
       <div class="d"><span>Beskyttelse</span><b>${esc(beskNavn(s.beskyttelse))}</b></div>
       <div class="d"><span>By</span><b>${esc(s.sted)}</b></div>
-      <div class="full">${sekIgjen(s.beskyttet_til) ? `<span class="merke mint">Beskyttet <span data-til="${s.beskyttet_til}"></span></span>` : ''}
+      <div class="full">${ri() < hitman() ? '<span class="merke mint">Nybegynnerbeskyttelse til Hitman</span>' : ''}
         <span class="dim" style="font-size:.85rem">${tall(s.exp)} erfaring${st.neste_rank ? ' · neste: ' + esc(st.neste_rank) : ''}</span>
         <button class="knapp sek liten" style="margin-left:auto" data-loggut>Logg ut</button></div>
     </div>` : ''}`;
@@ -778,11 +783,12 @@ async function tegnHandlinger(def) {
   const skinne = SKINNE.map(([id, navn, felt, total]) => {
     const r = ringStil(felt, total);
     const fengselsVent = id === 'fengsel' && fengslet();
+    if (id === 'drap' && ri() < hitman()) return `<button class="stopp ${ruter.handling === id ? 'aktiv' : ''}" data-gaa="${id}"><b>${navn}</b><small class="vent">fra Hitman</small></button>`;
     return `<button class="stopp ${ruter.handling === id ? 'aktiv' : ''}" data-gaa="${id}" data-ring="${felt || ''}" data-total="${total}">
-      <b>${navn}</b><small class="${r.vent || fengselsVent ? 'vent' : ''}">${felt ? (fengselsVent ? 'Inne' : r.vent ? r.tekst : 'Klar') : '&nbsp;'}</small>
-      ${felt ? `<span class="framdrift"><i style="width:${(fengselsVent ? .5 : r.p) * 100}%;background:${fengselsVent ? 'var(--signal)' : r.f}"></i></span>` : ''}</button>`;
+      <b>${navn}</b><small class="${fengselsVent ? 'inne' : r.vent ? 'vent' : ''}">${felt ? (fengselsVent ? 'inne' : r.vent ? 'om ' + r.tekst : 'klar') : '&nbsp;'}</small>
+      ${felt ? `<span class="framdrift"><i style="height:${(fengselsVent ? .5 : r.p) * 100}%;background:${fengselsVent ? 'var(--signal)' : r.vent ? 'var(--gull-mork)' : 'var(--gull)'}"></i></span>` : ''}</button>`;
   }).join('');
-  const felt = SKINNE.find(x => x[0] === ruter.handling)?.[2];
+  const felt = ruter.handling === 'drap' && ri() < hitman() ? null : SKINNE.find(x => x[0] === ruter.handling)?.[2];
   const status = felt ? `<span class="status" data-til="${st.spiller[felt]}" data-klar="Klar"></span>` : '';
   return `<div class="handlinger"><nav class="skinne" aria-label="Handlinger">${skinne}</nav>
     <div class="panel"><div class="panelhode ${BILDER[ruter.handling] ? 'medbilde' : ''}" ${bildeStil(ruter.handling, 900)}>${BILDER[ruter.handling] ? LAG : ''}<div><div class="over">Handling</div><h1>${esc(def.tittel)}</h1></div>${status}</div>
@@ -812,21 +818,24 @@ async function garasjeValg(navn = 'p_bil') {
 //  ALLE SIDER
 // =====================================================================
 const ri = () => st.rank_indeks;
+const hitman = () => { const i = (data.ranker || []).findIndex(r => r.navn === 'Hitman'); return i < 0 ? 3 : data.ranker[i].indeks; };
 const SIDER = {
   // ------------------------------------------------ HANDLINGER
   krim: { fane: 'handlinger', tittel: 'Kriminalitet', kortnavn: 'Krim', async vis() {
-    return seksjon('Handling', `<div class="liste">${data.krim.map(k => {
+    const laaste = data.krim.filter(k => ri() < k.min_rank).length;
+    return seksjon('Handling', `<div class="liste">${data.krim.filter(k => ri() >= k.min_rank).map(k => {
       const laast = ri() < k.min_rank, sjanse = Math.min(95, k.sjanse + ri() * 4);
       return `<div class="linjeel ${laast ? 'laast' : ''}"><div class="info"><b>${esc(k.navn)}</b><small>${laast ? 'Krever ' + esc(data.ranker[k.min_rank].navn) : `${kr(k.min_gevinst)}–${kr(k.max_gevinst)} · +${k.exp} erfaring`}</small></div>
         <span class="sjanse">${laast ? '' : sjanse + ' %'}</span>${venteKnapp('krim_klar', 'begaa_krim', { p_id: k.id }, k.navn, laast)}</div>`;
-    }).join('')}</div>`, 'Sjanse') + `<p class="dim" style="text-align:center;margin:0;font-size:.88rem">Mislykkes du, får du likevel +1 erfaring.</p>`;
+    }).join('')}</div>`, 'Sjanse') + `<p class="dim" style="text-align:center;margin:0;font-size:.88rem">Mislykkes du, får du likevel +1 erfaring.${laaste ? '<br><i>Flere jobber dukker opp når du rykker opp i rank.</i>' : ''}</p>`;
   } },
   bil: { fane: 'handlinger', tittel: 'Biltyveri', async vis() {
-    return seksjon('Sted', `<div class="liste">${data.bil_steder.map(b => {
+    const laasteB = data.bil_steder.filter(b => ri() < b.min_rank).length;
+    return seksjon('Sted', `<div class="liste">${data.bil_steder.filter(b => ri() >= b.min_rank).map(b => {
       const laast = ri() < b.min_rank;
       return `<div class="linjeel ${laast ? 'laast' : ''}"><div class="info"><b>${esc(b.navn)}</b><small>${laast ? 'Krever ' + esc(data.ranker[b.min_rank].navn) : `+${2 + b.tier * 2} erfaring · ${['', 'billige biler', 'mellomklasse', 'luksusbiler'][b.tier]}`}</small></div>
         <span class="sjanse">${laast ? '' : Math.min(90, b.sjanse + ri() * 3) + ' %'}</span>${venteKnapp('bil_klar', 'stjel_bil', { p_id: b.id }, b.navn, laast)}</div>`;
-    }).join('')}</div>`, 'Sjanse') + `<button class="knapp sek full" data-gaa="garasje">Gå til garasjen (${st.biler} biler)</button>`;
+    }).join('')}</div>`, 'Sjanse') + (laasteB ? '<p class="dim" style="text-align:center;margin:0 0 10px;font-size:.88rem"><i>Flere steder dukker opp når du rykker opp i rank.</i></p>' : '') + `<button class="knapp sek full" data-gaa="garasje">Gå til garasjen (${st.biler} biler)</button>`;
   } },
   ran: { fane: 'handlinger', tittel: 'Ran', kortnavn: 'Ran', async vis() {
     const s = st.spiller;
@@ -843,6 +852,10 @@ const SIDER = {
   } },
   drap: { fane: 'handlinger', tittel: 'Drap', async vis() {
     const s = st.spiller;
+    if (ri() < hitman()) {
+      const h = data.ranker.find(r => r.indeks === hitman());
+      return seksjon('Bare for Hitman', kropp(`<p style="margin-top:0">Du må være <b>Hitman</b> for å drepe. Du er ${esc(st.rank)} og har ${tall(s.exp)} av ${tall(h?.exp || 500)} erfaring.</p><div class="bar"><i style="width:${Math.min(100, s.exp / (h?.exp || 500) * 100)}%"></i></div><p class="dim" style="margin-bottom:0">Til da har du <b>nybegynnerbeskyttelse</b>: ingen kan drepe deg før du selv blir Hitman. Du kan fortsatt bli ranet, så sett pengene i banken.</p>`));
+    }
     return seksjon('Angrip', kropp(`<p class="dim">Målet må være i ${esc(s.sted)}. Flere kuler og bedre våpen gir mer skade. Drep for å ta alle kontantene.</p>
       <div class="nokkeltall" style="margin-bottom:12px"><div><span>Våpen</span><b>${esc(vapenNavn(s.vapen))}</b></div><div><span>Kuler</span><b>${tall(s.kuler)}</b></div></div>
       <form data-rpc="angrip" class="rad"><div><label for="angNavn">Spillernavn</label><input id="angNavn" name="p_navn" required></div><div><label for="angKuler">Kuler</label><input id="angKuler" name="p_kuler" type="number" min="1" required data-num></div><button class="knapp">Skyt</button></form>`))
@@ -1293,8 +1306,8 @@ function tikk() {
   document.querySelectorAll('.stopp[data-ring]').forEach(el => {
     const felt = el.dataset.ring; if (!felt) return;
     const r = ringStil(felt, Number(el.dataset.total)), bar = el.querySelector('.framdrift i'), lbl = el.querySelector('small');
-    if (el.dataset.gaa === 'fengsel' && fengslet()) { bar.style.width = '50%'; bar.style.background = 'var(--signal)'; lbl.textContent = 'Inne'; lbl.className = 'vent'; return; }
-    bar.style.width = r.p * 100 + '%'; bar.style.background = r.f; lbl.textContent = r.vent ? r.tekst : 'Klar'; lbl.className = r.vent ? 'vent' : '';
+    if (el.dataset.gaa === 'fengsel' && fengslet()) { bar.style.height = '50%'; bar.style.background = 'var(--signal)'; lbl.textContent = 'inne'; lbl.className = 'inne'; return; }
+    bar.style.height = r.p * 100 + '%'; bar.style.background = r.vent ? 'var(--gull-mork)' : 'var(--gull)'; lbl.textContent = r.vent ? 'om ' + r.tekst : 'klar'; lbl.className = r.vent ? 'vent' : '';
   });
 }
 setInterval(tikk, 1000);
