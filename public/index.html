@@ -145,6 +145,20 @@ button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radi
 .kort::after{content:"";position:absolute;right:14px;top:17px;width:8px;height:8px;border-top:2px solid var(--signal2);border-right:2px solid var(--signal2);transform:rotate(45deg)}
 .kort.bred{grid-column:1/-1;min-height:0}
 .kort.av{opacity:.55;cursor:default}
+/* Bilder (Unsplash, fri lisens). Mørk toning gjør teksten lesbar; feiler bildet, vises vanlig kort. */
+.kort.medbilde{justify-content:flex-end;min-height:132px;border-color:var(--line2);background:linear-gradient(180deg,rgba(6,8,12,.05) 0%,rgba(6,8,12,.5) 48%,rgba(6,8,12,.94) 100%),var(--img) center/cover no-repeat,var(--panel2);overflow:hidden}
+.kort.medbilde:hover{filter:brightness(1.12)}
+.kort.medbilde b{color:#fff;font-size:1.12rem;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.kort.medbilde span{color:#dfe3ea;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.kort.medbilde span.merke{text-shadow:none}
+.kort.medbilde::after{filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))}
+.kort.medbilde.bred{min-height:128px}
+.panelhode.medbilde{min-height:132px;border-bottom-color:var(--line2);background:linear-gradient(180deg,rgba(6,8,12,.1) 0%,rgba(6,8,12,.55) 50%,rgba(6,8,12,.95) 100%),var(--img) center/cover no-repeat,var(--panel)}
+.panelhode.medbilde h1{color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.8)}
+.panelhode.medbilde .over{color:#cfd5de}
+.panelhode.medbilde .status{text-shadow:0 1px 4px rgba(0,0,0,.9)}
+.hubbilde{height:118px;margin:12px 12px 0;border-radius:var(--r2);border:1px solid var(--line2);background:linear-gradient(180deg,rgba(6,8,12,0) 30%,rgba(6,8,12,.75)),var(--img) center/cover no-repeat,var(--panel)}
+@media (min-width:640px){.kort.medbilde{min-height:150px}.hubbilde{height:170px}.panelhode.medbilde{min-height:170px}}
 .kort.av::after{display:none}
 .merke{display:inline-block;align-self:flex-start;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:.04em;background:var(--signal-bg);color:var(--signal2);border:1px solid #4a2128}
 .merke.mint{background:var(--mint-bg);color:var(--mint);border-color:#1d4a3b}
@@ -675,16 +689,35 @@ const HUBER = {
     ['Mot banken', ['blackjack', 'terninger']],
     ['Hver uke', ['lotto:bred']]] },
 };
+// Bilder fra Unsplash (gratis under Unsplash-lisensen). Lastes rett fra Unsplash sitt bildenettverk.
+const BILDER = {
+  krim: 'photo-1586165877141-3dbcfc059283', bil: 'photo-1503736334956-4c8f8e92946d', ran: 'photo-1560684033-2a9ff3d2a03e',
+  fengsel: 'photo-1543536833-6d65fcc64f66', drap: 'photo-1602432140723-b88c8b054b26', reise: 'photo-1507812984078-917a274065be',
+  sykehus: 'photo-1629410484397-a4dcd74088a0', garasje: 'photo-1637970067784-927e66e07e36',
+  bank: 'photo-1593672715438-d88a70629abe', poenghandel: 'photo-1513151233558-d860c5398176', borsen: 'photo-1689732888407-310424e3a372',
+  overfor_poeng: 'photo-1521791136064-7986c2920216', kuler: 'photo-1580865767741-37cd59206d74', overfor_kuler: 'photo-1545270812-b631d7f05548',
+  utstyr: 'photo-1595590424283-b8f17842773f', bruktbil: 'photo-1553440569-bcc63803a83d', selg_bil: 'photo-1567808291548-fc3ee04dbcf0',
+  livvakt: 'photo-1617127365659-c47fa864d8bc', hasj: 'photo-1498671546682-94a232c26d17',
+  minprofil: 'photo-1618886614638-80e3c103d31a', meldinger: 'photo-1505682634904-d7c8d95cdc50', gjeng: 'photo-1507679799987-c73779587ccf',
+  rangering: 'photo-1769028866840-14b25805a119', prestasjoner: 'photo-1578269174936-2709b6aeb913', gravplass: 'photo-1652987435744-06e48d0a8030',
+  chat: 'photo-1555086156-e6c7353d283f', forum: 'photo-1608992204898-036ffc94095c', regler: 'photo-1589391886645-d51941baf7fb',
+  sok: 'photo-1697301439928-7c60326ff1ea', palogget: 'photo-1661628014274-0df78c28beef', verv: 'photo-1638262052640-82e94d64664a',
+  nyheter: 'photo-1641138628182-44dafabba70f', avis: 'photo-1703381132774-caeab4f6a9db',
+  adminpanel: 'photo-1563986768711-b3bde3dc821e', botrapport: 'photo-1745270917331-787c80129680',
+  blackjack: 'photo-1592398191627-25b41eeaa398', terninger: 'photo-1626775238053-4315516eedc9', lotto: 'photo-1566563255308-753861417000',
+  hub_handel: 'photo-1647462659133-7126b04b52ba', hub_sosial: 'photo-1642919794897-146bf10bff9e', hub_casino: 'photo-1509478861672-91e9a2f90c04',
+};
+const bildeStil = (k, w = 640) => BILDER[k] ? `style="--img:url('https://images.unsplash.com/${BILDER[k]}?auto=format&fit=crop&w=${w}&q=60')"` : '';
 function tegnHub(id) {
   if (id === 'oppdrag') return '';
   const h = { ...HUBER[id] }, v = st.varsler || {};
   if (id === 'sosial' && st.admin && !h.seksjoner.some(x => x[0] === 'Admin')) h.seksjoner = [...h.seksjoner, ['Admin', ['adminpanel', 'botrapport']]];
-  return sidehode(h.tittel, h.under) + `<div class="innside">${fengselBanner()}${h.seksjoner.map(([tittel, sider]) => seksjon(tittel, `<div class="rutenett">${sider.map(x => {
+  return sidehode(h.tittel, h.under) + (BILDER['hub_' + id] ? `<div class="hubbilde" ${bildeStil('hub_' + id, 1000)} role="img" aria-label="${esc(h.tittel)}"></div>` : '') + `<div class="innside">${fengselBanner()}${h.seksjoner.map(([tittel, sider]) => seksjon(tittel, `<div class="rutenett">${sider.map(x => {
     const [k, bred] = x.split(':'); const d = SIDER[k];
     const merke = d.kommer ? '<span class="merke gul">Kommer</span>'
       : k === 'meldinger' && (st.uleste || st.uleste_logg) ? `<span class="merke">${st.uleste + (st.uleste_logg || 0)} nye</span>`
       : k === 'prestasjoner' && v.prestasjoner ? `<span class="merke mint">${v.prestasjoner} klar</span>` : '';
-    return `<button class="kort ${bred ? 'bred' : ''} ${d.kommer ? 'av' : ''}" ${d.kommer ? 'disabled' : `data-gaa="${k}"`}><b>${esc(d.tittel)}</b><span>${esc(d.kort)}</span>${merke}</button>`;
+    return `<button class="kort ${bred ? 'bred' : ''} ${d.kommer ? 'av' : ''} ${BILDER[k] ? 'medbilde' : ''}" ${bildeStil(k, bred ? 900 : 480)} ${d.kommer ? 'disabled' : `data-gaa="${k}"`}><b>${esc(d.tittel)}</b><span>${esc(d.kort)}</span>${merke}</button>`;
   }).join('')}</div>`)).join('')}</div>`;
 }
 
@@ -709,7 +742,7 @@ async function tegnHandlinger(def) {
   const felt = SKINNE.find(x => x[0] === ruter.handling)?.[2];
   const status = felt ? `<span class="status" data-til="${st.spiller[felt]}" data-klar="Klar"></span>` : '';
   return `<div class="handlinger"><nav class="skinne" aria-label="Handlinger">${skinne}</nav>
-    <div class="panel"><div class="panelhode"><div><div class="over">Handling</div><h1>${esc(def.tittel)}</h1></div>${status}</div>
+    <div class="panel"><div class="panelhode ${BILDER[ruter.handling] ? 'medbilde' : ''}" ${bildeStil(ruter.handling, 900)}><div><div class="over">Handling</div><h1>${esc(def.tittel)}</h1></div>${status}</div>
     <div class="innside">${def === SIDER.fengsel ? '' : fengselBanner()}${await def.vis()}</div></div></div>`;
 }
 
