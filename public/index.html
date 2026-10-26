@@ -7,7 +7,7 @@
 <title>Undergrunnen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 /* Tema: T-banen om natten. Asfaltblått, signalrødt for handling, mintgrønt for «klar». */
 :root{
@@ -73,6 +73,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .topprad{display:flex;align-items:center;gap:10px;padding:12px max(14px,env(safe-area-inset-right,0px)) 10px max(14px,env(safe-area-inset-left,0px))}
 .avatar{flex:0 0 auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.25rem;color:#fff;border:2px solid var(--line2);text-transform:uppercase}
 .avatar.liten{width:32px;height:32px;font-size:.95rem;border-width:1px}
+.avatar{position:relative;overflow:hidden}
+.avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.avatar.stor{width:128px;height:128px;font-size:3rem;border:3px solid var(--signal)}
+button.avatarknapp{background:none;border:0;padding:0;cursor:pointer;border-radius:50%}
 .hvem{flex:1;min-width:0;cursor:pointer;background:none;border:0;padding:0;text-align:left}
 .hvem b{display:block;font-family:var(--display);font-size:1.3rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hvem>span{display:block;font-size:.82rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -206,7 +210,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .spillkort.rod{color:#c8263a}
 .spillkort .s{align-self:flex-end;font-size:1.1rem;line-height:1}
 .spillkort.bak{background:repeating-linear-gradient(45deg,var(--signal) 0 6px,#c73743 6px 12px);border:3px solid #f4f1ea}
-.rulettall{font-family:var(--display);font-size:3.4rem;line-height:1;text-align:center}
+.terningbord{display:flex;align-items:center;justify-content:center;gap:18px;text-align:center;margin:4px 0 6px}
+.terningbord .mot{font-family:var(--display);color:var(--dim2);font-size:1.1rem}
+.terninger{display:flex;gap:8px;margin-top:4px}
+.terning{width:52px;height:52px;border-radius:10px;background:#f4f1ea;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:7px;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+.terning i{display:block;margin:auto;width:9px;height:9px;border-radius:50%}
+.terning i.p{background:#16181c}
+#bankT .terning{background:var(--signal)} #bankT .terning i.p{background:#fff}
 
 /* chat og forum */
 .chatlogg{height:52vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:12px 16px}
@@ -218,7 +228,48 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .innlegg .hode{display:flex;gap:8px;align-items:center;margin-bottom:6px}
 .innlegg .tekst{white-space:pre-wrap;word-break:break-word}
 .melding.ulest .info b{color:var(--gul)}
+.loggikon{flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--dim2);align-self:flex-start;margin-top:6px}
+.loggikon.ok{background:var(--mint)} .loggikon.bad{background:var(--signal)} .loggikon.hendelse{background:var(--gul);box-shadow:0 0 0 3px #3a3010}
+.loggrad.ny{background:#1d1a10}
 .meldingkropp{white-space:pre-wrap;padding:0 16px 14px;color:var(--text)}
+
+
+/* profil */
+.profiltopp{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:8px 0 4px}
+.profiltopp h2{font-size:1.8rem;margin-top:6px}
+.merker{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.linjeel.pil{position:relative;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;color:var(--text);text-align:left;cursor:pointer;padding-right:36px}
+.liste>.linjeel.pil:first-child{border-top:0}
+.linjeel.pil::after{content:"";position:absolute;right:18px;top:50%;margin-top:-4px;width:8px;height:8px;border-top:2px solid var(--signal2);border-right:2px solid var(--signal2);transform:rotate(45deg)}
+button.linjeel{width:100%;background:none;border-left:0;border-right:0;border-bottom:0;color:var(--text);text-align:left;cursor:pointer}
+.bryter{cursor:pointer;position:relative}
+.bryter input{position:absolute;opacity:0;pointer-events:none}
+.bryter .spor{flex:0 0 auto;width:50px;height:28px;border-radius:14px;background:var(--line2);position:relative;transition:background .2s}
+.bryter .spor::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s}
+.bryter input:checked+.spor{background:var(--signal)}
+.bryter input:checked+.spor::after{transform:translateX(22px)}
+.bryter input:focus-visible+.spor{outline:2px solid var(--blaa);outline-offset:2px}
+.rad-bryter{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.avatarrad{display:flex;gap:16px;align-items:center}
+.avatarrad .avatar.stor{width:96px;height:96px;font-size:2.2rem}
+.valg{display:flex;gap:8px;flex-wrap:wrap}
+.valg button{flex:1 1 90px;padding:.6em;border-radius:var(--r);border:1px solid var(--line2);background:var(--bg2);color:var(--dim);font-weight:600;cursor:pointer}
+.valg button.aktiv{border-color:var(--signal);color:var(--signal2);background:var(--signal-bg)}
+.verktoy{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 8px}
+.verktoy button{width:40px;height:38px;border-radius:8px;border:1px solid var(--line2);background:var(--bg2);color:var(--text);font-size:1rem;cursor:pointer;display:grid;place-items:center}
+.verktoy button:hover{border-color:var(--dim)}
+.fargeprikk{display:block;width:16px;height:16px;border-radius:50%;background:#ff4d5a}
+.biotekst{display:block;width:calc(100% - 32px);margin:0 16px;font-family:ui-monospace,Menlo,monospace;font-size:.88rem}
+.forhand{margin:12px 16px 16px;padding:12px;border:1px dashed var(--line2);border-radius:var(--r);background:var(--bg2)}
+.bb{line-height:1.6;word-break:break-word}
+.bb img{max-width:100%;border-radius:8px}
+.bb blockquote{margin:10px 0;padding:10px 14px;border:1px solid var(--line2);border-left:3px solid var(--signal);border-radius:8px;background:var(--bg2)}
+.bb code{font-family:ui-monospace,Menlo,monospace;background:var(--bg2);padding:1px 5px;border-radius:4px}
+.bb hr{border:0;border-top:1px solid var(--line2);margin:14px 0}
+.bb ul{margin:6px 0;padding-left:22px}
+.bb a{color:var(--blaa)}
+.bb-s1{font-size:.75em}.bb-s2{font-size:.9em}.bb-s3{font-size:1.1em}.bb-s4{font-size:1.4em}.bb-s5{font-size:2em;font-family:var(--display);line-height:1.1}.bb-s6{font-size:2.8em;font-family:var(--display);line-height:1}
+.skjold{flex:0 0 auto;width:52px;height:58px;display:grid;place-items:center;font-family:var(--display);font-weight:700;color:var(--gul);background:#2b230e;border:2px solid var(--gul);border-radius:10px 10px 26px 26px;font-size:.95rem}
 
 /* modal og varsel */
 #varsel{position:fixed;left:50%;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:min(560px,calc(100vw - 32px));z-index:40;padding:12px 16px;border-radius:var(--r);background:var(--panel2);border:1px solid var(--line2);box-shadow:0 10px 40px rgba(0,0,0,.6);font-weight:500}
@@ -317,7 +368,13 @@ const tidKort = (s) => s >= 3600 ? `${Math.ceil(s / 3600)}t` : s >= 60 ? `${Math
 const fengslet = () => st?.spiller && sekIgjen(st.spiller.fengsel_til) > 0;
 
 function fargeFra(navn) { let h = 0; for (const c of String(navn)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return `hsl(${h % 360} 45% 34%)`; }
-const avatar = (navn, liten) => `<span class="avatar${liten ? ' liten' : ''}" style="background:${fargeFra(navn)}">${esc(String(navn).slice(0, 2))}</span>`;
+let bildeKart = {};
+async function hentBilder() { try { bildeKart = (await rpc('bilde_liste')) || {}; } catch {} }
+const avatar = (navn, liten, stor, eksplisitt) => {
+  const url = eksplisitt !== undefined ? eksplisitt : bildeKart[navn], kl = `avatar${liten ? ' liten' : ''}${stor ? ' stor' : ''}`;
+  if (url) return `<span class="${kl}" style="background:${fargeFra(navn)}"><img src="${esc(url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"></span>`;
+  return `<span class="${kl}" style="background:${fargeFra(navn)}">${esc(String(navn).slice(0, 2))}</span>`;
+};
 const lagre = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
 const hent = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 
@@ -441,11 +498,13 @@ async function start() {
   if (starter) return; starter = true;
   try {
     if (!data) data = await rpc('spill_data');
+    await hentBilder();
     await oppdater();
     if (!st.spiller) { visLag(); return; }
     vis('spill');
     clearInterval(pollTimer);
-    pollTimer = setInterval(() => oppdater().catch(e => { if (e instanceof IkkeInnlogget) tilInnlogging(); }), 20000);
+    let runder = 0;
+    pollTimer = setInterval(() => { if (++runder % 6 === 0) hentBilder(); oppdater().catch(e => { if (e instanceof IkkeInnlogget) tilInnlogging(); }); }, 20000);
     await tegnSide();
   } catch (e) { if (e instanceof IkkeInnlogget) tilInnlogging(); else varsel(e.message, 'bad'); }
   finally { starter = false; }
@@ -475,7 +534,7 @@ function tegnTopp() {
   const s = st.spiller;
   $('#topp').innerHTML = `
     <div class="topprad">
-      ${avatar(s.navn)}
+      <button class="avatarknapp" data-gaa="minprofil" aria-label="Din profil">${avatar(s.navn)}</button>
       <button class="hvem" data-gaa="ranker" aria-label="Se ranker">
         <b>${esc(s.navn)}${st.gjeng_tag ? ` <span class="dim" style="font-size:.85rem">[${esc(st.gjeng_tag)}]</span>` : ''}</b>
         <span>${esc(st.rank)} · <span class="pst">${st.neste_rank ? rankProsent() + ' %' : 'MAKS'}</span><span class="by"> · ${esc(s.sted)}</span></span>
@@ -485,7 +544,7 @@ function tegnTopp() {
         <div title="Poeng: ${tall(s.poeng)}">${IK.poeng}<b>${kompakt(s.poeng)}</b></div>
         <div title="Kuler: ${tall(s.kuler)}">${IK.kuler}<b>${kompakt(s.kuler)}</b></div>
       </div>
-      <button class="bjelle" data-gaa="meldinger" aria-label="Meldinger">${IK.bjelle}${st.uleste ? `<span class="prikk">${st.uleste > 9 ? '9+' : st.uleste}</span>` : ''}</button>
+      <button class="bjelle" data-gaa="meldinger" data-param="${!st.uleste && st.uleste_logg ? 'logg' : ''}" aria-label="Meldinger og logg">${IK.bjelle}${(st.uleste + (st.uleste_logg || 0)) ? `<span class="prikk">${(st.uleste + (st.uleste_logg || 0)) > 9 ? '9+' : st.uleste + (st.uleste_logg || 0)}</span>` : ''}</button>
     </div>
     <div class="linje" data-gaa="ranker" title="${st.neste_rank ? rankProsent() + ' % til ' + esc(st.neste_rank) : 'Høyeste rank'}"><i style="width:${rankProsent()}%"></i></div>
     <button class="utvid ${detaljerApen ? 'apen' : ''}" data-utvid aria-label="Vis detaljer">${IK.ned}</button>
@@ -514,13 +573,16 @@ function klarNoe() {
   const s = st.spiller; if (fengslet()) return false;
   return ['krim_klar', 'bil_klar', 'ran_klar'].some(k => sekIgjen(s[k]) === 0);
 }
+const skjulCasino = () => hent('ug_skjul_casino') === '1';
 function tegnBunn() {
   const v = st.varsler || {};
-  $('#bunnIndre').innerHTML = FANER.map(([id, navn]) => {
+  const faner = FANER.filter(f => !(f[0] === 'casino' && skjulCasino()));
+  $('#bunnIndre').style.gridTemplateColumns = `repeat(${faner.length},1fr)`;
+  $('#bunnIndre').innerHTML = faner.map(([id, navn]) => {
     let dott = '';
     if (id === 'handlinger' && klarNoe()) dott = '<span class="dott mint"></span>';
     if (id === 'oppdrag' && v.oppdrag) dott = '<span class="dott rod"></span>';
-    if (id === 'sosial' && (v.prestasjoner || st.uleste)) dott = '<span class="dott rod"></span>';
+    if (id === 'sosial' && (v.prestasjoner || st.uleste || st.uleste_logg)) dott = '<span class="dott rod"></span>';
     return `<button data-fane="${id}" class="${ruter.fane === id ? 'aktiv' : ''}" aria-current="${ruter.fane === id ? 'page' : 'false'}">${IK[id]}${dott}<span>${navn}</span></button>`;
   }).join('');
 }
@@ -578,21 +640,23 @@ const HUBER = {
     ['Kjøretøy', ['bruktbil', 'selg_bil']],
     ['Forretninger', ['livvakt', 'hasj']]] },
   sosial: { tittel: 'Sosial', under: 'Gjeng, forum og spillere', seksjoner: [
+    ['Deg', ['minprofil', 'meldinger']],
     ['Gjeng og rangering', ['gjeng', 'rangering', 'prestasjoner', 'gravplass']],
-    ['Prat', ['meldinger', 'chat', 'forum:bred']],
+    ['Prat', ['chat', 'forum']],
     ['Spillere', ['sok', 'palogget', 'verv:bred']],
     ['Info', ['nyheter', 'avis']]] },
   casino: { tittel: 'Casino', under: 'Undergrunnen · Spill på egen risiko', seksjoner: [
-    ['Mot andre spillere', ['dodsterninger', 'terning', 'streetrace', 'royale', 'lotto', 'nummer', 'poker', 'bjbord']],
-    ['Mot huset', ['blackjack', 'rulett']]] },
+    ['Mot banken', ['blackjack', 'terninger']],
+    ['Hver uke', ['lotto:bred']]] },
 };
 function tegnHub(id) {
   if (id === 'oppdrag') return '';
-  const h = HUBER[id], v = st.varsler || {};
+  const h = { ...HUBER[id] }, v = st.varsler || {};
+  if (id === 'sosial' && st.admin && !h.seksjoner.some(x => x[0] === 'Admin')) h.seksjoner = [...h.seksjoner, ['Admin', ['botrapport:bred']]];
   return sidehode(h.tittel, h.under) + `<div class="innside">${fengselBanner()}${h.seksjoner.map(([tittel, sider]) => seksjon(tittel, `<div class="rutenett">${sider.map(x => {
     const [k, bred] = x.split(':'); const d = SIDER[k];
     const merke = d.kommer ? '<span class="merke gul">Kommer</span>'
-      : k === 'meldinger' && st.uleste ? `<span class="merke">${st.uleste} uleste</span>`
+      : k === 'meldinger' && (st.uleste || st.uleste_logg) ? `<span class="merke">${st.uleste + (st.uleste_logg || 0)} nye</span>`
       : k === 'prestasjoner' && v.prestasjoner ? `<span class="merke mint">${v.prestasjoner} klar</span>` : '';
     return `<button class="kort ${bred ? 'bred' : ''} ${d.kommer ? 'av' : ''}" ${d.kommer ? 'disabled' : `data-gaa="${k}"`}><b>${esc(d.tittel)}</b><span>${esc(d.kort)}</span>${merke}</button>`;
   }).join('')}</div>`)).join('')}</div>`;
@@ -802,12 +866,19 @@ const SIDER = {
     const g = await rpc('gravplass_liste');
     return seksjon('Hvil i fred', g.length ? `<table class="tabell"><tr><th>Navn</th><th>Rank</th><th>Drept av</th></tr>${g.map(x => `<tr><td>${esc(x.navn)}</td><td>${esc(x.rank)}</td><td class="bad">${esc(x.drept_av)}</td></tr>`).join('')}</table>` : '<p class="tom">Ingen er drept ennå.</p>');
   } },
-  meldinger: { fane: 'sosial', tittel: 'Meldinger', kort: 'Innboks og nye meldinger', async vis(p) {
+  meldinger: { fane: 'sosial', tittel: 'Meldinger', kort: 'Innboks og handlingslogg', async vis(p) {
+    const logg = p === 'logg', til = !logg && p ? p : '';
+    const faner = `<div class="faner" style="margin:0"><button class="${logg ? '' : 'aktiv'}" data-gaa="meldinger" data-param="">Innboks${st.uleste ? ` (${st.uleste})` : ''}</button><button class="${logg ? 'aktiv' : ''}" data-gaa="meldinger" data-param="logg">Logg${st.uleste_logg ? ` (${st.uleste_logg})` : ''}</button></div>`;
+    if (logg) {
+      const l = await rpc('min_logg', { p_type: '' });
+      if (st.uleste_logg) rpc('les_logg').then(() => oppdater()).catch(() => {});
+      return faner + seksjon('Handlingslogg', l.length ? `<div class="liste">${l.map(x => `<div class="linjeel loggrad ${x.lest ? '' : 'ny'}"><span class="loggikon ${x.type === 'hendelse' ? 'hendelse' : x.ok === true ? 'ok' : x.ok === false ? 'bad' : ''}" aria-hidden="true"></span><div class="info"><b style="font-weight:500">${esc(x.tekst)}</b><small>${x.type === 'hendelse' ? 'Hendelse · ' : ''}${dato(x.tid)}</small></div></div>`).join('')}</div>` : '<p class="tom">Ingenting har skjedd ennå. Alt du gjør, og alt som skjer med deg, havner her.</p>', 'Siste 150');
+    }
     const m = await rpc('mine_meldinger');
-    return seksjon('Ny melding', kropp(`<form data-rpc="send_melding" id="skrivForm"><div class="rad" style="margin-bottom:10px"><div><label for="mTil">Til</label><input id="mTil" name="p_til" required value="${esc(p || '')}"></div><div><label for="mEmne">Emne</label><input id="mEmne" name="p_emne" maxlength="80"></div></div>
+    return faner + seksjon('Ny melding', kropp(`<form data-rpc="send_melding" id="skrivForm"><div class="rad" style="margin-bottom:10px"><div><label for="mTil">Til</label><input id="mTil" name="p_til" required value="${esc(til)}"></div><div><label for="mEmne">Emne</label><input id="mEmne" name="p_emne" maxlength="80"></div></div>
       <div class="felt"><label for="mTekst">Melding</label><textarea id="mTekst" name="p_tekst" rows="3" maxlength="2000" required></textarea></div><button class="knapp">Send</button></form>`))
       + seksjon('Innboks', m.length ? `<div class="liste">${m.map(x => `<div class="melding ${x.lest ? '' : 'ulest'}"><div class="linjeel" style="cursor:pointer" data-apne="${x.id}" data-lest="${x.lest}">${avatar(x.fra_navn, 1)}<div class="info"><b>${esc(x.emne)}</b><small>${esc(x.fra_navn)} · ${dato(x.tid)}</small></div></div>
-        <div class="meldingkropp hidden" id="m${x.id}">${esc(x.tekst)}<div class="rad" style="margin-top:10px;justify-content:flex-end">${x.fra_navn !== 'System' ? `<button class="knapp sek liten" data-svar="${esc(x.fra_navn)}" data-emne="${esc(x.emne)}">Svar</button>` : ''}<button class="knapp sek liten" data-slett="${x.id}">Slett</button></div></div></div>`).join('')}</div>` : '<p class="tom">Ingen meldinger.</p>');
+        <div class="meldingkropp hidden" id="m${x.id}">${esc(x.tekst)}<div class="rad" style="margin-top:10px;justify-content:flex-end"><button class="knapp sek liten" data-profil="${esc(x.fra_navn)}">Profil</button><button class="knapp sek liten" data-svar="${esc(x.fra_navn)}" data-emne="${esc(x.emne)}">Svar</button><button class="knapp sek liten" data-slett="${x.id}">Slett</button></div></div></div>`).join('')}</div>` : '<p class="tom">Ingen meldinger fra andre spillere ennå.</p>');
   } },
   chat: { fane: 'sosial', tittel: 'Chat', kort: 'Snakk med hele byen', async vis() {
     return seksjon('Byens chat', `<div class="chatlogg" id="chatlogg"></div><form id="chatForm" class="rad" style="padding:0 16px 14px"><div style="flex:5 1 180px"><input name="tekst" maxlength="300" placeholder="Skriv noe …" autocomplete="off" required aria-label="Chatmelding"></div><button class="knapp">Send</button></form>`);
@@ -859,43 +930,96 @@ const SIDER = {
       + seksjon('Rankstigen', `<table class="tabell"><tr><th>Rank</th><th class="h">Erfaring</th></tr>${data.ranker.map(x => `<tr class="${x.indeks === r ? 'meg' : ''}"><td>${x.indeks === r ? '<b class="bad">' + esc(x.navn) + '</b> ← du' : x.indeks < r ? '<span class="dim">' + esc(x.navn) + '</span>' : esc(x.navn)}</td><td class="tall">${tall(x.exp)}</td></tr>`).join('')}</table>`);
   } },
 
+
+  // ------------------------------------------------ PROFIL
+  minprofil: { fane: 'sosial', tittel: 'Din profil', kort: 'Bilde, om meg og innstillinger', async vis() {
+    const s = st.spiller;
+    return `<div class="profiltopp">${avatar(s.navn, 0, 1)}<h2>${esc(s.navn)}</h2><span class="dim">${esc(st.rank)} · ${rankProsent()} %</span></div>`
+      + seksjon('Utstyr', `<div class="liste"><div class="linjeel"><div class="info dim">Våpen</div><b>${esc(vapenNavn(s.vapen))}</b></div><div class="linjeel"><div class="info dim">Beskyttelse</div><b>${esc(beskNavn(s.beskyttelse))}</b></div><div class="linjeel"><div class="info dim">Kuler</div><b class="tall">${tall(s.kuler)}</b></div></div>`)
+      + seksjon('Andre seksjoner', `<div class="liste">${[['profil', 'Se offentlig profil', s.navn], ['prestasjoner', 'Prestasjoner'], ['statistikk', 'Din statistikk'], ['ranker', 'Ranker og regler'], ['meldinger', 'Handlingslogg', 'logg']].map(([g, t, pa]) => `<button class="linjeel pil" data-gaa="${g}" ${pa ? `data-param="${esc(pa)}"` : ''}><div class="info"><b>${t}</b></div></button>`).join('')}</div>`)
+      + seksjon('Innstillinger', `<div class="liste"><button class="linjeel pil" data-gaa="rediger_profil"><div class="info"><b>Rediger profil</b><small>Bilde, kjønn, musikk og om meg</small></div></button>
+        <label class="linjeel bryter"><div class="info"><b>Skjul casino</b><small>Tar casino-fanen bort fra menyen nederst. Gjelder bare denne enheten.</small></div><input type="checkbox" id="skjulCasino" ${skjulCasino() ? 'checked' : ''}><span class="spor" aria-hidden="true"></span></label>
+        <button class="linjeel" data-loggut><div class="info"><b class="bad">Logg ut</b></div></button></div>`);
+  }, etter() { $('#skjulCasino').onchange = (e) => { lagre('ug_skjul_casino', e.target.checked ? '1' : '0'); if (e.target.checked && ruter.fane === 'casino') ruter.fane = 'sosial'; tegnBunn(); varsel(e.target.checked ? 'Casino er skjult fra menyen.' : 'Casino vises igjen i menyen.'); }; } },
+
+  rediger_profil: { fane: 'sosial', tittel: 'Profilinnstillinger', async vis() {
+    const p = await rpc('min_profil');
+    profilUtkast = { ...p };
+    return seksjon('Avatar', kropp(`<div class="avatarrad">${avatar(st.spiller.navn, 0, 1)}<div style="flex:1;min-width:0">
+        <label class="knapp sek" style="width:100%;margin-bottom:8px">Last opp bilde<input type="file" id="bildeFil" accept="image/*" hidden></label>
+        ${p.bilde ? '<button class="knapp sek liten" data-act="slett_profilbilde" style="width:100%">Fjern bilde</button>' : ''}</div></div>
+        <div class="felt" style="margin-top:12px"><label for="pAvatar">…eller lenke til et bilde</label><input id="pAvatar" value="${esc(p.avatar_url)}" placeholder="https://…" inputmode="url"></div>
+        <p class="dim" style="font-size:.8rem;margin:0">Opplastet bilde går foran lenke. Bildet beskjæres til et kvadrat.</p>`))
+      + seksjon('Generelt', kropp(`<label>Kjønn</label><div class="valg" id="pKjonn">${[['mann', 'Mann'], ['kvinne', 'Kvinne'], ['', 'Vil ikke si']].map(([v, t]) => `<button type="button" data-kjonn="${v}" class="${p.kjonn === v ? 'aktiv' : ''}">${t}</button>`).join('')}</div>
+        <div class="felt" style="margin-top:12px"><label for="pMusikk">Bakgrunnsmusikk (lenke til mp3, YouTube eller Spotify)</label><input id="pMusikk" value="${esc(p.musikk_url)}" placeholder="https://…" inputmode="url"></div>
+        <label class="bryter rad-bryter"><div><b>Vis «om meg» i profilen</b></div><input type="checkbox" id="pVis" ${p.vis_bio ? 'checked' : ''}><span class="spor" aria-hidden="true"></span></label>`))
+      + seksjon('Om meg', `<div class="verktoy">${VERKTOY.map(([id, tittel, ikon]) => `<button type="button" data-bb="${id}" title="${tittel}" aria-label="${tittel}">${ikon}</button>`).join('')}</div>
+        <textarea id="pBio" rows="9" maxlength="6000" class="biotekst" placeholder="Skriv om karakteren din. Marker tekst og trykk på knappene over for å formatere.">${esc(p.bio)}</textarea>
+        <div class="forhand"><small class="dim">Forhåndsvisning</small><div class="bb" id="pForhand">${bbkode(p.bio) || '<span class="dim">Ingenting ennå.</span>'}</div></div>`)
+      + `<button class="knapp full" id="lagreProfil">Lagre profil</button>`;
+  }, etter() { profilRedigering(); } },
+
+  profil: { fane: 'sosial', tittel: 'Profil', async vis(navn) {
+    const x = await rpc('profil', { p_navn: navn || st.spiller.navn });
+    const rad = (a, b) => `<div class="linjeel"><div class="info dim">${a}</div><b>${b}</b></div>`;
+    const mus = musikk(x.musikk);
+    if (x.bilde) bildeKart[x.navn] = x.bilde; else delete bildeKart[x.navn];
+    return `<div class="profiltopp">${avatar(x.navn, 0, 1)}<h2>${esc(x.navn)}</h2><span class="dim">${esc(x.rank)}</span>
+        <div class="merker"><span class="merke mint">Levende</span>${x.online ? '<span class="merke mint">Online</span>' : '<span class="merke" style="opacity:.6">Offline</span>'}${x.tag ? `<span class="merke gul">${esc(x.tag)}</span>` : ''}${x.fengsel ? '<span class="merke">I fengsel</span>' : ''}${x.bot ? '<span class="merke" title="Datastyrt spiller">Bot</span>' : ''}</div>
+        <div class="rad" style="justify-content:center;margin-top:12px">${x.min ? '<button class="knapp sek liten" data-gaa="rediger_profil">Rediger profil</button>' : `<button class="knapp liten" data-gaa="meldinger" data-param="${esc(x.navn)}">Send melding</button>`}</div></div>`
+      + seksjon('Identitet', `<div class="liste">${rad('Gjeng', x.gjeng ? esc(x.gjeng) : '–')}${rad('Pengestatus', esc(x.pengestatus))}${rad('Kjønn', x.kjonn === 'mann' ? 'Mann' : x.kjonn === 'kvinne' ? 'Kvinne' : '–')}${x.bot ? rad('Type', 'Datastyrt spiller') : ''}</div>`)
+      + seksjon('Prestasjoner', `<div class="linjeel"><span class="skjold">${tall(x.prestasjonspoeng)}</span><div class="info"><b class="gul">${tall(x.prestasjonspoeng)} poeng</b><small>${x.prestasjoner} av ${x.prestasjoner_totalt} låst opp</small></div></div>`)
+      + seksjon('Statistikk', `<div class="liste">${rad('Totale drap', tall(x.drap))}${rad('Kriminalitet utført', tall(x.krim))}${rad('Biler stjålet', tall(x.biler))}${rad('Meldinger sendt', tall(x.meldinger_sendt))}</div>`)
+      + seksjon('Aktivitet', `<div class="nokkeltall" style="padding:12px"><div><span>Registrert</span><b>${new Date(x.opprettet).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</b></div><div><span>Sist aktiv</span><b>${new Date(x.sist_aktiv).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</b></div></div>`)
+      + (mus ? seksjon('Musikk', kropp(mus)) : '')
+      + (x.bio ? seksjon('Om spilleren', `<div class="bb kropp">${bbkode(x.bio)}</div>`) : '');
+  } },
+
+  statistikk: { fane: 'sosial', tittel: 'Din statistikk', async vis() {
+    const p = await rpc('min_profil'), s = p.statistikk || {};
+    const navn = { krim: 'Kriminalitet forsøkt', krim_ok: 'Kriminalitet lyktes', bil: 'Biltyveri forsøkt', bil_ok: 'Biler stjålet', ran: 'Ran forsøkt', ran_ok: 'Ran lyktes', utbrudd: 'Utbrudd forsøkt', utbrudd_ok: 'Spillere brutt ut', angrep: 'Angrep', drap: 'Drap', reise: 'Reiser', kasino: 'Kasinospill', melding: 'Meldinger sendt' };
+    return seksjon('Alt du har gjort', `<table class="tabell">${Object.entries(navn).map(([k, t]) => `<tr><td>${t}</td><td class="tall">${tall(s[k] || 0)}</td></tr>`).join('')}</table>`);
+  } },
+
+  botrapport: { fane: 'sosial', tittel: 'Botrapport', kort: 'Feil funnet av de 20 botene', oppfrisk: 60, async vis() {
+    const r = await rpc('bot_rapport');
+    return `<div class="nokkeltall"><div><span>Boter</span><b>${r.boter.length}</b></div><div><span>Kjøringer (siste)</span><b>${r.kjoringer.length}</b></div><div><span>Uventede feil (3 døgn)</span><b class="${r.uventet.length ? 'bad' : 'ok'}">${r.uventet.length}</b></div><div><span>Kall siste kjøring</span><b>${r.kjoringer[0]?.kall ?? 0}</b></div></div>`
+      + seksjon('Uventede feil', r.uventet.length ? `<div class="liste">${r.uventet.slice(0, 40).map(f => `<div class="linjeel"><div class="info"><b class="bad" style="font-weight:600">${esc(f.fn)}: ${esc(f.feil)}</b><small>${esc(f.bot)} · kode ${esc(f.kode || '–')} · ${dato(f.tid)}${f.args ? ' · ' + esc(JSON.stringify(f.args)).slice(0, 120) : ''}</small></div></div>`).join('')}</div>` : '<p class="tom ok">Ingen uventede feil. Alt virker.</p>')
+      + seksjon('Spillregler som stoppet botene (siste døgn)', Object.keys(r.regelfeil).length ? `<table class="tabell">${Object.entries(r.regelfeil).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="tall">${v}</td></tr>`).join('')}</table>` : '<p class="tom">Ingen.</p>')
+      + seksjon('Kjøringer', `<table class="tabell"><tr><th>Tid</th><th class="h">Boter</th><th class="h">Kall</th><th class="h">Feil</th></tr>${r.kjoringer.slice(0, 20).map(k => `<tr><td>${dato(k.start)}</td><td class="tall">${k.boter}</td><td class="tall">${k.kall}</td><td class="tall ${k.uventet ? 'bad' : ''}">${k.uventet}</td></tr>`).join('')}</table>`)
+      + seksjon('Botene', `<div class="liste">${r.boter.map(b => `<div class="linjeel">${avatar(b.navn, 1)}<div class="info"><b><button class="lenke" data-profil="${esc(b.navn)}">${esc(b.navn)}</button></b><small>${esc(b.rank)} · ${kr(b.penger)} · sist aktiv ${dato(b.sist_aktiv)}</small></div></div>`).join('')}</div>`);
+  } },
+
   // ------------------------------------------------ CASINO
-  dodsterninger: { fane: 'casino', tittel: 'Dødsterninger', kort: 'Alle kaster. Laveste sum ryker ut.', oppfrisk: 8, vis: () => gruppeSide('terninger', 'Alle kaster to terninger hver runde. Den med lavest sum ryker ut. Siste spiller vinner 95 % av potten.') },
-  terning: { fane: 'casino', tittel: 'Terningduell', kort: 'Kast terning mot en annen', oppfrisk: 8, vis: () => utfordringSide('terning') },
-  streetrace: { fane: 'casino', tittel: 'Streetracing', kort: 'Race med bilen din', oppfrisk: 8, vis: () => utfordringSide('race') },
-  royale: { fane: 'casino', tittel: 'Battle royale', kort: 'Siste mann stående vinner', oppfrisk: 8, vis: () => gruppeSide('royale', 'Alle går inn i ringen. Én etter én blir tatt ut. Bedre våpen gir bedre sjanse til å overleve. Siste spiller vinner 95 % av potten.') },
+  terninger: { fane: 'casino', tittel: 'Terninger', kort: 'Kast mot banken – høyest sum vinner', async vis() {
+    const l = await rpc('lotto_info');
+    return seksjon('Kast mot banken', kropp(`<div class="terningbord"><div><small class="dim">Du</small><div class="terninger" id="dineT">${terning(0)}${terning(0)}</div></div><b class="mot">mot</b><div><small class="dim">Banken</small><div class="terninger" id="bankT">${terning(0)}${terning(0)}</div></div></div>
+      <p class="dim" style="text-align:center">Høyest sum vinner. Likt kastes på nytt. Vinner du, får du innsatsen dobbelt tilbake. Taper du, går innsatsen i lottopotten (nå ${kr(l.pott)}).</p>
+      <form id="terningForm" class="rad"><div><label for="tInn">Innsats</label><input id="tInn" name="innsats" type="number" min="100" max="2000000" value="${hent('ug_tinnsats') || 1000}" required></div><button class="knapp">Kast</button></form>`));
+  }, etter() {
+    $('#terningForm').onsubmit = async (e) => {
+      e.preventDefault(); const k = e.target.querySelector('button'), innsats = Number(new FormData(e.target).get('innsats')); k.disabled = true; lagre('ug_tinnsats', innsats);
+      const rull = setInterval(() => { $('#dineT').innerHTML = terning(1 + Math.floor(Math.random() * 6)) + terning(1 + Math.floor(Math.random() * 6)); $('#bankT').innerHTML = terning(1 + Math.floor(Math.random() * 6)) + terning(1 + Math.floor(Math.random() * 6)); }, 80);
+      try {
+        const r = await rpc('terning_kast', { p_innsats: innsats });
+        await new Promise(o => setTimeout(o, 600)); clearInterval(rull);
+        $('#dineT').innerHTML = r.din.map(terning).join(''); $('#bankT').innerHTML = r.bank.map(terning).join('');
+        varsel(r.melding, r.ok ? 'ok' : 'bad'); await oppdater();
+      } catch (err) { clearInterval(rull); varsel(err.message, 'bad'); }
+      setTimeout(() => { k.disabled = false; }, 600);
+    };
+  } },
   lotto: { fane: 'casino', tittel: 'Lotto', kort: 'Ukentlig trekning', async vis() {
     const l = await rpc('lotto_info');
     return `<div class="nokkeltall"><div><span>Potten nå</span><b class="ok">${kr(l.pott)}</b></div><div><span>Trekning om</span><b data-til="${l.trekning}"></b></div><div><span>Kuponger totalt</span><b>${tall(l.kuponger)}</b></div><div><span>Dine kuponger</span><b>${tall(l.mine)}</b></div></div>`
-      + seksjon('Kjøp kuponger', kropp(`<p class="dim">${kr(l.pris)} per kupong. Jo flere kuponger, jo større sjanse. Vinneren får pengene i banken.</p><form data-rpc="kjop_lotto" class="rad"><div><label for="lotAnt">Antall</label><input id="lotAnt" name="p_antall" type="number" min="1" max="100" value="1" required data-num></div><button class="knapp">Kjøp</button></form>`))
+      + seksjon('Slik vokser potten', `<table class="tabell"><tr><td>Grunnbeløp</td><td class="tall">${kr(100000)}</td></tr><tr><td>Solgte kuponger (${tall(l.kuponger)} × ${kr(l.pris)})</td><td class="tall">${kr(l.kuponger * l.pris)}</td></tr><tr><td>Tapt i blackjack og terninger</td><td class="tall ok">${kr(l.fra_kasino)}</td></tr><tr><td><b>Totalt</b></td><td class="tall"><b>${kr(l.pott)}</b></td></tr></table>`)
+      + seksjon('Kjøp kuponger', kropp(`<p class="dim">${kr(l.pris)} per kupong. Trekning hver mandag kl. 00:00. Én vinner tar hele potten, rett i banken. Kjøper ingen kuponger, rulles kasinopengene over til neste uke.</p><form data-rpc="kjop_lotto" class="rad"><div><label for="lotAnt">Antall</label><input id="lotAnt" name="p_antall" type="number" min="1" max="100" value="1" required data-num></div><button class="knapp">Kjøp</button></form>`))
       + seksjon('Siste vinnere', l.siste.length ? `<div class="liste">${l.siste.map(x => `<div class="linjeel"><div class="info"><b>${esc(x.vinner)}</b><small>${tall(x.kuponger)} kuponger · ${dato(x.tid)}</small></div><b class="ok tall">${kr(x.pott)}</b></div>`).join('')}</div>` : '<p class="tom">Ingen trekninger ennå.</p>');
   } },
-  nummer: { fane: 'casino', tittel: 'Nummerspillet', kort: 'Gjett det hemmelige tallet', oppfrisk: 15, async vis() {
-    const n = await rpc('nummer_info');
-    return `<div class="nokkeltall"><div><span>Potten</span><b class="ok">${kr(n.pott)}</b></div><div><span>Gjetninger</span><b>${tall(n.gjetninger)}</b></div></div>`
-      + seksjon('Gjett tallet', kropp(`<p class="dim">Et hemmelig tall mellom 1 og 1000. Hvert gjett koster ${kr(n.pris)} og går i potten. Den som treffer, vinner alt.</p>
-        <form data-rpc="nummer_gjett" class="rad"><div><label for="numTall">Ditt tall</label><input id="numTall" name="p_tall" type="number" min="1" max="1000" required data-num></div><button class="knapp">Gjett</button></form>
-        ${n.mine.length ? `<p style="margin-bottom:0"><b>Dine hint:</b> ${n.mine.map(m => `<span class="merke ${m.hint === 'høyere' ? 'mint' : 'gul'}">${m.tall} → ${m.hint}</span>`).join(' ')}</p>` : ''}`))
-      + seksjon('Tidligere vinnere', n.siste.length ? `<div class="liste">${n.siste.map(x => `<div class="linjeel"><div class="info"><b>${esc(x.vinner)}</b><small>Tallet var ${x.tall} · ${dato(x.tid)}</small></div><b class="ok tall">${kr(x.pott)}</b></div>`).join('')}</div>` : '<p class="tom">Ingen har vunnet ennå.</p>');
-  } },
-  poker: { fane: 'casino', tittel: 'Poker', kort: "Texas Hold'em mot andre", kommer: true, async vis() { return ''; } },
-  bjbord: { fane: 'casino', tittel: 'Blackjack-bord', kort: 'Mot andre ved samme bord', kommer: true, async vis() { return ''; } },
-  blackjack: { fane: 'casino', tittel: 'Blackjack', kort: 'Slå huset, kom nærmest 21', async vis() {
+  blackjack: { fane: 'casino', tittel: 'Blackjack', kort: 'Mot banken – kom nærmest 21', async vis() {
     const b = await rpc('bj_status');
     return bjVisning(b);
   } },
-  rulett: { fane: 'casino', tittel: 'Rulett', kort: 'Rødt, svart eller tall', async vis() {
-    return seksjon('Rulettbordet', kropp(`<div id="rulettRes" class="rulettall dim">–</div><p class="dim" style="text-align:center">Rød/svart/partall/oddetall gir dobbelt. Riktig tall gir 36 ganger innsatsen.</p>
-      <form id="rulettForm"><div class="rad" style="margin-bottom:10px"><div><label for="rulInn">Innsats</label><input id="rulInn" name="innsats" type="number" min="100" max="5000000" required></div><div><label for="rulValg">Valg</label><select id="rulValg" name="valg"><option value="rod">Rød</option><option value="svart">Svart</option><option value="partall">Partall</option><option value="oddetall">Oddetall</option>${Array.from({ length: 37 }, (_, i) => `<option value="${i}">Tallet ${i}</option>`).join('')}</select></div></div><button class="knapp full">Spinn</button></form>`));
-  }, etter() {
-    $('#rulettForm').onsubmit = async (e) => {
-      e.preventDefault(); const f = new FormData(e.target), k = e.target.querySelector('button'); k.disabled = true;
-      try { const r = await rpc('rulett', { p_innsats: Number(f.get('innsats')), p_valg: f.get('valg') }); const el = $('#rulettRes'); el.textContent = r.tall; el.className = 'rulettall ' + (r.farge === 'rød' ? 'bad' : r.farge === 'grønn' ? 'ok' : ''); varsel(r.melding, r.ok ? 'ok' : 'bad'); await oppdater(); }
-      catch (err) { varsel(err.message, 'bad'); }
-      k.disabled = false;
-    };
-  } },
-
   // ------------------------------------------------ OPPDRAG
   oppdrag: { fane: 'oppdrag', tittel: 'Oppdrag', async vis() {
     const l = await rpc('mine_oppdrag'), ferdig = l.filter(x => x.hentet).length;
@@ -908,36 +1032,98 @@ const SIDER = {
   } },
 };
 
+
+// ---------- BBCode (trygg: teksten escapes først, bare kjente koder blir HTML) ----------
+function bbkode(tekst) {
+  if (!tekst) return '';
+  let h = esc(tekst);
+  const URL_OK = 'https?:\\/\\/[^\\s\\[\\]"<>]+';
+  for (let i = 0; i < 6; i++) {
+    const for_ = h;
+    h = h.replace(/\[(b|i|u|s)\]([\s\S]*?)\[\/\1\]/gi, (m, t, inn) => `<${{ b: 'strong', i: 'em', u: 'u', s: 's' }[t.toLowerCase()]}>${inn}</${{ b: 'strong', i: 'em', u: 'u', s: 's' }[t.toLowerCase()]}>`)
+      .replace(/\[color=(#[0-9a-f]{3,6}|[a-z]{3,20})\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=([1-6])\]([\s\S]*?)\[\/size\]/gi, '<span class="bb-s$1">$2</span>')
+      .replace(/\[(center|left|right)\]([\s\S]*?)\[\/\1\]/gi, '<div style="text-align:$1">$2</div>')
+      .replace(/\[quote(?:=([^\]]{1,40}))?\]([\s\S]*?)\[\/quote\]/gi, (m, n, inn) => `<blockquote>${n ? `<b>${n}:</b><br>` : ''}${inn}</blockquote>`)
+      .replace(/\[code\]([\s\S]*?)\[\/code\]/gi, '<code>$1</code>')
+      .replace(/\[list\]([\s\S]*?)\[\/list\]/gi, (m, inn) => '<ul>' + inn.split('[*]').map(x => x.trim()).filter(Boolean).map(x => `<li>${x}</li>`).join('') + '</ul>');
+    if (h === for_) break;
+  }
+  h = h.replace(new RegExp(`\\[url=(${URL_OK})\\]([\\s\\S]*?)\\[\\/url\\]`, 'gi'), '<a href="$1" target="_blank" rel="noopener noreferrer nofollow">$2</a>')
+    .replace(new RegExp(`\\[url\\](${URL_OK})\\[\\/url\\]`, 'gi'), '<a href="$1" target="_blank" rel="noopener noreferrer nofollow">$1</a>')
+    .replace(new RegExp(`\\[img\\](${URL_OK})\\[\\/img\\]`, 'gi'), '<img src="$1" alt="" loading="lazy" referrerpolicy="no-referrer">')
+    .replace(/\[hr\]/gi, '<hr>');
+  return h.replace(/\n/g, '<br>').replace(/<br>\s*(<\/?(ul|li|div|blockquote|hr)[^>]*>)/g, '$1').replace(/(<\/?(ul|li|div|blockquote)[^>]*>)\s*<br>/g, '$1');
+}
+function musikk(url) {
+  if (!url) return '';
+  if (/\.(mp3|ogg|wav|m4a)(\?|$)/i.test(url)) return `<audio controls preload="none" src="${esc(url)}" style="width:100%"></audio>`;
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,15})/);
+  if (yt) return `<a class="knapp sek full" href="https://www.youtube.com/watch?v=${yt[1]}" target="_blank" rel="noopener noreferrer">▶ Spill musikken på YouTube</a>`;
+  return `<a class="knapp sek full" href="${esc(url)}" target="_blank" rel="noopener noreferrer nofollow">▶ Åpne musikken</a>`;
+}
+const VERKTOY = [
+  ['b', 'Fet', '<b>B</b>'], ['i', 'Kursiv', '<i>I</i>'], ['u', 'Understrek', '<u>U</u>'], ['s', 'Gjennomstrek', '<s>S</s>'],
+  ['color', 'Farge', '<span class="fargeprikk"></span>'], ['size', 'Størrelse', 'Aa'], ['list', 'Liste', '☰'], ['quote', 'Sitat', '❝'],
+  ['left', 'Venstrejuster', '⇤'], ['center', 'Midtstill', '↔'], ['right', 'Høyrejuster', '⇥'], ['url', 'Lenke', '🔗'],
+  ['img', 'Bilde', '🖼'], ['code', 'Kode', '&lt;/&gt;'], ['hr', 'Strek', '—'], ['emoji', 'Emoji', '🙂']];
+const FARGER = ['#ff4d5a', '#ffc94d', '#3ee3a6', '#5cc6ff', '#c084fc', '#ffffff'];
+let profilUtkast = {};
+function settInn(ta, før, etter = '') {
+  const a = ta.selectionStart, b = ta.selectionEnd, valgt = ta.value.slice(a, b);
+  ta.value = ta.value.slice(0, a) + før + valgt + etter + ta.value.slice(b);
+  ta.focus(); ta.selectionStart = a + før.length; ta.selectionEnd = a + før.length + valgt.length;
+  ta.dispatchEvent(new Event('input'));
+}
+let fargeNr = 0, størrelse = 4;
+function profilRedigering() {
+  const ta = $('#pBio');
+  ta.oninput = () => { $('#pForhand').innerHTML = bbkode(ta.value) || '<span class="dim">Ingenting ennå.</span>'; };
+  document.querySelectorAll('[data-bb]').forEach(k => k.onclick = () => {
+    const t = k.dataset.bb;
+    if (t === 'color') { const f = FARGER[fargeNr++ % FARGER.length]; settInn(ta, `[color=${f}]`, '[/color]'); k.querySelector('.fargeprikk').style.background = FARGER[fargeNr % FARGER.length]; }
+    else if (t === 'size') { settInn(ta, `[size=${størrelse}]`, '[/size]'); størrelse = størrelse >= 6 ? 1 : størrelse + 1; }
+    else if (t === 'list') settInn(ta, '[list]\n[*] ', '\n[*] \n[/list]');
+    else if (t === 'url') settInn(ta, '[url=https://]', '[/url]');
+    else if (t === 'img') settInn(ta, '[img]https://', '[/img]');
+    else if (t === 'hr') settInn(ta, '\n[hr]\n');
+    else if (t === 'emoji') settInn(ta, ['😎', '🔫', '💰', '🃏', '🚬', '👑', '🔥', '💀'][Math.floor(Math.random() * 8)]);
+    else settInn(ta, `[${t}]`, `[/${t}]`);
+  });
+  document.querySelectorAll('[data-kjonn]').forEach(k => k.onclick = () => { profilUtkast.kjonn = k.dataset.kjonn; document.querySelectorAll('[data-kjonn]').forEach(x => x.classList.toggle('aktiv', x === k)); });
+  $('#bildeFil').onchange = async (e) => {
+    const fil = e.target.files[0]; if (!fil) return;
+    try {
+      const bilde = await new Promise((ok, feil) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => feil(new Error('Kunne ikke lese bildet')); i.src = URL.createObjectURL(fil); });
+      const side = Math.min(bilde.naturalWidth, bilde.naturalHeight), c = document.createElement('canvas'); c.width = c.height = 320;
+      c.getContext('2d').drawImage(bilde, (bilde.naturalWidth - side) / 2, (bilde.naturalHeight - side) / 2, side, side, 0, 0, 320, 320);
+      const r = await rpc('sett_profilbilde', { p_data: c.toDataURL('image/jpeg', 0.85) });
+      varsel(r.melding); await hentBilder(); await oppdater(); await tegnSide(true);
+    } catch (err) { varsel(err.message, 'bad'); }
+  };
+  $('#lagreProfil').onclick = async (e) => {
+    e.target.disabled = true;
+    try {
+      const r = await rpc('sett_profil', { p_bio: ta.value, p_kjonn: profilUtkast.kjonn ?? '', p_avatar_url: $('#pAvatar').value.trim(), p_musikk_url: $('#pMusikk').value.trim(), p_vis_bio: $('#pVis').checked });
+      varsel(r.melding); await hentBilder(); await oppdater(); gaa('profil', st.spiller.navn);
+    } catch (err) { varsel(err.message, 'bad'); e.target.disabled = false; }
+  };
+}
+
 // ---------- casino-hjelpere ----------
-async function utfordringSide(type) {
-  const u = await rpc('utfordringer_liste', { p_type: type }), race = type === 'race';
-  const bilValg = race ? await garasjeValg() : null;
-  return seksjon('Åpne utfordringer', u.apne.length ? `<div class="liste">${u.apne.map(x => `<div class="linjeel">${avatar(x.navn, 1)}<div class="info"><b>${esc(x.navn)}</b><small>${race ? esc(x.bil) + ' · ' : ''}Innsats ${kr(x.innsats)}</small></div>
-      ${x.min ? `<button class="knapp sek liten" data-act="avbryt_utfordring" data-args='${arg({ p_id: x.id })}'>Trekk</button>` : race ? `<button class="knapp liten" data-godta-race="${x.id}">Kjør</button>` : `<button class="knapp liten" data-act="godta_utfordring" data-args='${arg({ p_id: x.id })}'>Kast</button>`}</div>`).join('')}</div>` : '<p class="tom">Ingen åpne utfordringer. Lag en!</p>')
-    + seksjon(race ? 'Utfordre til race' : 'Lag utfordring', kropp(`<p class="dim">${race ? 'Dyrere bil gir fordel, men flaks avgjør også. Vinneren får 97 % av potten.' : 'Begge kaster to terninger. Høyest sum vinner 97 % av potten.'}</p>
-      ${race && !bilValg.har ? bilValg.html : `<form data-rpc="lag_utfordring"><input type="hidden" name="p_type" value="${type}">${race ? `<div class="felt"><label>Din bil</label>${bilValg.html}</div>` : ''}<div class="rad"><div><label for="utInn">Innsats</label><input id="utInn" name="p_innsats" type="number" min="1000" required data-num></div><button class="knapp">Legg ut</button></div></form>`}
-      ${race && bilValg.har ? `<div id="raceBil" class="hidden">${bilValg.html}</div>` : ''}`))
-    + seksjon('Siste resultater', u.siste.length ? `<div class="liste">${u.siste.map(x => `<div class="linjeel"><div class="info"><b style="font-weight:500">${esc(x.resultat)}</b><small>${dato(x.tid)}</small></div></div>`).join('')}</div>` : '<p class="tom">Ingen resultater ennå.</p>');
-}
-async function gruppeSide(type, regler) {
-  const g = await rpc('gruppespill_liste', { p_type: type });
-  return seksjon('Åpne spill', g.apne.length ? `<div class="liste">${g.apne.map(x => `<div class="linjeel"><div class="info"><b>Innsats ${kr(x.innsats)}</b><small>${x.deltakere.length}/${x.maks}: ${x.deltakere.map(esc).join(', ')}</small></div>
-      ${x.med ? `<button class="knapp sek liten" data-act="forlat_gruppespill" data-args='${arg({ p_id: x.id })}'>Forlat</button>` : `<button class="knapp liten" data-act="bli_med_gruppespill" data-args='${arg({ p_id: x.id })}'>Bli med</button>`}</div>`).join('')}</div>` : '<p class="tom">Ingen åpne spill. Start et!</p>')
-    + seksjon('Start nytt spill', kropp(`<p class="dim">${regler} Spillet starter når alle plassene er fylt.</p>
-      <form data-rpc="lag_gruppespill"><input type="hidden" name="p_type" value="${type}"><div class="rad"><div><label for="gInn">Innsats</label><input id="gInn" name="p_innsats" type="number" min="1000" required data-num></div><div><label for="gMaks">Spillere</label><select id="gMaks" name="p_maks" data-num>${[3, 4, 5, 6, 8].map(n => `<option ${n === 4 ? 'selected' : ''}>${n}</option>`).join('')}</select></div><button class="knapp">Start</button></div></form>`))
-    + seksjon('Siste spill', g.siste.length ? g.siste.map(x => kropp(`<b>${esc(x.vinner)} vant</b> <span class="dim">· ${x.maks} spillere · ${dato(x.tid)}</span><p class="pre">${esc(x.logg)}</p>`)).join('<div style="border-top:1px solid var(--line)"></div>') : '<p class="tom">Ingen spill ferdig ennå.</p>');
-}
+const PRIKKER = { 0: [], 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+const terning = (n) => `<span class="terning" aria-label="${n || 'terning'}">${Array.from({ length: 9 }, (_, i) => `<i class="${PRIKKER[n].includes(i) ? 'p' : ''}"></i>`).join('')}</span>`;
 function bjVisning(b) {
   const hand = (kort, verdi, skjult) => `<div class="hand">${kort.map(spillkort).join('')}${skjult ? '<span class="spillkort bak"></span>' : ''}</div><small class="dim">Verdi: <b>${verdi}</b></small>`;
   if (b.aktiv || b.ferdig) {
-    return seksjon('Dealer', kropp(hand(b.dealer, b.dealer_verdi, b.aktiv)))
+    return seksjon('Banken', kropp(hand(b.dealer, b.dealer_verdi, b.aktiv)))
       + seksjon('Din hånd', kropp(hand(b.hand, b.hand_verdi, false)), 'Innsats ' + kr(b.innsats))
       + (b.aktiv ? `<div class="rad"><button class="knapp" data-bj="bj_trekk">Trekk kort</button><button class="knapp sek" data-bj="bj_staa">Stå</button></div>`
         : `<div class="banner ${b.ok ? 'mint' : b.uavgjort ? 'gul' : ''}"><div>${esc(b.melding)}</div></div>${bjStart(b.innsats)}`);
   }
   return bjStart(1000);
 }
-const bjStart = (innsats) => seksjon('Ny runde', kropp(`<p class="dim">Kom nærmere 21 enn dealeren uten å gå over. Blackjack betaler 3:2. Dealeren står på 17.</p><form id="bjForm" class="rad"><div><label for="bjInn">Innsats</label><input id="bjInn" name="innsats" type="number" min="100" max="2000000" value="${innsats}" required></div><button class="knapp">Del ut</button></form>`));
+const bjStart = (innsats) => seksjon('Ny runde', kropp(`<p class="dim">Kom nærmere 21 enn banken uten å gå over. Blackjack betaler 3:2. Banken står på 17. Tapte innsatser går i ukens lottopott.</p><form id="bjForm" class="rad"><div><label for="bjInn">Innsats</label><input id="bjInn" name="innsats" type="number" min="100" max="2000000" value="${innsats}" required></div><button class="knapp">Del ut</button></form>`));
 
 // ---------- chat ----------
 let sisteChatId = 0;
@@ -992,8 +1178,6 @@ document.addEventListener('click', async (e) => {
   if (bj) { bj.disabled = true; try { const r = await rpc(bj.dataset.bj); if (r.ferdig) { varsel(r.melding, r.ok || r.uavgjort ? 'ok' : 'bad'); await oppdater(); } $('#innhold .innside').innerHTML = bjVisning(r); } catch (err) { varsel(err.message, 'bad'); } return; }
   const sa = t.closest('[data-selg-aksje]');
   if (sa) { const inp = sa.closest('form').querySelector('[name=p_antall]'); if (!inp.value) { inp.focus(); return varsel('Skriv inn hvor mange aksjer du vil selge.', 'bad'); } return handling('selg_aksje', { p_id: Number(sa.dataset.selgAksje), p_antall: Number(inp.value) }); }
-  const gr = t.closest('[data-godta-race]');
-  if (gr) { const sel = $('#raceBil select'); if (!sel) return varsel('Du trenger en bil i garasjen.', 'bad'); return handling('godta_utfordring', { p_id: Number(gr.dataset.godtaRace), p_bil: Number(sel.value) }); }
   const apne = t.closest('[data-apne]');
   if (apne) { const id = apne.dataset.apne; $('#m' + id).classList.toggle('hidden'); if (apne.dataset.lest === 'false') { apne.dataset.lest = 'true'; apne.parentElement.classList.remove('ulest'); await rpc('les_melding', { p_id: Number(id) }); await oppdater(); } return; }
   const sl = t.closest('[data-slett]'); if (sl) { await rpc('slett_melding', { p_id: Number(sl.dataset.slett) }); return tegnSide(true); }
@@ -1022,16 +1206,7 @@ document.addEventListener('submit', async (e) => {
   if (f.dataset.rpc === 'ny_traad' && r?.id) gaa('forum', 't' + r.id);
 });
 
-async function visProfil(navn) {
-  try {
-    const x = await rpc('profil', { p_navn: navn });
-    $('#modal').innerHTML = `<div class="boks"><div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">${avatar(x.navn)}<div><h2 style="font-size:1.5rem">${esc(x.navn)}</h2><span class="${x.online ? 'ok' : 'dim'}">${x.online ? '● Pålogget' : 'Ikke pålogget'}</span></div></div>
-      <div class="nokkeltall" style="margin-bottom:12px"><div><span>Rank</span><b>${esc(x.rank)}</b></div><div><span>Drap</span><b>${x.drap}</b></div><div><span>Gjeng</span><b>${esc(x.gjeng || '–')}</b></div><div><span>Prestasjoner</span><b>${x.prestasjoner}</b></div></div>
-      <p class="dim" style="font-size:.85rem">Startet ${new Date(x.opprettet).toLocaleDateString('nb-NO')}${x.fengsel ? ' · sitter i fengsel' : ''}${x.beskyttet ? ' · ny og beskyttet' : ''}</p>
-      <div class="rad"><button class="knapp sek" data-lukk>Lukk</button>${x.navn !== st.spiller.navn ? `<button class="knapp" data-gaa="meldinger" data-param="${esc(x.navn)}">Send melding</button>` : ''}</div></div>`;
-    $('#modal').classList.remove('hidden');
-  } catch (err) { varsel(err.message, 'bad'); }
-}
+function visProfil(navn) { $('#modal').classList.add('hidden'); gaa('profil', navn); }
 
 start();
 </script>

@@ -151,6 +151,18 @@ const feil = (melding, status = 400) => json({ error: melding }, status);
 export default async (req) => {
   const sti = new URL(req.url).pathname.replace(/^\/api\/?/, "");
   if (sti === "oppsett") return json({ google: googleKlar() });
+  if (sti.startsWith("bilde/")) {
+    // Profilbilder: offentlige, versjonert adresse (?v=) gjør at de kan mellomlagres lenge
+    let navn = "";
+    try { navn = decodeURIComponent(sti.slice(6)); } catch { return new Response("Ikke funnet", { status: 404 }); }
+    if (!/^[A-Za-z0-9_æøåÆØÅ]{3,16}$/.test(navn)) return new Response("Ikke funnet", { status: 404 });
+    try {
+      const [rad] = await q`select pb.data from profilbilder pb join spillere s on s.id = pb.spiller where lower(s.navn) = lower(${navn})`;
+      if (!rad) return new Response("Ikke funnet", { status: 404, headers: { "cache-control": "public, max-age=60" } });
+      return new Response(Buffer.from(rad.data, "base64"), { headers: {
+        "content-type": "image/jpeg", "cache-control": "public, max-age=31536000, immutable", "x-content-type-options": "nosniff" } });
+    } catch (e) { console.error("bilde-feil", e); return new Response("Feil", { status: 500 }); }
+  }
   try {
     if (sti === "google/start") return await googleStart(req);
     if (sti === "google/callback") return await googleCallback(req);
