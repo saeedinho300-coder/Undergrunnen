@@ -2,137 +2,263 @@
 <html lang="no">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f15">
 <title>Undergrunnen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Tema: T-banen om natten. Asfaltblått, signalrødt for handling, mintgrønt for «klar». */
 :root{
-  --bg:#0d0c0b; --panel:#171513; --panel2:#1f1c19; --line:#2e2a25;
-  --text:#e9e4dc; --dim:#9a9187; --red:#c3262e; --red2:#e0434b;
-  --gold:#d6a84a; --green:#5fae6a; --radius:6px;
+  --bg:#0b0f15; --bg2:#0f141c; --panel:#141b25; --panel2:#19222e; --hover:#1f2a38; --line:#243041; --line2:#2e3c50;
+  --text:#e8edf3; --dim:#8b98aa; --dim2:#5f6c7e;
+  --signal:#ff4d5a; --signal2:#ff6f79; --signal-bg:#2a1418;
+  --mint:#3ee3a6; --mint-bg:#0f2a22; --gul:#ffc94d; --blaa:#5cc6ff;
+  --r:10px; --r2:14px;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --navh:64px;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
-body{background:radial-gradient(ellipse at top,#1d1512 0%,var(--bg) 60%) fixed}
-a{color:var(--gold)}
-h1,h2,h3{font-family:"Bebas Neue",Impact,sans-serif;letter-spacing:.04em;font-weight:400;margin:0 0 .4em}
-h1{font-size:2.6rem;color:var(--red2)} h2{font-size:1.9rem} h3{font-size:1.3rem;color:var(--gold)}
-.mono{font-family:"IBM Plex Mono",monospace}
-.dim{color:var(--dim)} .ok{color:var(--green)} .bad{color:var(--red2)} .gold{color:var(--gold)}
-.hidden{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 var(--body);-webkit-text-size-adjust:100%}
+body{min-height:100vh}
 button,input,select,textarea{font:inherit;color:inherit}
-input,select,textarea{background:#0f0e0d;border:1px solid var(--line);border-radius:var(--radius);padding:.55em .7em;width:100%}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--red);border-color:transparent}
-button{background:var(--red);border:0;border-radius:var(--radius);padding:.55em 1em;font-weight:600;cursor:pointer;white-space:nowrap}
-button:hover{background:var(--red2)} button:disabled{opacity:.4;cursor:not-allowed}
-button.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
-button.ghost:hover{border-color:var(--gold)}
-button.small{padding:.3em .7em;font-size:.85rem}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.row>*{flex:1 1 140px}
-.list{display:flex;flex-direction:column;gap:8px}
-.item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px}
-.item .info{min-width:0;flex:1}
-.item .info b{display:block}
-.item small{color:var(--dim)}
-.locked{opacity:.45}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.stat{background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px}
-.stat span{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim)}
-.stat b{font-family:"IBM Plex Mono",monospace;font-weight:500}
-.bar{height:6px;background:#0f0e0d;border-radius:3px;overflow:hidden;margin-top:6px}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold))}
-table{width:100%;border-collapse:collapse}
-td,th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left}
-th{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:500}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px}
-.link{background:none;padding:0;color:var(--gold);font-weight:500}
-.link:hover{background:none;text-decoration:underline}
+a{color:var(--blaa)}
+.hidden{display:none!important}
+.mono,.tall{font-variant-numeric:tabular-nums}
+.dim{color:var(--dim)} .ok{color:var(--mint)} .bad{color:var(--signal2)} .gul{color:var(--gul)}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.02em;margin:0;text-wrap:balance}
 
-/* innlogging */
-#auth,#lag{max-width:400px;margin:8vh auto;padding:0 16px}
-.logo{text-align:center;margin-bottom:24px}
-.logo p{margin:0;color:var(--dim)}
-.tabs{display:flex;gap:6px;margin-bottom:14px}
-.tabs button{flex:1}
-form .felt{margin-bottom:10px}
-label{display:block;font-size:.8rem;color:var(--dim);margin-bottom:3px}
+/* skjema */
+input,select,textarea{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:.65em .8em;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--signal);outline-offset:-1px;border-color:transparent}
+textarea{resize:vertical}
+label{display:block;font-size:.8rem;color:var(--dim);margin:0 0 4px}
+.knapp,button.knapp{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--r);padding:.65em 1.1em;background:var(--signal);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none}
+.knapp:hover{background:var(--signal2)}
+.knapp:disabled{opacity:.4;cursor:not-allowed}
+.knapp.sek{background:var(--panel2);border:1px solid var(--line2);color:var(--text)}
+.knapp.sek:hover{border-color:var(--dim)}
+.knapp.mint{background:var(--mint);color:#06281c}
+.knapp.liten{padding:.4em .8em;font-size:.85rem}
+.knapp.full{width:100%}
+.lenke{background:none;border:0;padding:0;color:var(--blaa);font-weight:600;cursor:pointer}
+.rad{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.rad>*{flex:1 1 140px;min-width:0}
+.rad>.knapp{flex:0 0 auto}
+form .felt{margin-bottom:12px}
+:focus-visible{outline:2px solid var(--blaa);outline-offset:2px}
 
-/* spill */
-#spill{display:grid;grid-template-columns:210px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
-header{grid-column:1/-1;background:#0a0908ee;border-bottom:1px solid var(--line);padding:10px 18px;position:sticky;top:0;z-index:5;backdrop-filter:blur(6px)}
-.topp{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.topp .navn{font-family:"Bebas Neue";font-size:1.6rem;line-height:1;color:var(--red2)}
-.topp .pill{font-size:.85rem;white-space:nowrap}
-.topp .pill span{color:var(--dim);margin-right:4px}
-.topp .loggut{margin-left:auto}
-.timere{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.timer{font-size:.75rem;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--dim)}
-.timer.klar{color:var(--green);border-color:#2f4a33}
-nav{border-right:1px solid var(--line);padding:14px 10px;position:sticky;top:96px;align-self:start}
-nav button{display:flex;justify-content:space-between;width:100%;background:none;text-align:left;font-weight:500;color:var(--dim);padding:.5em .8em;margin-bottom:2px}
-nav button:hover{background:var(--panel);color:var(--text)}
-nav button.aktiv{background:var(--panel);color:var(--text);box-shadow:inset 3px 0 0 var(--red)}
-nav .badge{background:var(--red);color:#fff;border-radius:10px;font-size:.7rem;padding:0 6px}
-main{padding:18px;max-width:860px;width:100%}
-#varsel{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:min(560px,92vw);z-index:20;padding:12px 16px;border-radius:var(--radius);background:var(--panel2);border:1px solid var(--line);box-shadow:0 8px 30px #000a}
-#varsel.ok{border-color:var(--green)} #varsel.bad{border-color:var(--red)}
-.fengselbanner{background:#2a1214;border:1px solid var(--red);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px}
-.chatlogg{height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:6px;background:#0f0e0d;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:10px}
-.chatlogg div{word-wrap:break-word}
-.chatlogg .t{color:var(--dim);font-size:.75rem;margin-right:6px}
-.melding .kropp{white-space:pre-wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
-.melding.ulest b{color:var(--gold)}
-.rulett-tall{font-family:"Bebas Neue";font-size:3.2rem;text-align:center;line-height:1}
-.skille{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:.8rem;margin:14px 0}
+/* ======================= INNLOGGING ======================= */
+.inngang{max-width:440px;margin:0 auto;padding:7vh max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.logo{text-align:center;margin-bottom:26px}
+.logo .merke{display:inline-flex;align-items:center;gap:12px}
+.logo h1{font-size:2.8rem;letter-spacing:.06em;text-transform:uppercase}
+.logo p{margin:6px 0 0;color:var(--dim)}
+.skilt{width:44px;height:44px;border-radius:50%;background:var(--signal);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.6rem;color:#fff;box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--signal)}
+.boks{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);padding:18px}
+.faner{display:flex;gap:6px;background:var(--bg2);padding:4px;border-radius:var(--r);margin-bottom:16px}
+.faner button{flex:1;border:0;background:none;padding:.55em;border-radius:8px;font-weight:600;color:var(--dim);cursor:pointer}
+.faner button.aktiv{background:var(--panel2);color:var(--text);box-shadow:inset 0 -2px 0 var(--signal)}
+.skille{display:flex;align-items:center;gap:10px;color:var(--dim2);font-size:.8rem;margin:16px 0}
 .skille::before,.skille::after{content:"";flex:1;height:1px;background:var(--line)}
-.googleknapp{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:.6em 1em;border-radius:var(--radius);background:#fff;color:#1f1f1f;font-weight:600;text-decoration:none}
-.googleknapp:hover{background:#f1f1f1}
-.rankbar{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:6px 10px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);color:var(--text);font-weight:500;text-align:left}
-.rankbar:hover{background:var(--panel2);border-color:var(--gold)}
-.rb-navn{font-family:"Bebas Neue",Impact,sans-serif;font-size:1.15rem;letter-spacing:.04em;color:var(--gold);white-space:nowrap}
-.rb-spor{flex:1;height:8px;background:#0f0e0d;border-radius:4px;overflow:hidden;min-width:60px}
-.rb-spor i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .6s ease}
-.rb-pst{font-size:.85rem;white-space:nowrap}
-.rb-neste{font-size:.8rem;color:var(--dim);white-space:nowrap}
-tr.denne td{background:var(--panel2)}
-@media (max-width:420px){.rb-neste{display:none}}
-.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
-.modal .card{max-width:380px;width:100%}
+.googleknapp{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:.7em 1em;border-radius:var(--r);background:#fff;color:#1f1f1f;font-weight:700;text-decoration:none}
 
-@media (max-width:760px){
-  #spill{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
-  header{padding:8px 12px;position:static}
-  .topp{gap:10px}
-  .topp .navn{font-size:1.35rem}
-  nav{position:sticky;top:0;display:flex;overflow-x:auto;gap:4px;padding:8px;border-right:0;border-bottom:1px solid var(--line);background:var(--bg);z-index:4;scrollbar-width:none}
-  nav::-webkit-scrollbar{display:none}
-  nav button{width:auto;flex:0 0 auto;margin:0;gap:6px}
-  nav button.aktiv{box-shadow:inset 0 -2px 0 var(--red)}
-  main{padding:12px}
+/* ======================= TOPPFELT ======================= */
+#spill{max-width:760px;margin:0 auto;min-height:100vh;padding-bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 16px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg2);z-index:30}
+#topp{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg2);border-bottom:1px solid var(--line)}
+.topprad{display:flex;align-items:center;gap:10px;padding:12px max(14px,env(safe-area-inset-right,0px)) 10px max(14px,env(safe-area-inset-left,0px))}
+.avatar{flex:0 0 auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.25rem;color:#fff;border:2px solid var(--line2);text-transform:uppercase}
+.avatar.liten{width:32px;height:32px;font-size:.95rem;border-width:1px}
+.hvem{flex:1;min-width:0;cursor:pointer;background:none;border:0;padding:0;text-align:left}
+.hvem b{display:block;font-family:var(--display);font-size:1.3rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hvem>span{display:block;font-size:.82rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hvem .by{display:none}
+@media (min-width:520px){.hvem .by{display:inline}}
+.hvem .pst{color:var(--signal2);font-weight:700}
+.statboks{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.statboks div{display:flex;flex-direction:column;align-items:center;padding:4px 8px;min-width:0}
+.statboks div+div{border-left:1px solid var(--line)}
+.statboks svg{width:15px;height:15px;color:var(--dim)}
+.statboks b{font-size:1.02rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.statboks .penger b{color:var(--mint)}
+.bjelle{position:relative;flex:0 0 auto;width:46px;height:46px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line2);display:grid;place-items:center;cursor:pointer;color:var(--text)}
+.bjelle svg{width:22px;height:22px}
+.prikk{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--signal);color:#fff;font-size:.72rem;font-weight:700;display:grid;place-items:center;border:2px solid var(--bg2)}
+/* T-banelinjen som rankbar */
+.linje{position:relative;height:6px;background:var(--line);cursor:pointer}
+.linje i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--signal),var(--signal2));transition:width .6s ease}
+.linje::after{content:"";position:absolute;right:-1px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:var(--bg2);border:3px solid var(--line2)}
+.utvid{display:block;margin:0 auto;border:0;background:none;color:var(--dim2);padding:2px 20px 4px;cursor:pointer}
+.utvid svg{width:14px;height:14px;transition:transform .2s}
+.utvid.apen svg{transform:rotate(180deg)}
+.detaljer{padding:4px max(14px,env(safe-area-inset-right,0px)) 12px max(14px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.detaljer .d{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 9px;min-width:0}
+.detaljer .d span{display:block;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim2)}
+.detaljer .d b{font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.detaljer .full{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ======================= BUNNMENY ======================= */
+#bunn{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--bg2);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+#bunn .indre{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+#bunn button{position:relative;height:var(--navh);border:0;background:none;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+#bunn button svg{width:24px;height:24px}
+#bunn button.aktiv{color:var(--signal2);background:linear-gradient(180deg,var(--signal-bg),transparent)}
+#bunn button.aktiv::before{content:"";position:absolute;top:0;left:18%;right:18%;height:3px;border-radius:0 0 3px 3px;background:var(--signal)}
+#bunn .dott{position:absolute;top:10px;left:calc(50% + 9px);width:9px;height:9px;border-radius:50%;border:2px solid var(--bg2)}
+#bunn .dott.mint{background:var(--mint)} #bunn .dott.rod{background:var(--signal)}
+
+/* ======================= INNHOLD ======================= */
+#innhold{padding:0}
+.sidehode{display:flex;align-items:center;gap:12px;padding:18px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.sidehode h1{font-size:1.9rem;line-height:1}
+.sidehode p{margin:3px 0 0;color:var(--dim);font-size:.88rem}
+.sidehode .hoyre{margin-left:auto}
+.tilbake{flex:0 0 auto;width:38px;height:38px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line2);display:grid;place-items:center;cursor:pointer;color:var(--text)}
+.tilbake svg{width:18px;height:18px}
+.innside{padding:14px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.seksjon{background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
+.seksjon>h2{font-size:.95rem;letter-spacing:.14em;text-transform:uppercase;color:var(--signal2);padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.seksjon>h2 .ekstra{margin-left:auto;color:var(--dim);letter-spacing:0;text-transform:none;font-family:var(--body);font-weight:500;font-size:.85rem}
+.seksjon .kropp{padding:14px 16px}
+.seksjon .kropp>p:first-child{margin-top:0}
+.seksjon .kropp>p:last-child{margin-bottom:0}
+.rutenett{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px}
+.kort{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:96px;padding:13px 34px 13px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);text-align:left;cursor:pointer;color:var(--text);min-width:0}
+.kort:hover{background:var(--hover);border-color:var(--line2)}
+.kort b{font-size:1.05rem;line-height:1.2}
+.kort span{color:var(--dim);font-size:.85rem;line-height:1.3}
+.kort::after{content:"";position:absolute;right:14px;top:17px;width:8px;height:8px;border-top:2px solid var(--signal2);border-right:2px solid var(--signal2);transform:rotate(45deg)}
+.kort.bred{grid-column:1/-1;min-height:0}
+.kort.av{opacity:.55;cursor:default}
+.kort.av::after{display:none}
+.merke{display:inline-block;align-self:flex-start;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:.04em;background:var(--signal-bg);color:var(--signal2);border:1px solid #4a2128}
+.merke.mint{background:var(--mint-bg);color:var(--mint);border-color:#1d4a3b}
+.merke.gul{background:#2b230e;color:var(--gul);border-color:#4d3f17}
+
+/* lister og tabeller */
+.liste{display:flex;flex-direction:column}
+.linjeel{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line);min-width:0}
+.linjeel:first-child{border-top:0}
+.linjeel .info{flex:1;min-width:0}
+.linjeel .info b{display:block;overflow:hidden;text-overflow:ellipsis}
+.linjeel .info small{display:block;color:var(--dim);font-size:.82rem}
+.linjeel .sjanse{color:var(--dim);font-size:.9rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.linjeel.laast{opacity:.45}
+.spill{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:0;background:var(--signal);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 0 0 3px var(--signal-bg)}
+.spill:hover{background:var(--signal2)}
+.spill:disabled{background:var(--line2);box-shadow:none;cursor:not-allowed}
+.spill svg{width:16px;height:16px;margin-left:2px}
+.aksje{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.aksje:first-child{border-top:0}
+.aksjetopp{display:flex;gap:12px;align-items:flex-start}
+.aksjetopp .info{flex:1;min-width:0}
+.aksjetopp .info small{display:block}
+.spark{width:100%;height:34px;display:block}
+.tabell{width:100%;border-collapse:collapse}
+.tabell th{font-family:var(--display);font-weight:600;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);text-align:left;padding:10px 16px 6px}
+.tabell td{padding:10px 16px;border-top:1px solid var(--line);vertical-align:middle}
+.tabell .tall,.tabell td.h{text-align:right}
+.tabell tr.meg td{background:var(--hover)}
+.tom{color:var(--dim);padding:18px 16px;text-align:center}
+.bar{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--signal)}
+.bar.mint i{background:var(--mint)}
+.nokkeltall{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.nokkeltall div{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.nokkeltall span{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim2)}
+.nokkeltall b{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.banner{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r);border:1px solid #4a2128;background:var(--signal-bg)}
+.banner.gul{border-color:#4d3f17;background:#221c0c}
+.banner.mint{border-color:#1d4a3b;background:var(--mint-bg)}
+.banner .knapp{margin-left:auto}
+.pre{white-space:pre-wrap;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.88rem;margin:6px 0 0}
+
+/* ======================= HANDLINGER: ikonrad ======================= */
+.handlinger{display:grid;grid-template-columns:76px minmax(0,1fr);min-height:calc(100vh - 220px)}
+.skinne{border-right:1px solid var(--line);background:var(--bg2);padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.stopp{position:relative;width:100%;border:0;background:none;padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:var(--text)}
+.stopp.aktiv{background:var(--panel)}
+.stopp.aktiv::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--signal)}
+.ring{--p:1;--f:var(--mint);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--f) calc(var(--p)*1turn),var(--line) 0)}
+.ring>span{width:44px;height:44px;border-radius:50%;background:var(--bg2);display:grid;place-items:center}
+.stopp.aktiv .ring>span{background:var(--panel)}
+.ring svg{width:22px;height:22px}
+.stopp small{font-size:.72rem;font-weight:700;color:var(--mint);font-variant-numeric:tabular-nums;line-height:1}
+.stopp small.vent{color:var(--gul)}
+.stopp em{display:none;font-style:normal;font-size:.72rem;color:var(--dim)}
+.stopp.aktiv em{color:var(--text)}
+@media (min-width:640px){.stopp em{display:block}}
+.panel{min-width:0}
+.panelhode{display:flex;align-items:flex-end;gap:10px;padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+.panelhode .over{font-family:var(--display);font-weight:600;font-size:.78rem;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase}
+.panelhode h1{font-size:1.75rem;line-height:1.05}
+.panelhode .status{margin-left:auto;font-family:var(--display);font-weight:700;font-size:1.2rem;color:var(--mint);font-variant-numeric:tabular-nums}
+.panelhode .status.vent{color:var(--gul)}
+.panel .innside{padding-left:12px;padding-right:max(12px,env(safe-area-inset-right,0px))}
+
+/* blackjack-kort */
+.hand{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
+.spillkort{width:46px;height:64px;border-radius:7px;background:#f4f1ea;color:#16181c;display:flex;flex-direction:column;justify-content:space-between;padding:4px 6px;font-weight:700;box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.spillkort.rod{color:#c8263a}
+.spillkort .s{align-self:flex-end;font-size:1.1rem;line-height:1}
+.spillkort.bak{background:repeating-linear-gradient(45deg,var(--signal) 0 6px,#c73743 6px 12px);border:3px solid #f4f1ea}
+.rulettall{font-family:var(--display);font-size:3.4rem;line-height:1;text-align:center}
+
+/* chat og forum */
+.chatlogg{height:52vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:12px 16px}
+.chatlogg .m{display:flex;gap:8px;align-items:flex-start;word-break:break-word}
+.chatlogg .m small{color:var(--dim2);font-size:.75rem;margin-left:6px}
+.chatlogg .sys{color:var(--signal2);font-style:italic;font-size:.9rem}
+.innlegg{padding:12px 16px;border-top:1px solid var(--line)}
+.innlegg:first-child{border-top:0}
+.innlegg .hode{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.innlegg .tekst{white-space:pre-wrap;word-break:break-word}
+.melding.ulest .info b{color:var(--gul)}
+.meldingkropp{white-space:pre-wrap;padding:0 16px 14px;color:var(--text)}
+
+/* modal og varsel */
+#varsel{position:fixed;left:50%;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:min(560px,calc(100vw - 32px));z-index:40;padding:12px 16px;border-radius:var(--r);background:var(--panel2);border:1px solid var(--line2);box-shadow:0 10px 40px rgba(0,0,0,.6);font-weight:500}
+#varsel.ok{border-color:var(--mint);box-shadow:0 10px 40px rgba(0,0,0,.6),inset 3px 0 0 var(--mint)}
+#varsel.bad{border-color:var(--signal);box-shadow:0 10px 40px rgba(0,0,0,.6),inset 3px 0 0 var(--signal)}
+.modal{position:fixed;inset:0;background:rgba(3,6,10,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal .boks{width:100%;max-width:400px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (min-width:640px){
+  .rutenett{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .handlinger{grid-template-columns:96px minmax(0,1fr)}
+  .nokkeltall{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (max-width:440px){
+  .topp .avatar,.topprad>.avatar{width:40px;height:40px;font-size:1.05rem}
+  .bjelle{width:42px;height:42px}
+  .statboks div{padding:4px 6px}
+  .statboks b{font-size:.95rem}
+  .hvem b{font-size:1.15rem}
 }
 </style>
 </head>
 <body>
 
 <!-- ============ INNLOGGING ============ -->
-<section id="auth" class="hidden">
-  <div class="logo"><h1>Undergrunnen</h1><p>Byen sover. Du gjør det ikke.</p></div>
-  <div class="card">
-    <div class="tabs">
-      <button type="button" id="tabLogg">Logg inn</button>
-      <button type="button" id="tabReg" class="ghost">Ny bruker</button>
-    </div>
+<section id="auth" class="inngang hidden">
+  <div class="logo">
+    <div class="merke"><div class="skilt">U</div><h1>Undergrunnen</h1></div>
+    <p>Byen sover. Du gjør det ikke.</p>
+  </div>
+  <div class="boks">
+    <div class="faner"><button type="button" id="tabLogg" class="aktiv">Logg inn</button><button type="button" id="tabReg">Ny bruker</button></div>
     <form id="authForm">
       <div class="felt"><label for="epost">Brukernavn eller e-post</label><input id="epost" name="epost" type="text" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="f.eks. zaid eller navn@epost.no"></div>
-      <div class="felt"><label>Passord</label><input name="passord" type="password" required minlength="6" autocomplete="current-password"></div>
-      <button style="width:100%" id="authKnapp">Logg inn</button>
-      <p id="authFeil" class="bad"></p>
+      <div class="felt"><label for="passord">Passord</label><input id="passord" name="passord" type="password" required minlength="6" autocomplete="current-password"></div>
+      <button class="knapp full" id="authKnapp">Logg inn</button>
+      <p id="authFeil" class="bad" style="margin-bottom:0"></p>
     </form>
     <div id="googleBoks" class="hidden">
-      <div class="skille"><span>eller</span></div>
+      <div class="skille">eller</div>
       <a class="googleknapp" href="/api/google/start">
         <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
         Fortsett med Google
@@ -142,80 +268,118 @@ tr.denne td{background:var(--panel2)}
 </section>
 
 <!-- ============ LAG KARAKTER ============ -->
-<section id="lag" class="hidden">
-  <div class="logo"><h1>Undergrunnen</h1></div>
-  <div class="card">
+<section id="lag" class="inngang hidden">
+  <div class="logo"><div class="merke"><div class="skilt">U</div><h1>Undergrunnen</h1></div></div>
+  <div class="boks">
     <div id="dodTekst"></div>
-    <h2>Velg ditt gangsternavn</h2>
+    <h2 style="font-size:1.6rem;margin-bottom:12px">Velg gangsternavn</h2>
     <form id="lagForm">
-      <div class="felt"><input name="navn" required maxlength="16" placeholder="3–16 tegn"></div>
-      <button style="width:100%">Start i Oslo</button>
+      <div class="felt"><input id="navn" name="navn" required maxlength="16" placeholder="3–16 tegn"></div>
+      <button class="knapp full">Start i Oslo</button>
       <p id="lagFeil" class="bad"></p>
     </form>
-    <button class="ghost small" data-loggut>Logg ut</button>
+    <button class="knapp sek liten" data-loggut>Logg ut</button>
   </div>
 </section>
 
 <!-- ============ SPILLET ============ -->
 <section id="spill" class="hidden">
   <header id="topp"></header>
-  <nav id="meny"></nav>
-  <main id="side"></main>
+  <main id="innhold"></main>
 </section>
+<nav id="bunn" class="hidden"><div class="indre" id="bunnIndre"></div></nav>
 
-<div id="varsel" class="hidden"></div>
+<div id="varsel" class="hidden" role="status" aria-live="polite"></div>
 <div id="modal" class="modal hidden"></div>
 
 <script type="module">
+// =====================================================================
+//  VERKTØY
+// =====================================================================
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const kr = (n) => Number(n || 0).toLocaleString('nb-NO') + ' kr';
 const tall = (n) => Number(n || 0).toLocaleString('nb-NO');
+const kort = (n) => { n = Number(n || 0); const a = Math.abs(n);
+  if (a >= 1e9) return (n / 1e9).toFixed(a >= 1e10 ? 0 : 1).replace('.', ',') + 'mrd';
+  if (a >= 1e6) return (n / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace('.', ',') + 'm';
+  if (a >= 1e4) return Math.floor(n / 1e3) + 'k';
+  return tall(n); };
+const kompakt = (n) => { n = Number(n || 0); return Math.abs(n) >= 1000 && Math.abs(n) < 1e6 ? (n / 1000).toFixed(n < 1e4 ? 1 : 0).replace('.', ',').replace(',0', '') + 'k' : kort(n); };
+const dato = (iso) => new Date(iso).toLocaleString('nb-NO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const arg = (o) => esc(JSON.stringify(o));
 
-let data = null;       // spilldata (kriminalitet, våpen osv.)
-let st = null;         // egen status
-let offset = 0;        // serverklokke minus klientklokke
-let side = 'oversikt';
-let chatTimer = null;
-let sisteChatId = 0;
-let pollTimer = null;
-
+let data = null, st = null, offset = 0;
 const naa = () => Date.now() + offset;
 const sekIgjen = (iso) => iso ? Math.max(0, Math.ceil((new Date(iso).getTime() - naa()) / 1000)) : 0;
-const tid = (s) => s >= 3600 ? `${Math.floor(s/3600)}t ${Math.floor(s%3600/60)}m` : s >= 60 ? `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}` : `${s}s`;
+const tid = (s) => s >= 3600 ? `${Math.floor(s / 3600)}t ${Math.floor(s % 3600 / 60)}m` : s >= 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : `${s}s`;
+const tidKort = (s) => s >= 3600 ? `${Math.ceil(s / 3600)}t` : s >= 60 ? `${Math.ceil(s / 60)}m` : `${s}s`;
 const fengslet = () => st?.spiller && sekIgjen(st.spiller.fengsel_til) > 0;
 
+function fargeFra(navn) { let h = 0; for (const c of String(navn)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return `hsl(${h % 360} 45% 34%)`; }
+const avatar = (navn, liten) => `<span class="avatar${liten ? ' liten' : ''}" style="background:${fargeFra(navn)}">${esc(String(navn).slice(0, 2))}</span>`;
+const lagre = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+const hent = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+
+// =====================================================================
+//  IKONER (egne, enkle strektegninger)
+// =====================================================================
+const S = (d, ekstra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${ekstra}>${d}</svg>`;
+const IK = {
+  handlinger: S('<path d="M7 11V7a2 2 0 1 1 4 0v3"/><path d="M11 9V5.5a2 2 0 1 1 4 0V10"/><path d="M15 9.5a2 2 0 1 1 4 0V14a7 7 0 0 1-7 7h-1a6 6 0 0 1-5-2.7L3.5 15a1.8 1.8 0 0 1 3-2l.5.7V11"/>'),
+  handel: S('<circle cx="9" cy="9" r="5.5"/><path d="M14.5 6.6A5.5 5.5 0 1 1 9.6 15"/><path d="M9 6.5v5M7.4 8h2.4a1 1 0 0 1 0 2H8.2a1 1 0 0 0 0 2h2.4"/>'),
+  sosial: S('<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/>'),
+  casino: S('<rect x="3" y="3" width="12" height="12" rx="2.5"/><circle cx="6.5" cy="6.5" r=".9" fill="currentColor"/><circle cx="11.5" cy="11.5" r=".9" fill="currentColor"/><circle cx="9" cy="9" r=".9" fill="currentColor"/><path d="M15 9h3.5A2.5 2.5 0 0 1 21 11.5v7a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 9 18.5V15"/><circle cx="15" cy="18" r=".9" fill="currentColor"/>'),
+  oppdrag: S('<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>'),
+  bjelle: S('<path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>'),
+  penger: S('<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'),
+  poeng: S('<path d="m12 3 2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6-4.5-4.1 6-.7z"/>'),
+  kuler: S('<path d="M9 21V10a3 3 0 0 1 6 0v11z"/><path d="M9 15h6"/>'),
+  krim: S('<path d="M4 9c0-2 3.5-4 8-4s8 2 8 4c0 3-2 6-4 6s-2.5-2-4-2-2 2-4 2-4-3-4-6Z"/><circle cx="9" cy="10" r="1.3" fill="currentColor"/><circle cx="15" cy="10" r="1.3" fill="currentColor"/>'),
+  bil: S('<path d="M3 16v-3l2-5h14l2 5v3"/><path d="M3 16h18v2H3z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/><path d="M6 12h12"/>'),
+  ran: S('<path d="M8 7V5a4 4 0 0 1 8 0v2"/><path d="M5 7h14l-1.2 13H6.2z"/><path d="M12 11v5M10 13h4"/>'),
+  fengsel: S('<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 3v18M12 3v18M16 3v18"/>'),
+  drap: S('<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>'),
+  reise: S('<path d="M2.5 13.5 21 7l-2 4-8.5 4.5-2 4.5-1.5-.5.5-4-4.5-1.5z"/>'),
+  sykehus: S('<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/>'),
+  garasje: S('<path d="M3 10 12 4l9 6v10H3z"/><path d="M7 20v-7h10v7M7 16h10"/>'),
+  plante: S('<path d="M12 21v-9"/><path d="M12 12C12 7 9 4 4 4c0 5 3 8 8 8Z"/><path d="M12 14c0-4 3-6 8-6 0 4-3 6-8 6Z"/>'),
+  tilbake: S('<path d="m15 18-6-6 6-6"/>'),
+  ned: S('<path d="m6 9 6 6 6-6"/>'),
+  spill: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15l12.5-7.5z"/></svg>',
+};
+
+// =====================================================================
+//  SERVER
+// =====================================================================
 class IkkeInnlogget extends Error {}
 async function post(sti, body = {}) {
   let r;
-  try {
-    r = await fetch('/api/' + sti, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), credentials: 'same-origin' });
-  } catch { throw new Error('Ingen kontakt med serveren. Sjekk nettet.'); }
+  try { r = await fetch('/api/' + sti, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), credentials: 'same-origin' }); }
+  catch { throw new Error('Ingen kontakt med serveren. Sjekk nettet.'); }
   let d = {};
-  try { d = await r.json(); } catch { /* ikke json */ }
+  try { d = await r.json(); } catch {}
   if (r.status === 401 && sti === 'rpc') throw new IkkeInnlogget(d.error || 'Du er ikke innlogget');
   if (!r.ok) throw new Error(d.error || 'Noe gikk galt. Prøv igjen.');
   return d;
 }
-async function rpc(fn, args = {}) {
-  return (await post('rpc', { fn, args })).data;
-}
+const rpc = async (fn, args = {}) => (await post('rpc', { fn, args })).data;
 
 let varselTimer;
 function varsel(tekst, type = 'ok') {
   const v = $('#varsel');
   v.className = type; v.textContent = tekst;
   clearTimeout(varselTimer);
-  varselTimer = setTimeout(() => v.classList.add('hidden'), 6000);
+  varselTimer = setTimeout(() => v.classList.add('hidden'), Math.min(9000, 3500 + tekst.length * 40));
 }
 
-// Kjører en spillhandling, viser resultatet og oppdaterer siden
-async function handling(navn, args) {
+async function handling(fn, args) {
   try {
-    const r = await rpc(navn, args);
-    if (r && r.melding) varsel(r.melding, r.ok ? 'ok' : 'bad');
+    const r = await rpc(fn, args);
+    if (r && r.melding) varsel(r.melding, r.ok || r.uavgjort ? 'ok' : 'bad');
+    if (r && r.rankopp) setTimeout(() => varsel(`Gratulerer! Du er nå ${r.rankopp}.`, 'ok'), 2200);
     await oppdater();
-    await visSide(side, true);
+    await tegnSide(true);
     return r;
   } catch (e) {
     if (e instanceof IkkeInnlogget) return tilInnlogging();
@@ -224,66 +388,55 @@ async function handling(navn, args) {
   }
 }
 
-// ---------------------------------------------------------------- AUTH
+// =====================================================================
+//  INNLOGGING
+// =====================================================================
 let registrer = false;
 function settAuthModus(reg) {
   registrer = reg;
-  $('#tabLogg').className = reg ? 'ghost' : '';
-  $('#tabReg').className = reg ? '' : 'ghost';
+  $('#tabLogg').classList.toggle('aktiv', !reg); $('#tabReg').classList.toggle('aktiv', reg);
   $('#authKnapp').textContent = reg ? 'Opprett bruker' : 'Logg inn';
   $('#authFeil').textContent = '';
 }
 $('#tabLogg').onclick = () => settAuthModus(false);
 $('#tabReg').onclick = () => settAuthModus(true);
-
 $('#authForm').onsubmit = async (e) => {
   e.preventDefault();
-  const f = new FormData(e.target);
-  const knapp = $('#authKnapp'); knapp.disabled = true;
+  const f = new FormData(e.target), knapp = $('#authKnapp'); knapp.disabled = true;
   $('#authFeil').textContent = '';
-  try {
-    await post(registrer ? 'registrer' : 'logginn', { epost: f.get('epost'), passord: f.get('passord') });
-    e.target.reset();
-    await start();
-  } catch (err) { $('#authFeil').textContent = err.message; }
+  try { await post(registrer ? 'registrer' : 'logginn', { epost: f.get('epost'), passord: f.get('passord') }); e.target.reset(); await start(); }
+  catch (err) { $('#authFeil').textContent = err.message; }
   knapp.disabled = false;
 };
-
-document.addEventListener('click', async (e) => {
-  if (e.target.closest('[data-loggut]')) { await post('loggut').catch(() => {}); tilInnlogging(); }
-});
-
-function tilInnlogging() {
-  stopp();
-  $('#modal').classList.add('hidden');
-  vis('auth');
-}
-
 $('#lagForm').onsubmit = async (e) => {
-  e.preventDefault();
-  $('#lagFeil').textContent = '';
+  e.preventDefault(); $('#lagFeil').textContent = '';
   try {
     await rpc('opprett_spiller', { p_navn: new FormData(e.target).get('navn') });
+    const verver = hent('ug_verv'); if (verver) { await rpc('sett_verver', { p_navn: verver }).catch(() => {}); lagre('ug_verv', ''); }
     await start();
-  } catch (err) {
-    if (err instanceof IkkeInnlogget) return tilInnlogging();
-    $('#lagFeil').textContent = err.message;
-  }
+  } catch (err) { if (err instanceof IkkeInnlogget) return tilInnlogging(); $('#lagFeil').textContent = err.message; }
 };
-
 function vis(id) {
   for (const s of ['auth', 'lag', 'spill']) $('#' + s).classList.toggle('hidden', s !== id);
+  $('#bunn').classList.toggle('hidden', id !== 'spill');
 }
-
-
-let starter = false;
-// Google-knapp og feilmelding fra Google-innlogging
+function tilInnlogging() { stopp(); $('#modal').classList.add('hidden'); vis('auth'); }
+function visLag() {
+  $('#dodTekst').innerHTML = st?.dod ? `<p class="bad" style="margin-top:0"><b>${esc(st.dod.navn)}</b> ble drept av <b>${esc(st.dod.drept_av)}</b>. Livet går videre – start på nytt.</p>` : '';
+  vis('lag');
+}
 fetch('/api/oppsett').then(r => r.json()).then(o => { if (o.google) $('#googleBoks').classList.remove('hidden'); }).catch(() => {});
 {
-  const feilFraUrl = new URLSearchParams(location.search).get('feil');
-  if (feilFraUrl) { $('#authFeil').textContent = feilFraUrl; history.replaceState(null, '', '/'); }
+  const p = new URLSearchParams(location.search);
+  if (p.get('feil')) $('#authFeil').textContent = p.get('feil');
+  if (p.get('verv')) { lagre('ug_verv', p.get('verv')); settAuthModus(true); }
+  if (p.get('feil') || p.get('verv')) history.replaceState(null, '', '/');
 }
 
+// =====================================================================
+//  OPPSTART OG STATUS
+// =====================================================================
+let pollTimer = null, sideTimer = null, starter = false, forrigeRank = null;
 async function start() {
   if (starter) return; starter = true;
   try {
@@ -291,580 +444,595 @@ async function start() {
     await oppdater();
     if (!st.spiller) { visLag(); return; }
     vis('spill');
-    tegnMeny();
     clearInterval(pollTimer);
-    pollTimer = setInterval(() => oppdater().catch((e) => { if (e instanceof IkkeInnlogget) tilInnlogging(); }), 20000);
-    await visSide(side);
-  } catch (e) {
-    if (e instanceof IkkeInnlogget) tilInnlogging();
-    else varsel(e.message, 'bad');
-  } finally { starter = false; }
+    pollTimer = setInterval(() => oppdater().catch(e => { if (e instanceof IkkeInnlogget) tilInnlogging(); }), 20000);
+    await tegnSide();
+  } catch (e) { if (e instanceof IkkeInnlogget) tilInnlogging(); else varsel(e.message, 'bad'); }
+  finally { starter = false; }
 }
+function stopp() { clearInterval(pollTimer); clearInterval(sideTimer); st = null; forrigeRank = null; }
 
-function stopp() {
-  clearInterval(pollTimer);
-  clearInterval(chatTimer);
-  st = null;
-}
-
-// ---------------------------------------------------------------- STATUS
-// Prosent fremgang mot neste rank (heltall, 0–100)
 function rankProsent() {
   if (!st?.neste_exp) return 100;
-  const p = ((st.spiller.exp - st.rank_exp) / (st.neste_exp - st.rank_exp)) * 100;
-  return Math.max(0, Math.min(99, Math.floor(p)));
+  return Math.max(0, Math.min(99, Math.floor(((st.spiller.exp - st.rank_exp) / (st.neste_exp - st.rank_exp)) * 100)));
 }
-let forrigeRank = null;
-
 async function oppdater() {
   st = await rpc('min_status');
-  if (st.spiller) {
-    if (forrigeRank !== null && st.rank_indeks > forrigeRank) {
-      setTimeout(() => varsel(st.rank_indeks >= 9 ? `Du er nå Don – byens høyeste rank!` : `Gratulerer! Du er nå ${st.rank}.`, 'ok'), 1500);
-    }
-    forrigeRank = st.rank_indeks;
-  }
   offset = new Date(st.tid).getTime() - Date.now();
-  if (!st.spiller) {
-    if (!$('#spill').classList.contains('hidden')) { clearInterval(pollTimer); visLag(); }
-    return;
-  }
-  tegnTopp();
-  tegnMeny();
+  if (!st.spiller) { if (!$('#spill').classList.contains('hidden')) { clearInterval(pollTimer); visLag(); } return; }
+  if (forrigeRank !== null && st.rank_indeks > forrigeRank) setTimeout(() => varsel(`Gratulerer! Du er nå ${st.rank}.`, 'ok'), 1800);
+  forrigeRank = st.rank_indeks;
+  tegnTopp(); tegnBunn();
 }
 
-function visLag() {
-  $('#dodTekst').innerHTML = st.dod
-    ? `<p class="bad"><b>${esc(st.dod.navn)}</b> ble drept av <b>${esc(st.dod.drept_av)}</b>. Livet går videre – start på nytt.</p>` : '';
-  vis('lag');
-}
-
-function vapenNavn(n) { return n ? data.vapen.find(v => v.nivaa === n)?.navn : 'Ingen'; }
-function beskNavn(n) { return n ? data.beskyttelse.find(v => v.nivaa === n)?.navn : 'Ingen'; }
-
+// =====================================================================
+//  TOPPFELT
+// =====================================================================
+let detaljerApen = hent('ug_detaljer') === '1';
+const vapenNavn = (n) => n ? data.vapen.find(v => v.nivaa === n)?.navn : 'Ingen';
+const beskNavn = (n) => n ? data.beskyttelse.find(v => v.nivaa === n)?.navn : 'Ingen';
 function tegnTopp() {
   const s = st.spiller;
   $('#topp').innerHTML = `
-    <div class="topp">
-      <div class="navn">${esc(s.navn)}</div>
-      <div class="pill"><span>Kontant</span><b class="mono gold">${kr(s.penger)}</b></div>
-      <div class="pill"><span>Bank</span><b class="mono">${kr(s.bank)}</b></div>
-      <div class="pill"><span>Helse</span><b class="mono ${s.helse < 50 ? 'bad' : ''}">${s.helse}%</b></div>
-      <div class="pill"><span>By</span>${esc(s.sted)}</div>
-      <button class="ghost small loggut" data-loggut>Logg ut</button>
+    <div class="topprad">
+      ${avatar(s.navn)}
+      <button class="hvem" data-gaa="ranker" aria-label="Se ranker">
+        <b>${esc(s.navn)}${st.gjeng_tag ? ` <span class="dim" style="font-size:.85rem">[${esc(st.gjeng_tag)}]</span>` : ''}</b>
+        <span>${esc(st.rank)} · <span class="pst">${st.neste_rank ? rankProsent() + ' %' : 'MAKS'}</span><span class="by"> · ${esc(s.sted)}</span></span>
+      </button>
+      <div class="statboks" aria-label="Kontanter, poeng og kuler">
+        <div class="penger" title="Kontanter: ${kr(s.penger)}">${IK.penger}<b>${kompakt(s.penger)}</b></div>
+        <div title="Poeng: ${tall(s.poeng)}">${IK.poeng}<b>${kompakt(s.poeng)}</b></div>
+        <div title="Kuler: ${tall(s.kuler)}">${IK.kuler}<b>${kompakt(s.kuler)}</b></div>
+      </div>
+      <button class="bjelle" data-gaa="meldinger" aria-label="Meldinger">${IK.bjelle}${st.uleste ? `<span class="prikk">${st.uleste > 9 ? '9+' : st.uleste}</span>` : ''}</button>
     </div>
-    <button class="rankbar" data-side-lenke="ranker" title="Se alle ranker">
-      <span class="rb-navn">${esc(st.rank)}</span>
-      <span class="rb-spor"><i style="width:${rankProsent()}%"></i></span>
-      <span class="rb-pst mono">${st.neste_rank ? rankProsent() + ' %' : 'Maks'}</span>
-      <span class="rb-neste">${st.neste_rank ? '→ ' + esc(st.neste_rank) : ''}</span>
-    </button>
-    <div class="timere">
-      <span class="timer" data-til="${s.fengsel_til || ''}" data-navn="Fengsel" data-skjul></span>
-      <span class="timer" data-til="${s.krim_klar}" data-navn="Krim"></span>
-      <span class="timer" data-til="${s.bil_klar}" data-navn="Bil"></span>
-      <span class="timer" data-til="${s.angrep_klar}" data-navn="Angrep"></span>
-      <span class="timer" data-til="${s.reise_klar}" data-navn="Reise"></span>
-    </div>`;
+    <div class="linje" data-gaa="ranker" title="${st.neste_rank ? rankProsent() + ' % til ' + esc(st.neste_rank) : 'Høyeste rank'}"><i style="width:${rankProsent()}%"></i></div>
+    <button class="utvid ${detaljerApen ? 'apen' : ''}" data-utvid aria-label="Vis detaljer">${IK.ned}</button>
+    ${detaljerApen ? `<div class="detaljer">
+      <div class="d"><span>Bank</span><b>${kr(s.bank)}</b></div>
+      <div class="d"><span>Helse</span><b class="${s.helse < 50 ? 'bad' : ''}">${s.helse} %</b></div>
+      <div class="d"><span>Drap</span><b>${s.drap}</b></div>
+      <div class="d"><span>Våpen</span><b>${esc(vapenNavn(s.vapen))}</b></div>
+      <div class="d"><span>Beskyttelse</span><b>${esc(beskNavn(s.beskyttelse))}</b></div>
+      <div class="d"><span>By</span><b>${esc(s.sted)}</b></div>
+      <div class="full">${sekIgjen(s.beskyttet_til) ? `<span class="merke mint">Beskyttet <span data-til="${s.beskyttet_til}"></span></span>` : ''}
+        <span class="dim" style="font-size:.85rem">${tall(s.exp)} erfaring${st.neste_rank ? ' · neste: ' + esc(st.neste_rank) : ''}</span>
+        <button class="knapp sek liten" style="margin-left:auto" data-loggut>Logg ut</button></div>
+    </div>` : ''}`;
   tikk();
 }
 
-const SIDER = [
-  ['oversikt', 'Oversikt'], ['krim', 'Kriminalitet'], ['bil', 'Biltyveri'], ['fengsel', 'Fengsel'],
-  ['bank', 'Bank'], ['butikk', 'Butikk'], ['sykehus', 'Sykehus'], ['reise', 'Reise'],
-  ['kasino', 'Kasino'], ['angrep', 'Angrep'], ['toppliste', 'Toppliste'], ['ranker', 'Ranker'],
-  ['meldinger', 'Meldinger'], ['chat', 'Chat'], ['gravplass', 'Gravplass'],
-];
-function tegnMeny() {
-  $('#meny').innerHTML = SIDER.map(([id, navn]) => {
-    let badge = '';
-    if (id === 'meldinger' && st?.uleste > 0) badge = `<span class="badge">${st.uleste}</span>`;
-    if (id === 'fengsel' && fengslet()) badge = `<span class="badge">!</span>`;
-    return `<button data-side="${id}" class="${id === side ? 'aktiv' : ''}">${navn}${badge}</button>`;
+// =====================================================================
+//  BUNNMENY OG NAVIGASJON
+// =====================================================================
+const FANER = [['handlinger', 'Handlinger'], ['handel', 'Handel'], ['sosial', 'Sosial'], ['casino', 'Casino'], ['oppdrag', 'Oppdrag']];
+let ruter = { fane: hent('ug_fane') || 'handlinger', side: null, param: null, handling: hent('ug_handling') || 'krim' };
+if (!FANER.some(f => f[0] === ruter.fane)) ruter.fane = 'handlinger';
+
+function klarNoe() {
+  const s = st.spiller; if (fengslet()) return false;
+  return ['krim_klar', 'bil_klar', 'ran_klar'].some(k => sekIgjen(s[k]) === 0);
+}
+function tegnBunn() {
+  const v = st.varsler || {};
+  $('#bunnIndre').innerHTML = FANER.map(([id, navn]) => {
+    let dott = '';
+    if (id === 'handlinger' && klarNoe()) dott = '<span class="dott mint"></span>';
+    if (id === 'oppdrag' && v.oppdrag) dott = '<span class="dott rod"></span>';
+    if (id === 'sosial' && (v.prestasjoner || st.uleste)) dott = '<span class="dott rod"></span>';
+    return `<button data-fane="${id}" class="${ruter.fane === id ? 'aktiv' : ''}" aria-current="${ruter.fane === id ? 'page' : 'false'}">${IK[id]}${dott}<span>${navn}</span></button>`;
   }).join('');
 }
-$('#meny').onclick = (e) => {
-  const b = e.target.closest('[data-side]');
-  if (b) { side = b.dataset.side; tegnMeny(); visSide(side); b.scrollIntoView({ inline: 'center', block: 'nearest' }); }
+function gaa(side, param = null) {
+  const def = SIDER[side];
+  if (!def) return;
+  if (def.fane === 'handlinger') { ruter = { ...ruter, fane: 'handlinger', side: null, handling: side }; lagre('ug_handling', side); }
+  else ruter = { ...ruter, fane: def.fane, side, param };
+  lagre('ug_fane', ruter.fane);
+  tegnBunn(); tegnSide(); window.scrollTo({ top: 0 });
+}
+function fane(id) { ruter = { ...ruter, fane: id, side: null, param: null }; lagre('ug_fane', id); tegnBunn(); tegnSide(); window.scrollTo({ top: 0 }); }
+
+// =====================================================================
+//  SIDETEGNING
+// =====================================================================
+const sidehode = (tittel, under, tilbake, hoyre = '') => `<div class="sidehode">
+  ${tilbake ? `<button class="tilbake" data-fane="${tilbake}" aria-label="Tilbake">${IK.tilbake}</button>` : ''}
+  <div><h1>${esc(tittel)}</h1>${under ? `<p>${under}</p>` : ''}</div>${hoyre ? `<div class="hoyre">${hoyre}</div>` : ''}</div>`;
+const seksjon = (tittel, innhold, ekstra = '') => `<section class="seksjon"><h2>${tittel}${ekstra ? `<span class="ekstra">${ekstra}</span>` : ''}</h2>${innhold}</section>`;
+const kropp = (h) => `<div class="kropp">${h}</div>`;
+const fengselBanner = () => fengslet() ? `<div class="banner">${IK.fengsel.replace('<svg', '<svg width="22" height="22"')}<div>Du sitter i fengsel i <b data-til="${st.spiller.fengsel_til}"></b>.</div><button class="knapp liten" data-gaa="fengsel">Til fengselet</button></div>` : '';
+
+let tegner = 0;
+async function tegnSide(stille = false) {
+  const nr = ++tegner, main = $('#innhold');
+  clearInterval(sideTimer);
+  if (!stille) main.innerHTML = '<p class="tom">Laster …</p>';
+  try {
+    let html, def;
+    if (ruter.fane === 'handlinger') { def = SIDER[ruter.handling] || SIDER.krim; html = await tegnHandlinger(def); }
+    else if (ruter.side) {
+      def = SIDER[ruter.side];
+      html = sidehode(def.tittel, def.under || '', def.fane) + `<div class="innside">${fengselBanner()}${await def.vis(ruter.param)}</div>`;
+    } else if (ruter.fane === 'oppdrag') {
+      def = SIDER.oppdrag;
+      html = sidehode('Oppdrag', 'Nye oppdrag hver dag ved midnatt') + `<div class="innside">${fengselBanner()}${await def.vis()}</div>`;
+    } else { def = null; html = tegnHub(ruter.fane); }
+    if (nr !== tegner) return;
+    const y = window.scrollY; main.innerHTML = html; if (stille) window.scrollTo(0, y);
+    tikk();
+    def?.etter?.(ruter.param);
+    if (def?.oppfrisk) sideTimer = setInterval(() => { if (!document.hidden && !$('#modal:not(.hidden)') && !document.activeElement?.matches('input,textarea,select')) tegnSide(true); }, def.oppfrisk * 1000);
+  } catch (e) {
+    if (e instanceof IkkeInnlogget) return tilInnlogging();
+    main.innerHTML = `<div class="innside"><p class="bad">${esc(e.message)}</p></div>`;
+  }
+}
+
+// ---------- hub-sider (Handel, Sosial, Casino) ----------
+const HUBER = {
+  handel: { tittel: 'Handel', under: 'Penger, utstyr, biler og forretninger', seksjoner: [
+    ['Økonomi', ['bank', 'poenghandel', 'borsen', 'overfor_poeng']],
+    ['Kuler og utstyr', ['kuler', 'overfor_kuler', 'utstyr:bred']],
+    ['Kjøretøy', ['bruktbil', 'selg_bil']],
+    ['Forretninger', ['livvakt', 'hasj']]] },
+  sosial: { tittel: 'Sosial', under: 'Gjeng, forum og spillere', seksjoner: [
+    ['Gjeng og rangering', ['gjeng', 'rangering', 'prestasjoner', 'gravplass']],
+    ['Prat', ['meldinger', 'chat', 'forum:bred']],
+    ['Spillere', ['sok', 'palogget', 'verv:bred']],
+    ['Info', ['nyheter', 'avis']]] },
+  casino: { tittel: 'Casino', under: 'Undergrunnen · Spill på egen risiko', seksjoner: [
+    ['Mot andre spillere', ['dodsterninger', 'terning', 'streetrace', 'royale', 'lotto', 'nummer', 'poker', 'bjbord']],
+    ['Mot huset', ['blackjack', 'rulett']]] },
+};
+function tegnHub(id) {
+  if (id === 'oppdrag') return '';
+  const h = HUBER[id], v = st.varsler || {};
+  return sidehode(h.tittel, h.under) + `<div class="innside">${fengselBanner()}${h.seksjoner.map(([tittel, sider]) => seksjon(tittel, `<div class="rutenett">${sider.map(x => {
+    const [k, bred] = x.split(':'); const d = SIDER[k];
+    const merke = d.kommer ? '<span class="merke gul">Kommer</span>'
+      : k === 'meldinger' && st.uleste ? `<span class="merke">${st.uleste} uleste</span>`
+      : k === 'prestasjoner' && v.prestasjoner ? `<span class="merke mint">${v.prestasjoner} klar</span>` : '';
+    return `<button class="kort ${bred ? 'bred' : ''} ${d.kommer ? 'av' : ''}" ${d.kommer ? 'disabled' : `data-gaa="${k}"`}><b>${esc(d.tittel)}</b><span>${esc(d.kort)}</span>${merke}</button>`;
+  }).join('')}</div>`)).join('')}</div>`;
+}
+
+// ---------- Handlinger: ikonrad + panel ----------
+const SKINNE = [
+  ['krim', 'krim', 'krim_klar', 180], ['bil', 'bil', 'bil_klar', 240], ['ran', 'ran', 'ran_klar', 180],
+  ['fengsel', 'fengsel', 'utbrudd_klar', 30], ['drap', 'drap', 'angrep_klar', 300], ['reise', 'reise', 'reise_klar', 300],
+  ['sykehus', 'sykehus', null, 0], ['garasje', 'garasje', null, 0]];
+function ringStil(felt, total) {
+  const s = felt ? sekIgjen(st.spiller[felt]) : 0;
+  if (!s) return { p: 1, f: 'var(--mint)', tekst: '✓', vent: false };
+  return { p: Math.max(.04, 1 - s / Math.max(total, s)), f: 'var(--gul)', tekst: tidKort(s), vent: true };
+}
+async function tegnHandlinger(def) {
+  const skinne = SKINNE.map(([id, ikon, felt, total]) => {
+    const r = ringStil(felt, total);
+    const fengselsVent = id === 'fengsel' && fengslet();
+    return `<button class="stopp ${ruter.handling === id ? 'aktiv' : ''}" data-gaa="${id}" aria-label="${esc(SIDER[id].tittel)}" data-ring="${felt || ''}" data-total="${total}">
+      <span class="ring" style="--p:${fengselsVent ? .5 : r.p};--f:${fengselsVent ? 'var(--signal)' : r.f}"><span>${IK[ikon]}</span></span>
+      <small class="${r.vent || fengselsVent ? 'vent' : ''}">${fengselsVent ? 'Inne' : r.tekst}</small><em>${esc(SIDER[id].kortnavn || SIDER[id].tittel)}</em></button>`;
+  }).join('');
+  const felt = SKINNE.find(x => x[0] === ruter.handling)?.[2];
+  const status = felt ? `<span class="status" data-til="${st.spiller[felt]}" data-klar="Klar"></span>` : '';
+  return `<div class="handlinger"><nav class="skinne" aria-label="Handlinger">${skinne}</nav>
+    <div class="panel"><div class="panelhode"><div><div class="over">Handling</div><h1>${esc(def.tittel)}</h1></div>${status}</div>
+    <div class="innside">${def === SIDER.fengsel ? '' : fengselBanner()}${await def.vis()}</div></div></div>`;
+}
+
+// ---------- felles byggeklosser ----------
+const knappRad = (fn, args, tekst = '', ekstra = '') => `<button class="spill" data-act="${fn}" data-args='${arg(args)}' aria-label="${esc(tekst || 'Utfør')}" ${ekstra}>${IK.spill}</button>`;
+function sparkline(verdier, bredde = 300, hoyde = 34) {
+  if (!verdier?.length) return '';
+  const min = Math.min(...verdier), max = Math.max(...verdier), sp = max - min || 1;
+  const pkt = verdier.map((v, i) => `${(i / (verdier.length - 1) * bredde).toFixed(1)},${(hoyde - 3 - (v - min) / sp * (hoyde - 6)).toFixed(1)}`).join(' ');
+  const opp = verdier[verdier.length - 1] >= verdier[0];
+  return `<svg class="spark" viewBox="0 0 ${bredde} ${hoyde}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pkt}" fill="none" stroke="${opp ? 'var(--mint)' : 'var(--signal2)'}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
+}
+const KORTVERDI = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'], FARGE = ['♠', '♥', '♦', '♣'];
+const spillkort = (c) => { const f = Math.floor(c / 13); return `<span class="spillkort ${f === 1 || f === 2 ? 'rod' : ''}"><span>${KORTVERDI[c % 13]}</span><span class="s">${FARGE[f]}</span></span>`; };
+async function garasjeValg(navn = 'p_bil') {
+  const biler = await rpc('min_garasje');
+  if (!biler.length) return { html: '<p class="bad" style="margin:0">Du trenger en bil i garasjen. Stjel en under Handlinger.</p>', har: false };
+  return { html: `<select name="${navn}" data-num>${biler.map(b => `<option value="${b.id}">${esc(b.bil)} (${kr(b.verdi)})</option>`).join('')}</select>`, har: true };
+}
+
+// =====================================================================
+//  ALLE SIDER
+// =====================================================================
+const ri = () => st.rank_indeks;
+const SIDER = {
+  // ------------------------------------------------ HANDLINGER
+  krim: { fane: 'handlinger', tittel: 'Kriminalitet', kortnavn: 'Krim', async vis() {
+    return seksjon('Handling', `<div class="liste">${data.krim.map(k => {
+      const laast = ri() < k.min_rank, sjanse = Math.min(95, k.sjanse + ri() * 4);
+      return `<div class="linjeel ${laast ? 'laast' : ''}"><div class="info"><b>${esc(k.navn)}</b><small>${laast ? 'Krever ' + esc(data.ranker[k.min_rank].navn) : `${kr(k.min_gevinst)}–${kr(k.max_gevinst)} · +${k.exp} erfaring`}</small></div>
+        <span class="sjanse">${laast ? '' : sjanse + ' %'}</span>${knappRad('begaa_krim', { p_id: k.id }, k.navn, laast ? 'disabled' : '')}</div>`;
+    }).join('')}</div>`, 'Sjanse') + `<p class="dim" style="text-align:center;margin:0;font-size:.88rem">Mislykkes du, får du likevel +1 erfaring.</p>`;
+  } },
+  bil: { fane: 'handlinger', tittel: 'Biltyveri', async vis() {
+    return seksjon('Sted', `<div class="liste">${data.bil_steder.map(b => {
+      const laast = ri() < b.min_rank;
+      return `<div class="linjeel ${laast ? 'laast' : ''}"><div class="info"><b>${esc(b.navn)}</b><small>${laast ? 'Krever ' + esc(data.ranker[b.min_rank].navn) : `+${2 + b.tier * 2} erfaring · ${['', 'billige biler', 'mellomklasse', 'luksusbiler'][b.tier]}`}</small></div>
+        <span class="sjanse">${laast ? '' : Math.min(90, b.sjanse + ri() * 3) + ' %'}</span>${knappRad('stjel_bil', { p_id: b.id }, b.navn, laast ? 'disabled' : '')}</div>`;
+    }).join('')}</div>`, 'Sjanse') + `<button class="knapp sek full" data-gaa="garasje">Gå til garasjen (${st.biler} biler)</button>`;
+  } },
+  ran: { fane: 'handlinger', tittel: 'Ran en spiller', kortnavn: 'Ran', async vis() {
+    const pa = (await rpc('palogget_liste')).filter(p => p.sted === st.spiller.sted && p.navn !== st.spiller.navn);
+    return seksjon('Velg offer', kropp(`<p class="dim">Ran noen i samme by som deg (${esc(st.spiller.sted)}). Du kan ta 5–10 % av kontantene deres. Høyere rank enn offeret gir bedre sjanse.</p>
+      <form data-rpc="ran_spiller" class="rad"><div><label for="ranNavn">Spillernavn</label><input id="ranNavn" name="p_navn" required list="ranListe"></div><button class="knapp">Ran</button></form>
+      <datalist id="ranListe">${pa.map(p => `<option value="${esc(p.navn)}">`).join('')}</datalist>`))
+      + seksjon(`Pålogget i ${esc(st.spiller.sted)}`, pa.length ? `<div class="liste">${pa.map(p => `<div class="linjeel">${avatar(p.navn, 1)}<div class="info"><b>${esc(p.navn)}</b><small>${esc(p.rank)}${p.tag ? ' · [' + esc(p.tag) + ']' : ''}</small></div>${knappRad('ran_spiller', { p_navn: p.navn }, 'Ran ' + p.navn)}</div>`).join('')}</div>` : '<p class="tom">Ingen andre er pålogget i byen nå.</p>');
+  } },
+  fengsel: { fane: 'handlinger', tittel: 'Fengsel', oppfrisk: 10, async vis() {
+    const liste = await rpc('fengsel_liste');
+    return (fengslet() ? `<div class="banner"><div>Du sitter inne i <b data-til="${st.spiller.fengsel_til}"></b>. Kausjon: <b data-kausjon></b></div><button class="knapp liten" data-act="kjop_deg_ut">Betal</button></div>` : '')
+      + seksjon('Innsatte', liste.length ? `<div class="liste">${liste.map(p => `<div class="linjeel">${avatar(p.navn, 1)}<div class="info"><b>${esc(p.navn)}</b><small>${esc(p.rank)} · <span data-til="${new Date(naa() + p.sek * 1000).toISOString()}"></span> igjen</small></div>
+        ${p.navn === st.spiller.navn ? '' : knappRad('bryt_ut', { p_navn: p.navn }, 'Bryt ut ' + p.navn)}</div>`).join('')}</div>` : '<p class="tom">Fengselet er tomt akkurat nå.</p>', 'Bryt ut: +5 erfaring');
+  } },
+  drap: { fane: 'handlinger', tittel: 'Drap', async vis() {
+    const s = st.spiller;
+    return seksjon('Angrip', kropp(`<p class="dim">Målet må være i ${esc(s.sted)}. Flere kuler og bedre våpen gir mer skade. Drep for å ta alle kontantene.</p>
+      <div class="nokkeltall" style="margin-bottom:12px"><div><span>Våpen</span><b>${esc(vapenNavn(s.vapen))}</b></div><div><span>Kuler</span><b>${tall(s.kuler)}</b></div></div>
+      <form data-rpc="angrip" class="rad"><div><label for="angNavn">Spillernavn</label><input id="angNavn" name="p_navn" required></div><div><label for="angKuler">Kuler</label><input id="angKuler" name="p_kuler" type="number" min="1" required data-num></div><button class="knapp">Skyt</button></form>`))
+      + seksjon('Detektiv', kropp(`<p class="dim">Finn ut hvilken by en spiller er i. Koster 5 000 kr.</p><form data-rpc="detektiv" class="rad"><div><label for="detNavn">Spillernavn</label><input id="detNavn" name="p_navn" required></div><button class="knapp sek">Lei detektiv</button></form>`));
+  } },
+  reise: { fane: 'handlinger', tittel: 'Reise', async vis() {
+    return seksjon('Fly', `<div class="liste">${data.byer.map(b => `<div class="linjeel"><div class="info"><b>${esc(b)}</b><small>${b === st.spiller.sted ? 'Du er her' : kr(data.reisepris) + ' · +1 erfaring'}</small></div>${b === st.spiller.sted ? '<span class="merke mint">Her</span>' : knappRad('reis', { p_by: b }, 'Fly til ' + b)}</div>`).join('')}</div>`);
+  } },
+  sykehus: { fane: 'handlinger', tittel: 'Sykehus', async vis() {
+    const s = st.spiller, pris = (100 - s.helse) * 200;
+    return seksjon('Helse', kropp(`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Helse</span><b>${s.helse} %</b></div><div class="bar ${s.helse >= 100 ? 'mint' : ''}"><i style="width:${s.helse}%"></i></div>
+      <p>${s.helse >= 100 ? '<span class="ok">Du er i full form.</span>' : `<button class="knapp full" data-act="sykehus">Bli frisk for ${kr(pris)}</button>`}</p>`));
+  } },
+  garasje: { fane: 'handlinger', tittel: 'Garasje', async vis() {
+    const biler = await rpc('min_garasje'), sum = biler.reduce((a, b) => a + b.verdi, 0);
+    return seksjon(`Biler (${biler.length}/30)`, biler.length ? `<div class="liste">${biler.map(b => `<div class="linjeel"><div class="info"><b>${esc(b.bil)}</b><small>Stjålet i ${esc(b.sted)} · ${kr(b.verdi)}</small></div><button class="knapp sek liten" data-act="selg_bil" data-args='${arg({ p_id: b.id })}'>Selg</button></div>`).join('')}</div>` : '<p class="tom">Garasjen er tom.</p>',
+      biler.length ? `<button class="knapp liten" data-act="selg_alle_biler">Selg alle (${kr(sum)})</button>` : '');
+  } },
+
+  // ------------------------------------------------ HANDEL
+  bank: { fane: 'handel', tittel: 'Bank', kort: 'Sett inn, ta ut, overfør', async vis() {
+    const s = st.spiller;
+    return `<div class="nokkeltall"><div><span>Kontanter</span><b class="ok">${kr(s.penger)}</b></div><div><span>I banken</span><b>${kr(s.bank)}</b></div></div>`
+      + seksjon('Sett inn og ta ut', kropp(`<p class="dim">Penger i banken kan ikke ranes eller tas av den som dreper deg.</p>
+        <form data-rpc="bank_sett_inn" class="rad" style="margin-bottom:10px"><div><label for="inn">Sett inn</label><input id="inn" name="p_belop" type="number" min="1" required data-num></div><button class="knapp">Sett inn</button><button type="button" class="knapp sek" data-act="bank_sett_inn" data-args='${arg({ p_belop: s.penger })}' ${s.penger ? '' : 'disabled'}>Alt</button></form>
+        <form data-rpc="bank_ta_ut" class="rad"><div><label for="ut">Ta ut</label><input id="ut" name="p_belop" type="number" min="1" required data-num></div><button class="knapp sek">Ta ut</button></form>`))
+      + seksjon('Overfør til spiller', kropp(`<form data-rpc="overfor" class="rad"><div><label for="ovNavn">Spiller</label><input id="ovNavn" name="p_navn" required></div><div><label for="ovBel">Beløp</label><input id="ovBel" name="p_belop" type="number" min="1" required data-num></div><button class="knapp">Overfør</button></form>`));
+  } },
+  poenghandel: { fane: 'handel', tittel: 'Poenghandel', kort: 'Bruk poeng på varer', async vis() {
+    const varer = [['kuler', '500 kuler', 5], ['penger', '100 000 kr', 10], ['ventetid', 'Nullstill ventetid på krim, bil og ran', 2], ['fengsel', 'Fri fra fengsel nå', 3], ['helse', 'Full helse', 4]];
+    return `<div class="banner gul">${IK.poeng.replace('<svg', '<svg width="22" height="22"')}<div>Du har <b>${tall(st.spiller.poeng)} poeng</b>. Tjen flere med oppdrag, prestasjoner og verving.</div></div>`
+      + seksjon('Varer', `<div class="liste">${varer.map(([id, navn, pris]) => `<div class="linjeel"><div class="info"><b>${navn}</b><small>${pris} poeng</small></div><button class="knapp liten" data-act="poeng_kjop" data-args='${arg({ p_vare: id })}' ${st.spiller.poeng < pris ? 'disabled' : ''}>Kjøp</button></div>`).join('')}</div>`);
+  } },
+  borsen: { fane: 'handel', tittel: 'Børsen', kort: 'Kjøp og selg aksjer', oppfrisk: 30, async vis() {
+    const a = await rpc('borsen');
+    const verdi = a.reduce((s, x) => s + x.antall * x.pris, 0), kost = a.reduce((s, x) => s + Number(x.kostpris), 0);
+    return `<div class="nokkeltall"><div><span>Porteføljeverdi</span><b>${kr(Math.floor(verdi))}</b></div><div><span>Gevinst/tap</span><b class="${verdi >= kost ? 'ok' : 'bad'}">${kr(Math.floor(verdi - kost))}</b></div></div>`
+      + seksjon('Aksjer', `<div class="liste">${a.map(x => `<div class="aksje">
+        <div class="aksjetopp"><div class="info"><b>${esc(x.ticker)} <span class="dim" style="font-weight:500">${esc(x.navn)}</span></b><small class="dim">${x.antall ? `Du eier ${tall(x.antall)} aksjer` : '24 timer'}</small></div>
+          <div style="text-align:right"><b class="tall">${Number(x.pris).toLocaleString('nb-NO', { minimumFractionDigits: 2 })}</b><small class="${x.endring >= 0 ? 'ok' : 'bad'}" style="display:block">${x.endring >= 0 ? '▲ +' : '▼ '}${String(x.endring).replace('.', ',')} %</small></div></div>
+        ${sparkline(x.historikk)}
+        <form data-rpc="kjop_aksje" class="rad" style="align-items:center"><input type="hidden" name="p_id" value="${x.id}" data-num><div><input name="p_antall" type="number" min="1" placeholder="Antall" aria-label="Antall ${esc(x.ticker)}" required data-num></div>
+          <button class="knapp liten">Kjøp</button><button type="button" class="knapp sek liten" data-selg-aksje="${x.id}" ${x.antall ? '' : 'disabled'}>Selg</button></form></div>`).join('')}</div>`, '1 % kurtasje')
+      + '<p class="dim" style="margin:0;font-size:.85rem">Kursene endrer seg hele tiden. Kjøp lavt, selg høyt.</p>';
+  } },
+  overfor_poeng: { fane: 'handel', tittel: 'Overfør poeng', kort: 'Send til spillere', async vis() {
+    return seksjon('Send poeng', kropp(`<p class="dim">Du har ${tall(st.spiller.poeng)} poeng.</p><form data-rpc="overfor_poeng" class="rad"><div><label for="opNavn">Spiller</label><input id="opNavn" name="p_navn" required></div><div><label for="opAnt">Antall</label><input id="opAnt" name="p_antall" type="number" min="1" required data-num></div><button class="knapp">Send</button></form>`));
+  } },
+  kuler: { fane: 'handel', tittel: 'Kjøp kuler', kort: 'Fra kulefabrikken', async vis() {
+    return seksjon('Kulefabrikken', kropp(`<p class="dim">Du har ${tall(st.spiller.kuler)} kuler. Pris: ${kr(data.kulepris)} per kule.</p>
+      <form data-rpc="kjop_kuler" class="rad"><div><label for="kulAnt">Antall</label><input id="kulAnt" name="p_antall" type="number" min="1" max="10000" required data-num></div><button class="knapp">Kjøp</button></form>
+      <div class="rad" style="margin-top:10px">${[100, 500, 1000, 5000].map(n => `<button class="knapp sek liten" data-act="kjop_kuler" data-args='${arg({ p_antall: n })}'>${tall(n)} (${kort(n * data.kulepris)})</button>`).join('')}</div>`));
+  } },
+  overfor_kuler: { fane: 'handel', tittel: 'Overfør kuler', kort: 'Send til spillere', async vis() {
+    return seksjon('Send kuler', kropp(`<p class="dim">Du har ${tall(st.spiller.kuler)} kuler.</p><form data-rpc="overfor_kuler" class="rad"><div><label for="okNavn">Spiller</label><input id="okNavn" name="p_navn" required></div><div><label for="okAnt">Antall</label><input id="okAnt" name="p_antall" type="number" min="1" required data-num></div><button class="knapp">Send</button></form>`));
+  } },
+  utstyr: { fane: 'handel', tittel: 'Kjøp utstyr', kort: 'Våpen og beskyttelse', async vis() {
+    const s = st.spiller;
+    const rad = (liste, har, fn) => `<div class="liste">${liste.map(v => `<div class="linjeel ${har >= v.nivaa ? 'laast' : ''}"><div class="info"><b>${esc(v.navn)}</b><small>Styrke ×${String(v.styrke).replace('.', ',')} · ${kr(v.pris)}</small></div>${har >= v.nivaa ? '<span class="merke mint">Eid</span>' : `<button class="knapp liten" data-act="${fn}" data-args='${arg({ p_nivaa: v.nivaa })}' ${s.penger < v.pris ? 'disabled' : ''}>Kjøp</button>`}</div>`).join('')}</div>`;
+    return seksjon('Våpen', rad(data.vapen, s.vapen, 'kjop_vapen'), 'Nå: ' + esc(vapenNavn(s.vapen))) + seksjon('Beskyttelse', rad(data.beskyttelse, s.beskyttelse, 'kjop_beskyttelse'), 'Nå: ' + esc(beskNavn(s.beskyttelse)));
+  } },
+  bruktbil: { fane: 'handel', tittel: 'Kjøp bruktbil', kort: 'Fra andre spillere', oppfrisk: 20, async vis() {
+    const l = await rpc('bruktbil_liste');
+    return seksjon('Til salgs', l.length ? `<div class="liste">${l.map(b => `<div class="linjeel"><div class="info"><b>${esc(b.bil)}</b><small>${esc(b.selger)} · verdi ${kr(b.verdi)}</small></div><b class="tall">${kr(b.pris)}</b>
+      ${b.min ? `<button class="knapp sek liten" data-act="trekk_bruktbil" data-args='${arg({ p_id: b.id })}'>Trekk</button>` : `<button class="knapp liten" data-act="kjop_bruktbil" data-args='${arg({ p_id: b.id })}'>Kjøp</button>`}</div>`).join('')}</div>` : '<p class="tom">Ingen biler til salgs akkurat nå.</p>')
+      + '<button class="knapp sek full" data-gaa="selg_bil">Selg en av dine biler</button>';
+  } },
+  selg_bil: { fane: 'handel', tittel: 'Selg bruktbil', kort: 'Legg ut egne biler', async vis() {
+    const v = await garasjeValg('p_garasje_id');
+    return seksjon('Legg ut til salgs', kropp(`<p class="dim">Pengene settes rett i banken din når noen kjøper. Maks pris er 10 ganger bilens verdi.</p>
+      ${v.har ? `<form data-rpc="legg_ut_bil"><div class="felt"><label>Bil</label>${v.html}</div><div class="rad"><div><label for="bbPris">Pris</label><input id="bbPris" name="p_pris" type="number" min="100" required data-num></div><button class="knapp">Legg ut</button></div></form>` : v.html}`));
+  } },
+  livvakt: { fane: 'handel', tittel: 'Livvaktutleie', kort: 'Tjen daglig inntekt', oppfrisk: 30, async vis() {
+    const f = (await rpc('forretninger')).livvakt;
+    return (f.nivaa ? seksjon(esc(f.info.navn), kropp(`<div class="nokkeltall"><div><span>Per time</span><b>${kr(f.info.timelonn)}</b></div><div><span>Klar til henting</span><b class="ok">${kr(f.opptjent)}</b></div></div>
+        <div class="bar mint" style="margin:12px 0 4px"><i style="width:${Math.min(100, f.timer / 24 * 100)}%"></i></div><p class="dim" style="font-size:.85rem;margin:0 0 12px">${String(f.timer).replace('.', ',')} av maks 24 timer opptjent. Hent jevnlig!</p>
+        <button class="knapp mint full" data-act="livvakt_hent" ${f.opptjent < 1 ? 'disabled' : ''}>Hent ${kr(f.opptjent)}</button>`), 'Nivå ' + f.nivaa) : '')
+      + (f.neste ? seksjon(f.nivaa ? 'Oppgrader' : 'Start livvaktutleie', kropp(`<p><b>${esc(f.neste.navn)}</b> tjener ${kr(f.neste.timelonn)} i timen, opptil 24 timer om gangen.</p><button class="knapp full" data-act="livvakt_oppgrader">Kjøp for ${kr(f.neste.pris)}</button>`)) : seksjon('Maks nivå', kropp('<p>Du har det største livvaktnettverket i byen.</p>')));
+  } },
+  hasj: { fane: 'handel', tittel: 'Hasjplantasje', kort: 'Dyrk og selg', async vis() {
+    const h = (await rpc('forretninger')).hasj;
+    if (h.planter > 0) {
+      const klar = sekIgjen(h.ferdig) === 0;
+      return seksjon('Plantasjen', kropp(`<p><b>${h.planter} planter</b> ${klar ? 'er klare til høsting!' : `er klare om <b data-til="${h.ferdig}"></b>.`}</p>
+        <p class="dim" style="font-size:.85rem">Hver plante gir 3 500–5 500 kr. Det er 10 % sjanse for politiraid ved høsting.</p>
+        <button class="knapp ${klar ? 'mint' : ''} full" data-act="hasj_host" ${klar ? '' : 'disabled'}>Høst og selg</button>`));
+    }
+    return seksjon('Plant', kropp(`<p class="dim">Hver plante koster ${kr(h.pris_per_plante)} og er klar etter 90 minutter. Maks ${h.maks} planter.</p>
+      <form data-rpc="hasj_plant" class="rad"><div><label for="hasjAnt">Antall planter</label><input id="hasjAnt" name="p_antall" type="number" min="1" max="${h.maks}" required data-num></div><button class="knapp">Plant</button></form>`));
+  } },
+
+  // ------------------------------------------------ SOSIAL
+  gjeng: { fane: 'sosial', tittel: 'Gjeng', kort: 'Bli med, start eller styr', async vis() {
+    const m = await rpc('min_gjeng');
+    if (!m.gjeng) {
+      const l = await rpc('gjeng_liste');
+      return seksjon('Gjenger', l.length ? `<div class="liste">${l.map(g => `<div class="linjeel"><div class="info"><b>${esc(g.navn)} [${esc(g.tag)}]</b><small>Leder ${esc(g.leder || '–')} · ${g.medlemmer}/10 medlemmer</small></div>${g.medlemmer < 10 ? `<button class="knapp liten" data-act="bli_med_gjeng" data-args='${arg({ p_id: g.id })}'>Bli med</button>` : '<span class="merke gul">Full</span>'}</div>`).join('')}</div>` : '<p class="tom">Ingen gjenger ennå. Start den første!</p>')
+        + seksjon('Start gjeng', kropp(`<p class="dim">Koster 250 000 kr. Du må være minst Smågangster.</p><form data-rpc="opprett_gjeng" class="rad"><div style="flex:2 1 160px"><label for="gjNavn">Navn</label><input id="gjNavn" name="p_navn" maxlength="24" required></div><div style="flex:1 1 80px"><label for="gjTag">Tagg</label><input id="gjTag" name="p_tag" maxlength="4" required></div><button class="knapp">Start</button></form>`));
+    }
+    const g = m.gjeng;
+    return `<div class="nokkeltall"><div><span>Gjeng</span><b>${esc(g.navn)} [${esc(g.tag)}]</b></div><div><span>Gjengbank</span><b class="ok">${kr(g.bank)}</b></div></div>`
+      + seksjon('Medlemmer', `<div class="liste">${m.medlemmer.map(x => `<div class="linjeel">${avatar(x.navn, 1)}<div class="info"><b>${esc(x.navn)} ${x.leder ? '<span class="merke">Leder</span>' : ''}</b><small>${esc(x.rank)} · ${x.drap} drap${x.online ? ' · <span class="ok">pålogget</span>' : ''}</small></div>
+        ${g.er_leder && !x.leder ? `<button class="knapp sek liten" data-act="kast_ut_gjeng" data-args='${arg({ p_navn: x.navn })}'>Kast ut</button>` : ''}</div>`).join('')}</div>`, `${m.medlemmer.length}/10`)
+      + seksjon('Gjengbanken', kropp(`<form data-rpc="gjeng_innskudd" class="rad"><div><label for="gjInn">Sett inn fra kontanter</label><input id="gjInn" name="p_belop" type="number" min="1" required data-num></div><button class="knapp">Sett inn</button></form>
+        ${g.er_leder ? `<form data-rpc="gjeng_utbetal" class="rad" style="margin-top:10px"><div><label for="gjTil">Betal ut til</label><select id="gjTil" name="p_navn">${m.medlemmer.map(x => `<option>${esc(x.navn)}</option>`).join('')}</select></div><div><label for="gjBel">Beløp</label><input id="gjBel" name="p_belop" type="number" min="1" required data-num></div><button class="knapp sek">Betal ut</button></form>` : ''}`))
+      + `<button class="knapp sek full" data-act="forlat_gjeng">Forlat gjengen</button>`;
+  } },
+  rangering: { fane: 'sosial', tittel: 'Rangering', kort: 'Topp spillere og gjenger', async vis(p) {
+    const vis = p || 'spillere';
+    const faner = `<div class="faner" style="margin:0"><button class="${vis === 'spillere' ? 'aktiv' : ''}" data-gaa="rangering" data-param="spillere">Spillere</button><button class="${vis === 'gjenger' ? 'aktiv' : ''}" data-gaa="rangering" data-param="gjenger">Gjenger</button></div>`;
+    if (vis === 'gjenger') {
+      const l = await rpc('gjeng_liste');
+      return faner + seksjon('Gjenger', l.length ? `<table class="tabell"><tr><th>#</th><th>Gjeng</th><th class="h">Erfaring</th></tr>${l.map((g, i) => `<tr><td class="dim">${i + 1}</td><td><b>${esc(g.navn)}</b> <span class="dim">[${esc(g.tag)}] · ${g.medlemmer} medl.</span></td><td class="tall">${tall(g.erfaring)}</td></tr>`).join('')}</table>` : '<p class="tom">Ingen gjenger ennå.</p>');
+    }
+    const l = await rpc('toppliste');
+    return faner + seksjon('Spillere', `<table class="tabell"><tr><th>#</th><th>Spiller</th><th>Rank</th><th class="h">Drap</th></tr>${l.map((x, i) => `<tr class="${x.navn === st.spiller.navn ? 'meg' : ''}"><td class="dim">${i + 1}</td><td><button class="lenke" data-profil="${esc(x.navn)}">${esc(x.navn)}</button>${x.tag ? ` <span class="dim">[${esc(x.tag)}]</span>` : ''}${x.online ? ' <span class="ok">●</span>' : ''}</td><td>${esc(x.rank)}</td><td class="tall">${x.drap}</td></tr>`).join('')}</table>`);
+  } },
+  prestasjoner: { fane: 'sosial', tittel: 'Prestasjoner', kort: 'Poeng, merker og belønninger', async vis() {
+    const l = await rpc('mine_prestasjoner'), tatt = l.filter(x => x.hentet).length;
+    return seksjon('Prestasjoner', `<div class="liste">${l.map(p => { const klar = !p.hentet && p.fremdrift >= p.mal; return `<div class="linjeel ${p.hentet ? '' : ''}"><div class="info"><b>${esc(p.tittel)} ${p.hentet ? '<span class="merke mint">Låst opp</span>' : ''}</b><small>${esc(p.beskrivelse)} · ${kr(p.penger)} + ${p.poeng} poeng</small>
+      ${p.hentet ? '' : `<div class="bar ${klar ? 'mint' : ''}" style="margin-top:6px"><i style="width:${Math.floor(p.fremdrift / p.mal * 100)}%"></i></div><small>${tall(p.fremdrift)} / ${tall(p.mal)}</small>`}</div>
+      ${klar ? `<button class="knapp mint liten" data-act="hent_prestasjon" data-args='${arg({ p_id: p.id })}'>Hent</button>` : ''}</div>`; }).join('')}</div>`, `${tatt}/${l.length}`);
+  } },
+  gravplass: { fane: 'sosial', tittel: 'Gravplass', kort: 'De som falt', async vis() {
+    const g = await rpc('gravplass_liste');
+    return seksjon('Hvil i fred', g.length ? `<table class="tabell"><tr><th>Navn</th><th>Rank</th><th>Drept av</th></tr>${g.map(x => `<tr><td>${esc(x.navn)}</td><td>${esc(x.rank)}</td><td class="bad">${esc(x.drept_av)}</td></tr>`).join('')}</table>` : '<p class="tom">Ingen er drept ennå.</p>');
+  } },
+  meldinger: { fane: 'sosial', tittel: 'Meldinger', kort: 'Innboks og nye meldinger', async vis(p) {
+    const m = await rpc('mine_meldinger');
+    return seksjon('Ny melding', kropp(`<form data-rpc="send_melding" id="skrivForm"><div class="rad" style="margin-bottom:10px"><div><label for="mTil">Til</label><input id="mTil" name="p_til" required value="${esc(p || '')}"></div><div><label for="mEmne">Emne</label><input id="mEmne" name="p_emne" maxlength="80"></div></div>
+      <div class="felt"><label for="mTekst">Melding</label><textarea id="mTekst" name="p_tekst" rows="3" maxlength="2000" required></textarea></div><button class="knapp">Send</button></form>`))
+      + seksjon('Innboks', m.length ? `<div class="liste">${m.map(x => `<div class="melding ${x.lest ? '' : 'ulest'}"><div class="linjeel" style="cursor:pointer" data-apne="${x.id}" data-lest="${x.lest}">${avatar(x.fra_navn, 1)}<div class="info"><b>${esc(x.emne)}</b><small>${esc(x.fra_navn)} · ${dato(x.tid)}</small></div></div>
+        <div class="meldingkropp hidden" id="m${x.id}">${esc(x.tekst)}<div class="rad" style="margin-top:10px;justify-content:flex-end">${x.fra_navn !== 'System' ? `<button class="knapp sek liten" data-svar="${esc(x.fra_navn)}" data-emne="${esc(x.emne)}">Svar</button>` : ''}<button class="knapp sek liten" data-slett="${x.id}">Slett</button></div></div></div>`).join('')}</div>` : '<p class="tom">Ingen meldinger.</p>');
+  } },
+  chat: { fane: 'sosial', tittel: 'Chat', kort: 'Snakk med hele byen', async vis() {
+    return seksjon('Byens chat', `<div class="chatlogg" id="chatlogg"></div><form id="chatForm" class="rad" style="padding:0 16px 14px"><div style="flex:5 1 180px"><input name="tekst" maxlength="300" placeholder="Skriv noe …" autocomplete="off" required aria-label="Chatmelding"></div><button class="knapp">Send</button></form>`);
+  }, etter() { startChat(); } },
+  forum: { fane: 'sosial', tittel: 'Forum', kort: 'Diskusjoner, salg, gjeng og hjelp', async vis(p) {
+    if (p && String(p).startsWith('t')) {
+      const t = await rpc('forum_traad', { p_id: Number(String(p).slice(1)) });
+      return `<button class="lenke" data-gaa="forum" data-param="${esc(t.traad.kategori)}">‹ ${esc(t.traad.kategori)}</button>`
+        + seksjon(esc(t.traad.tittel), `<div>${t.innlegg.map(i => `<div class="innlegg"><div class="hode">${avatar(i.forfatter, 1)}<b><button class="lenke" data-profil="${esc(i.forfatter)}">${esc(i.forfatter)}</button></b><small class="dim">${dato(i.tid)}</small></div><div class="tekst">${esc(i.tekst)}</div></div>`).join('')}</div>`)
+        + seksjon('Svar', kropp(`<form data-rpc="svar_traad"><input type="hidden" name="p_id" value="${t.traad.id}" data-num><div class="felt"><textarea name="p_tekst" rows="3" maxlength="3000" required aria-label="Svar"></textarea></div><button class="knapp">Publiser svar</button></form>`));
+    }
+    const kat = p || '';
+    const l = await rpc('forum_liste', { p_kategori: kat });
+    return `<div class="faner" style="margin:0;flex-wrap:wrap">${['', 'Generelt', 'Salg', 'Gjeng', 'Hjelp'].map(k => `<button class="${kat === k ? 'aktiv' : ''}" data-gaa="forum" data-param="${k}">${k || 'Alle'}</button>`).join('')}</div>`
+      + seksjon('Tråder', l.length ? `<div class="liste">${l.map(t => `<div class="linjeel" style="cursor:pointer" data-gaa="forum" data-param="t${t.id}"><div class="info"><b>${esc(t.tittel)}</b><small>${esc(t.kategori)} · ${esc(t.forfatter)} · ${t.antall} innlegg · ${dato(t.sist_aktiv)}</small></div></div>`).join('')}</div>` : '<p class="tom">Ingen tråder her ennå.</p>')
+      + seksjon('Ny tråd', kropp(`<form data-rpc="ny_traad"><div class="rad" style="margin-bottom:10px"><div style="flex:1 1 120px"><label for="fKat">Kategori</label><select id="fKat" name="p_kategori">${['Generelt', 'Salg', 'Gjeng', 'Hjelp'].map(k => `<option ${k === kat ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div style="flex:3 1 200px"><label for="fTit">Tittel</label><input id="fTit" name="p_tittel" maxlength="80" required></div></div>
+        <div class="felt"><label for="fTek">Innlegg</label><textarea id="fTek" name="p_tekst" rows="4" maxlength="3000" required></textarea></div><button class="knapp">Opprett tråd</button></form>`));
+  } },
+  sok: { fane: 'sosial', tittel: 'Søk', kort: 'Finn spillere', async vis(p) {
+    const res = p ? await rpc('sok_spillere', { p_sok: p }) : [];
+    return seksjon('Søk etter spiller', kropp(`<form id="sokForm" class="rad"><div><label for="sokFelt">Navn</label><input id="sokFelt" name="q" value="${esc(p || '')}" required></div><button class="knapp">Søk</button></form>`))
+      + (p ? seksjon('Treff', res.length ? `<div class="liste">${res.map(x => `<div class="linjeel">${avatar(x.navn, 1)}<div class="info"><b><button class="lenke" data-profil="${esc(x.navn)}">${esc(x.navn)}</button>${x.tag ? ` <span class="dim">[${esc(x.tag)}]</span>` : ''}</b><small>${esc(x.rank)}${x.online ? ' · <span class="ok">pålogget</span>' : ''}</small></div></div>`).join('')}</div>` : '<p class="tom">Ingen treff.</p>') : '');
+  } },
+  palogget: { fane: 'sosial', tittel: 'Pålogget nå', kort: 'Se hvem som er online', oppfrisk: 30, async vis() {
+    const l = await rpc('palogget_liste');
+    return seksjon('Pålogget', `<div class="liste">${l.map(x => `<div class="linjeel">${avatar(x.navn, 1)}<div class="info"><b><button class="lenke" data-profil="${esc(x.navn)}">${esc(x.navn)}</button>${x.tag ? ` <span class="dim">[${esc(x.tag)}]</span>` : ''}</b><small>${esc(x.rank)} · ${esc(x.sted)}</small></div></div>`).join('')}</div>`, `${l.length} spillere`);
+  } },
+  verv: { fane: 'sosial', tittel: 'Verv en venn', kort: 'Inviter venner og få 10 poeng', async vis() {
+    const v = await rpc('verv_info'), lenke = location.origin + '/?verv=' + encodeURIComponent(v.kode);
+    return seksjon('Din vervelenke', kropp(`<p class="dim">Når en venn registrerer seg med lenken din og blir Smågangster, får du <b>10 poeng og 25 000 kr</b>.</p>
+      <div class="rad"><div><input id="vervLenke" readonly value="${esc(lenke)}" aria-label="Vervelenke"></div><button class="knapp" data-kopier="vervLenke">Kopier</button></div>`))
+      + seksjon('Dine vervede', v.vervede.length ? `<div class="liste">${v.vervede.map(x => `<div class="linjeel"><div class="info"><b>${esc(x.navn)}</b><small>${esc(x.rank)}</small></div>${x.betalt ? '<span class="merke mint">Bonus utbetalt</span>' : '<span class="merke gul">Venter</span>'}</div>`).join('')}</div>` : '<p class="tom">Ingen ennå.</p>');
+  } },
+  nyheter: { fane: 'sosial', tittel: 'Nyheter', kort: 'Oppdateringer fra staben', async vis() {
+    const l = await rpc('nyheter_liste');
+    return l.map(n => seksjon(esc(n.tittel), kropp(`<p class="dim" style="font-size:.8rem">${dato(n.tid)}</p><p style="white-space:pre-wrap">${esc(n.tekst)}</p>`))).join('');
+  } },
+  avis: { fane: 'sosial', tittel: 'Avis', kort: 'Dagens hendelser i byen', oppfrisk: 30, async vis() {
+    const l = await rpc('avis_liste');
+    return seksjon('Undergrunnsposten', l.length ? `<div class="liste">${l.map(a => `<div class="linjeel"><div class="info"><b style="font-weight:500">${esc(a.tekst)}</b><small>${dato(a.tid)}</small></div></div>`).join('')}</div>` : '<p class="tom">Ingenting har skjedd ennå.</p>');
+  } },
+  ranker: { fane: 'sosial', tittel: 'Ranker', kort: 'Alle ranker og regler', async vis() {
+    const r = ri();
+    return seksjon('Din rank', kropp(`<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-family:var(--display);font-size:1.6rem">${esc(st.rank)}</b><span class="dim">${st.neste_rank ? rankProsent() + ' % til ' + esc(st.neste_rank) : 'Høyeste rank'}</span></div><div class="bar" style="margin-top:8px"><i style="width:${rankProsent()}%"></i></div>`))
+      + seksjon('Slik får du erfaring', `<table class="tabell"><tr><th>Handling</th><th>Lykkes</th><th class="h">Feiler</th></tr>
+        <tr><td>Kriminalitet</td><td>+2 til +25</td><td class="tall">+1</td></tr><tr><td>Biltyveri</td><td>+4 / +6 / +8</td><td class="tall">+1</td></tr>
+        <tr><td>Ran en spiller</td><td>+3</td><td class="tall">+1</td></tr><tr><td>Bryte ut</td><td>+5</td><td class="tall">+1</td></tr>
+        <tr><td>Angrep</td><td>+3 treff, drap +40 og mer</td><td class="tall">+1</td></tr><tr><td>Reise</td><td>+1</td><td class="tall">–</td></tr></table>`)
+      + seksjon('Rankstigen', `<table class="tabell"><tr><th>Rank</th><th class="h">Erfaring</th></tr>${data.ranker.map(x => `<tr class="${x.indeks === r ? 'meg' : ''}"><td>${x.indeks === r ? '<b class="bad">' + esc(x.navn) + '</b> ← du' : x.indeks < r ? '<span class="dim">' + esc(x.navn) + '</span>' : esc(x.navn)}</td><td class="tall">${tall(x.exp)}</td></tr>`).join('')}</table>`);
+  } },
+
+  // ------------------------------------------------ CASINO
+  dodsterninger: { fane: 'casino', tittel: 'Dødsterninger', kort: 'Alle kaster. Laveste sum ryker ut.', oppfrisk: 8, vis: () => gruppeSide('terninger', 'Alle kaster to terninger hver runde. Den med lavest sum ryker ut. Siste spiller vinner 95 % av potten.') },
+  terning: { fane: 'casino', tittel: 'Terningduell', kort: 'Kast terning mot en annen', oppfrisk: 8, vis: () => utfordringSide('terning') },
+  streetrace: { fane: 'casino', tittel: 'Streetracing', kort: 'Race med bilen din', oppfrisk: 8, vis: () => utfordringSide('race') },
+  royale: { fane: 'casino', tittel: 'Battle royale', kort: 'Siste mann stående vinner', oppfrisk: 8, vis: () => gruppeSide('royale', 'Alle går inn i ringen. Én etter én blir tatt ut. Bedre våpen gir bedre sjanse til å overleve. Siste spiller vinner 95 % av potten.') },
+  lotto: { fane: 'casino', tittel: 'Lotto', kort: 'Ukentlig trekning', async vis() {
+    const l = await rpc('lotto_info');
+    return `<div class="nokkeltall"><div><span>Potten nå</span><b class="ok">${kr(l.pott)}</b></div><div><span>Trekning om</span><b data-til="${l.trekning}"></b></div><div><span>Kuponger totalt</span><b>${tall(l.kuponger)}</b></div><div><span>Dine kuponger</span><b>${tall(l.mine)}</b></div></div>`
+      + seksjon('Kjøp kuponger', kropp(`<p class="dim">${kr(l.pris)} per kupong. Jo flere kuponger, jo større sjanse. Vinneren får pengene i banken.</p><form data-rpc="kjop_lotto" class="rad"><div><label for="lotAnt">Antall</label><input id="lotAnt" name="p_antall" type="number" min="1" max="100" value="1" required data-num></div><button class="knapp">Kjøp</button></form>`))
+      + seksjon('Siste vinnere', l.siste.length ? `<div class="liste">${l.siste.map(x => `<div class="linjeel"><div class="info"><b>${esc(x.vinner)}</b><small>${tall(x.kuponger)} kuponger · ${dato(x.tid)}</small></div><b class="ok tall">${kr(x.pott)}</b></div>`).join('')}</div>` : '<p class="tom">Ingen trekninger ennå.</p>');
+  } },
+  nummer: { fane: 'casino', tittel: 'Nummerspillet', kort: 'Gjett det hemmelige tallet', oppfrisk: 15, async vis() {
+    const n = await rpc('nummer_info');
+    return `<div class="nokkeltall"><div><span>Potten</span><b class="ok">${kr(n.pott)}</b></div><div><span>Gjetninger</span><b>${tall(n.gjetninger)}</b></div></div>`
+      + seksjon('Gjett tallet', kropp(`<p class="dim">Et hemmelig tall mellom 1 og 1000. Hvert gjett koster ${kr(n.pris)} og går i potten. Den som treffer, vinner alt.</p>
+        <form data-rpc="nummer_gjett" class="rad"><div><label for="numTall">Ditt tall</label><input id="numTall" name="p_tall" type="number" min="1" max="1000" required data-num></div><button class="knapp">Gjett</button></form>
+        ${n.mine.length ? `<p style="margin-bottom:0"><b>Dine hint:</b> ${n.mine.map(m => `<span class="merke ${m.hint === 'høyere' ? 'mint' : 'gul'}">${m.tall} → ${m.hint}</span>`).join(' ')}</p>` : ''}`))
+      + seksjon('Tidligere vinnere', n.siste.length ? `<div class="liste">${n.siste.map(x => `<div class="linjeel"><div class="info"><b>${esc(x.vinner)}</b><small>Tallet var ${x.tall} · ${dato(x.tid)}</small></div><b class="ok tall">${kr(x.pott)}</b></div>`).join('')}</div>` : '<p class="tom">Ingen har vunnet ennå.</p>');
+  } },
+  poker: { fane: 'casino', tittel: 'Poker', kort: "Texas Hold'em mot andre", kommer: true, async vis() { return ''; } },
+  bjbord: { fane: 'casino', tittel: 'Blackjack-bord', kort: 'Mot andre ved samme bord', kommer: true, async vis() { return ''; } },
+  blackjack: { fane: 'casino', tittel: 'Blackjack', kort: 'Slå huset, kom nærmest 21', async vis() {
+    const b = await rpc('bj_status');
+    return bjVisning(b);
+  } },
+  rulett: { fane: 'casino', tittel: 'Rulett', kort: 'Rødt, svart eller tall', async vis() {
+    return seksjon('Rulettbordet', kropp(`<div id="rulettRes" class="rulettall dim">–</div><p class="dim" style="text-align:center">Rød/svart/partall/oddetall gir dobbelt. Riktig tall gir 36 ganger innsatsen.</p>
+      <form id="rulettForm"><div class="rad" style="margin-bottom:10px"><div><label for="rulInn">Innsats</label><input id="rulInn" name="innsats" type="number" min="100" max="5000000" required></div><div><label for="rulValg">Valg</label><select id="rulValg" name="valg"><option value="rod">Rød</option><option value="svart">Svart</option><option value="partall">Partall</option><option value="oddetall">Oddetall</option>${Array.from({ length: 37 }, (_, i) => `<option value="${i}">Tallet ${i}</option>`).join('')}</select></div></div><button class="knapp full">Spinn</button></form>`));
+  }, etter() {
+    $('#rulettForm').onsubmit = async (e) => {
+      e.preventDefault(); const f = new FormData(e.target), k = e.target.querySelector('button'); k.disabled = true;
+      try { const r = await rpc('rulett', { p_innsats: Number(f.get('innsats')), p_valg: f.get('valg') }); const el = $('#rulettRes'); el.textContent = r.tall; el.className = 'rulettall ' + (r.farge === 'rød' ? 'bad' : r.farge === 'grønn' ? 'ok' : ''); varsel(r.melding, r.ok ? 'ok' : 'bad'); await oppdater(); }
+      catch (err) { varsel(err.message, 'bad'); }
+      k.disabled = false;
+    };
+  } },
+
+  // ------------------------------------------------ OPPDRAG
+  oppdrag: { fane: 'oppdrag', tittel: 'Oppdrag', async vis() {
+    const l = await rpc('mine_oppdrag'), ferdig = l.filter(x => x.hentet).length;
+    const midnatt = new Date(); midnatt.setHours(24, 0, 0, 0);
+    return `<div class="banner gul">${IK.oppdrag.replace('<svg', '<svg width="22" height="22"')}<div>Nye oppdrag om <b data-til="${midnatt.toISOString()}"></b>. Fullfør dem for penger og poeng.</div></div>`
+      + seksjon('Dagens oppdrag', `<div class="liste">${l.map(o => { const klar = !o.hentet && o.fremdrift >= o.mal; return `<div class="linjeel"><div class="info"><b>${esc(o.tittel)}</b><small>${kr(o.penger)} + ${o.poeng} poeng</small>
+        <div class="bar ${klar || o.hentet ? 'mint' : ''}" style="margin-top:6px"><i style="width:${Math.floor(o.fremdrift / o.mal * 100)}%"></i></div><small>${o.fremdrift} / ${o.mal}</small></div>
+        ${o.hentet ? '<span class="merke mint">Hentet</span>' : klar ? `<button class="knapp mint liten" data-act="hent_oppdrag" data-args='${arg({ p_id: o.id })}'>Hent</button>` : ''}</div>`; }).join('')}</div>`, `${ferdig}/${l.length} fullført`)
+      + `<button class="kort bred" data-gaa="prestasjoner"><b>Prestasjoner</b><span>Langsiktige mål med større belønninger${st.varsler?.prestasjoner ? ` · <span class="ok">${st.varsler.prestasjoner} klar til henting</span>` : ''}</span></button>`;
+  } },
 };
 
-// Oppdaterer alle nedtellinger hvert sekund
+// ---------- casino-hjelpere ----------
+async function utfordringSide(type) {
+  const u = await rpc('utfordringer_liste', { p_type: type }), race = type === 'race';
+  const bilValg = race ? await garasjeValg() : null;
+  return seksjon('Åpne utfordringer', u.apne.length ? `<div class="liste">${u.apne.map(x => `<div class="linjeel">${avatar(x.navn, 1)}<div class="info"><b>${esc(x.navn)}</b><small>${race ? esc(x.bil) + ' · ' : ''}Innsats ${kr(x.innsats)}</small></div>
+      ${x.min ? `<button class="knapp sek liten" data-act="avbryt_utfordring" data-args='${arg({ p_id: x.id })}'>Trekk</button>` : race ? `<button class="knapp liten" data-godta-race="${x.id}">Kjør</button>` : `<button class="knapp liten" data-act="godta_utfordring" data-args='${arg({ p_id: x.id })}'>Kast</button>`}</div>`).join('')}</div>` : '<p class="tom">Ingen åpne utfordringer. Lag en!</p>')
+    + seksjon(race ? 'Utfordre til race' : 'Lag utfordring', kropp(`<p class="dim">${race ? 'Dyrere bil gir fordel, men flaks avgjør også. Vinneren får 97 % av potten.' : 'Begge kaster to terninger. Høyest sum vinner 97 % av potten.'}</p>
+      ${race && !bilValg.har ? bilValg.html : `<form data-rpc="lag_utfordring"><input type="hidden" name="p_type" value="${type}">${race ? `<div class="felt"><label>Din bil</label>${bilValg.html}</div>` : ''}<div class="rad"><div><label for="utInn">Innsats</label><input id="utInn" name="p_innsats" type="number" min="1000" required data-num></div><button class="knapp">Legg ut</button></div></form>`}
+      ${race && bilValg.har ? `<div id="raceBil" class="hidden">${bilValg.html}</div>` : ''}`))
+    + seksjon('Siste resultater', u.siste.length ? `<div class="liste">${u.siste.map(x => `<div class="linjeel"><div class="info"><b style="font-weight:500">${esc(x.resultat)}</b><small>${dato(x.tid)}</small></div></div>`).join('')}</div>` : '<p class="tom">Ingen resultater ennå.</p>');
+}
+async function gruppeSide(type, regler) {
+  const g = await rpc('gruppespill_liste', { p_type: type });
+  return seksjon('Åpne spill', g.apne.length ? `<div class="liste">${g.apne.map(x => `<div class="linjeel"><div class="info"><b>Innsats ${kr(x.innsats)}</b><small>${x.deltakere.length}/${x.maks}: ${x.deltakere.map(esc).join(', ')}</small></div>
+      ${x.med ? `<button class="knapp sek liten" data-act="forlat_gruppespill" data-args='${arg({ p_id: x.id })}'>Forlat</button>` : `<button class="knapp liten" data-act="bli_med_gruppespill" data-args='${arg({ p_id: x.id })}'>Bli med</button>`}</div>`).join('')}</div>` : '<p class="tom">Ingen åpne spill. Start et!</p>')
+    + seksjon('Start nytt spill', kropp(`<p class="dim">${regler} Spillet starter når alle plassene er fylt.</p>
+      <form data-rpc="lag_gruppespill"><input type="hidden" name="p_type" value="${type}"><div class="rad"><div><label for="gInn">Innsats</label><input id="gInn" name="p_innsats" type="number" min="1000" required data-num></div><div><label for="gMaks">Spillere</label><select id="gMaks" name="p_maks" data-num>${[3, 4, 5, 6, 8].map(n => `<option ${n === 4 ? 'selected' : ''}>${n}</option>`).join('')}</select></div><button class="knapp">Start</button></div></form>`))
+    + seksjon('Siste spill', g.siste.length ? g.siste.map(x => kropp(`<b>${esc(x.vinner)} vant</b> <span class="dim">· ${x.maks} spillere · ${dato(x.tid)}</span><p class="pre">${esc(x.logg)}</p>`)).join('<div style="border-top:1px solid var(--line)"></div>') : '<p class="tom">Ingen spill ferdig ennå.</p>');
+}
+function bjVisning(b) {
+  const hand = (kort, verdi, skjult) => `<div class="hand">${kort.map(spillkort).join('')}${skjult ? '<span class="spillkort bak"></span>' : ''}</div><small class="dim">Verdi: <b>${verdi}</b></small>`;
+  if (b.aktiv || b.ferdig) {
+    return seksjon('Dealer', kropp(hand(b.dealer, b.dealer_verdi, b.aktiv)))
+      + seksjon('Din hånd', kropp(hand(b.hand, b.hand_verdi, false)), 'Innsats ' + kr(b.innsats))
+      + (b.aktiv ? `<div class="rad"><button class="knapp" data-bj="bj_trekk">Trekk kort</button><button class="knapp sek" data-bj="bj_staa">Stå</button></div>`
+        : `<div class="banner ${b.ok ? 'mint' : b.uavgjort ? 'gul' : ''}"><div>${esc(b.melding)}</div></div>${bjStart(b.innsats)}`);
+  }
+  return bjStart(1000);
+}
+const bjStart = (innsats) => seksjon('Ny runde', kropp(`<p class="dim">Kom nærmere 21 enn dealeren uten å gå over. Blackjack betaler 3:2. Dealeren står på 17.</p><form id="bjForm" class="rad"><div><label for="bjInn">Innsats</label><input id="bjInn" name="innsats" type="number" min="100" max="2000000" value="${innsats}" required></div><button class="knapp">Del ut</button></form>`));
+
+// ---------- chat ----------
+let sisteChatId = 0;
+function leggTilChat(m) {
+  const logg = $('#chatlogg'); if (!logg) return;
+  const d = document.createElement('div'); d.className = 'm';
+  const t = new Date(m.tid).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
+  d.innerHTML = m.navn === 'System' ? `<span class="sys">${esc(m.tekst)} <small>${t}</small></span>` : `${avatar(m.navn, 1)}<div><b>${esc(m.navn)}</b><small>${t}</small><div>${esc(m.tekst)}</div></div>`;
+  const nederst = logg.scrollHeight - logg.scrollTop - logg.clientHeight < 60;
+  logg.appendChild(d); if (nederst || logg.children.length < 70) logg.scrollTop = logg.scrollHeight;
+}
+async function hentChat() { try { for (const m of await rpc('chat_siste', { p_etter: sisteChatId })) { leggTilChat(m); sisteChatId = Math.max(sisteChatId, m.id); } } catch {} }
+async function startChat() {
+  sisteChatId = 0; await hentChat();
+  clearInterval(sideTimer);
+  sideTimer = setInterval(() => { if (ruter.side === 'chat' && !document.hidden) hentChat(); }, 4000);
+  $('#chatForm').onsubmit = async (e) => { e.preventDefault(); const inp = e.target.tekst; try { await rpc('send_chat', { p_tekst: inp.value }); inp.value = ''; await hentChat(); } catch (err) { varsel(err.message, 'bad'); } };
+}
+
+// =====================================================================
+//  NEDTELLINGER (hvert sekund)
+// =====================================================================
 function tikk() {
+  if (!st?.spiller) return;
   document.querySelectorAll('[data-til]').forEach(el => {
     const s = sekIgjen(el.dataset.til);
-    if (el.dataset.navn) {
-      if (el.hasAttribute('data-skjul')) el.classList.toggle('hidden', s === 0);
-      el.textContent = `${el.dataset.navn}: ${s ? tid(s) : 'klar'}`;
-      el.classList.toggle('klar', s === 0);
-    } else {
-      el.textContent = s ? tid(s) : 'klar';
-    }
+    el.textContent = s ? tid(s) : (el.dataset.klar || 'nå');
+    if (el.classList.contains('status')) el.classList.toggle('vent', s > 0);
   });
-  document.querySelectorAll('[data-kausjon]').forEach(el => {
-    el.textContent = kr(sekIgjen(st?.spiller?.fengsel_til) * 25);
+  document.querySelectorAll('[data-kausjon]').forEach(el => { el.textContent = kr(sekIgjen(st.spiller.fengsel_til) * 25); });
+  document.querySelectorAll('.stopp[data-ring]').forEach(el => {
+    const felt = el.dataset.ring; if (!felt) return;
+    const r = ringStil(felt, Number(el.dataset.total)), ring = el.querySelector('.ring'), lbl = el.querySelector('small');
+    if (el.dataset.gaa === 'fengsel' && fengslet()) { ring.style.setProperty('--p', .5); ring.style.setProperty('--f', 'var(--signal)'); lbl.textContent = 'Inne'; lbl.className = 'vent'; return; }
+    ring.style.setProperty('--p', r.p); ring.style.setProperty('--f', r.f); lbl.textContent = r.tekst; lbl.className = r.vent ? 'vent' : '';
   });
 }
 setInterval(tikk, 1000);
 
-// ---------------------------------------------------------------- SIDER
-async function visSide(id, stille = false) {
-  const main = $('#side');
-  if (!stille) main.innerHTML = '<p class="dim">Laster …</p>';
-  try {
-    const html = await SIDE_HTML[id]();
-    if (side !== id) return;
-    const scroll = window.scrollY;
-    main.innerHTML = (fengslet() && id !== 'fengsel'
-      ? `<div class="fengselbanner">Du sitter i fengsel. Ute om <b class="mono" data-til="${st.spiller.fengsel_til}"></b>. <button class="small ghost" data-side-lenke="fengsel">Til fengselet</button></div>` : '') + html;
-    if (stille) window.scrollTo(0, scroll);
-    tikk();
-    ETTER[id]?.();
-  } catch (e) { main.innerHTML = `<p class="bad">${esc(e.message)}</p>`; }
-}
-
-const rankIndeks = () => st.rank_indeks;
-
-const SIDE_HTML = {
-  async oversikt() {
-    const s = st.spiller;
-    const online = await rpc('antall_online');
-    const besk = sekIgjen(s.beskyttet_til);
-    return `
-      <h2>Oversikt</h2>
-      <div class="card">
-        <h3>${esc(st.rank)}</h3>
-        <div class="dim">${st.neste_rank ? `${rankProsent()} % av veien til ${esc(st.neste_rank)}` : 'Du har nådd høyeste rank: Don.'}</div>
-        <div class="bar"><i style="width:${rankProsent()}%"></i></div>
-        <p class="dim" style="margin:8px 0 0;font-size:.85rem">All kriminalitet, biltyveri, utbrudd, angrep og reiser gir erfaring – også når det går galt. <button class="link" data-side-lenke="ranker">Se reglene</button></p>
-        ${besk ? `<p class="ok">Du er ny i byen og kan ikke bli skutt de neste <b data-til="${s.beskyttet_til}"></b>. Angriper du noen, mister du beskyttelsen.</p>` : ''}
-      </div>
-      <div class="grid">
-        <div class="stat"><span>Kontanter</span><b class="gold">${kr(s.penger)}</b></div>
-        <div class="stat"><span>Bank</span><b>${kr(s.bank)}</b></div>
-        <div class="stat"><span>Helse</span><b>${s.helse}%</b></div>
-        <div class="stat"><span>By</span><b>${esc(s.sted)}</b></div>
-        <div class="stat"><span>Våpen</span><b>${esc(vapenNavn(s.vapen))}</b></div>
-        <div class="stat"><span>Beskyttelse</span><b>${esc(beskNavn(s.beskyttelse))}</b></div>
-        <div class="stat"><span>Kuler</span><b>${tall(s.kuler)}</b></div>
-        <div class="stat"><span>Drap</span><b>${s.drap}</b></div>
-        <div class="stat"><span>Biler i garasjen</span><b>${st.biler}</b></div>
-        <div class="stat"><span>Spillere pålogget</span><b>${online}</b></div>
-      </div>
-      <div class="card" style="margin-top:14px">
-        <h3>Tips</h3>
-        <p class="dim" style="margin:0">Kontanter kan bli tatt av den som dreper deg – sett pengene i banken. Høyere rank gir bedre sjanser, nye handlinger og gjør deg vanskeligere å drepe.</p>
-      </div>`;
-  },
-
-  async krim() {
-    const ri = rankIndeks();
-    return `
-      <h2>Kriminalitet</h2>
-      <p class="dim">Neste forsøk: <b class="mono" data-til="${st.spiller.krim_klar}"></b></p>
-      <div class="list">${data.krim.map(k => {
-        const laast = ri < k.min_rank;
-        const sjanse = Math.min(95, k.sjanse + ri * 4);
-        return `<div class="item ${laast ? 'locked' : ''}">
-          <div class="info"><b>${esc(k.navn)}</b>
-            <small>${laast ? `Krever ${esc(data.ranker[k.min_rank].navn)}` : `${sjanse}% sjanse · ${kr(k.min_gevinst)}–${kr(k.max_gevinst)} · ${k.ventetid}s ventetid`}</small></div>
-          <button data-act="begaa_krim" data-args='{"p_id":${k.id}}' ${laast ? 'disabled' : ''}>Utfør</button>
-        </div>`;
-      }).join('')}</div>`;
-  },
-
-  async bil() {
-    const ri = rankIndeks();
-    const biler = await rpc('min_garasje');
-    const sum = biler.reduce((a, b) => a + b.verdi, 0);
-    return `
-      <h2>Biltyveri</h2>
-      <p class="dim">Neste forsøk: <b class="mono" data-til="${st.spiller.bil_klar}"></b></p>
-      <div class="list">${data.bil_steder.map(b => {
-        const laast = ri < b.min_rank;
-        return `<div class="item ${laast ? 'locked' : ''}">
-          <div class="info"><b>${esc(b.navn)}</b>
-            <small>${laast ? `Krever ${esc(data.ranker[b.min_rank].navn)}` : `${Math.min(90, b.sjanse + ri * 3)}% sjanse`}</small></div>
-          <button data-act="stjel_bil" data-args='{"p_id":${b.id}}' ${laast ? 'disabled' : ''}>Stjel</button>
-        </div>`;
-      }).join('')}</div>
-      <div class="card" style="margin-top:16px">
-        <div class="row" style="justify-content:space-between">
-          <h3 style="margin:0">Garasje (${biler.length}/30)</h3>
-          ${biler.length ? `<button class="ghost small" style="flex:0 0 auto" data-act="selg_alle_biler">Selg alle for ${kr(sum)}</button>` : ''}
-        </div>
-        ${biler.length ? `<table><tr><th>Bil</th><th>Stjålet i</th><th>Verdi</th><th></th></tr>${biler.map(b =>
-          `<tr><td>${esc(b.bil)}</td><td class="dim">${esc(b.sted)}</td><td class="mono">${kr(b.verdi)}</td>
-           <td style="text-align:right"><button class="small ghost" data-act="selg_bil" data-args='{"p_id":${b.id}}'>Selg</button></td></tr>`).join('')}</table>`
-          : '<p class="dim">Garasjen er tom.</p>'}
-      </div>`;
-  },
-
-  async fengsel() {
-    const liste = await rpc('fengsel_liste');
-    return `
-      <h2>Fengsel</h2>
-      ${fengslet() ? `<div class="fengselbanner">
-          Du sitter inne i <b class="mono" data-til="${st.spiller.fengsel_til}"></b>.
-          Kausjon: <b class="mono" data-kausjon></b>
-          <button class="small" data-act="kjop_deg_ut">Betal kausjon</button></div>` : ''}
-      <p class="dim">Bryt ut andre for erfaring. Mislykkes du, kan du havne inne selv.</p>
-      ${liste.length ? `<div class="list">${liste.map(p => `
-        <div class="item"><div class="info"><b>${esc(p.navn)}</b><small>${esc(p.rank)} · <span data-til="${new Date(naa() + p.sek * 1000).toISOString()}"></span> igjen</small></div>
-        ${p.navn === st.spiller.navn ? '' : `<button data-act="bryt_ut" data-args='${esc(JSON.stringify({ p_navn: p.navn }))}'>Bryt ut</button>`}</div>`).join('')}</div>`
-        : '<p class="dim">Fengselet er tomt akkurat nå.</p>'}`;
-  },
-
-  async bank() {
-    const s = st.spiller;
-    return `
-      <h2>Bank</h2>
-      <div class="grid" style="margin-bottom:14px">
-        <div class="stat"><span>Kontanter</span><b class="gold">${kr(s.penger)}</b></div>
-        <div class="stat"><span>I banken</span><b>${kr(s.bank)}</b></div>
-      </div>
-      <div class="card">
-        <h3>Sett inn / ta ut</h3>
-        <form data-rpc="bank_sett_inn" class="row" style="margin-bottom:10px">
-          <input name="p_belop" type="number" min="1" placeholder="Beløp" data-num required>
-          <button>Sett inn</button>
-          <button type="button" class="ghost" data-act="bank_sett_inn" data-args='{"p_belop":${s.penger}}' ${s.penger ? '' : 'disabled'}>Sett inn alt</button>
-        </form>
-        <form data-rpc="bank_ta_ut" class="row">
-          <input name="p_belop" type="number" min="1" placeholder="Beløp" data-num required>
-          <button>Ta ut</button>
-        </form>
-      </div>
-      <div class="card">
-        <h3>Overfør til spiller</h3>
-        <p class="dim">Trekkes fra banken.</p>
-        <form data-rpc="overfor" class="row">
-          <input name="p_navn" placeholder="Spillernavn" required>
-          <input name="p_belop" type="number" min="1" placeholder="Beløp" data-num required>
-          <button>Overfør</button>
-        </form>
-      </div>`;
-  },
-
-  async butikk() {
-    const s = st.spiller;
-    const rad = (liste, har, act) => liste.map(v => `
-      <div class="item ${har >= v.nivaa ? 'locked' : ''}">
-        <div class="info"><b>${esc(v.navn)}</b><small>Styrke ×${v.styrke} · ${kr(v.pris)}</small></div>
-        ${har >= v.nivaa ? '<span class="dim">Eid</span>' : `<button data-act="${act}" data-args='{"p_nivaa":${v.nivaa}}' ${s.penger < v.pris ? 'disabled' : ''}>Kjøp</button>`}
-      </div>`).join('');
-    return `
-      <h2>Butikk</h2>
-      <div class="card"><h3>Våpen</h3><p class="dim">Nå: ${esc(vapenNavn(s.vapen))}</p><div class="list">${rad(data.vapen, s.vapen, 'kjop_vapen')}</div></div>
-      <div class="card"><h3>Beskyttelse</h3><p class="dim">Nå: ${esc(beskNavn(s.beskyttelse))}</p><div class="list">${rad(data.beskyttelse, s.beskyttelse, 'kjop_beskyttelse')}</div></div>
-      <div class="card"><h3>Kuler</h3>
-        <p class="dim">Du har ${tall(s.kuler)} kuler. Pris: ${kr(data.kulepris)} per kule.</p>
-        <form data-rpc="kjop_kuler" class="row">
-          <input name="p_antall" type="number" min="1" max="10000" placeholder="Antall" data-num required>
-          <button>Kjøp kuler</button>
-        </form>
-      </div>`;
-  },
-
-  async sykehus() {
-    const s = st.spiller;
-    const pris = (100 - s.helse) * 200;
-    return `
-      <h2>Sykehus</h2>
-      <div class="card">
-        <p>Helse: <b class="mono">${s.helse}%</b></p>
-        <div class="bar" style="margin-bottom:14px"><i style="width:${s.helse}%"></i></div>
-        ${s.helse >= 100 ? '<p class="ok">Du er i full form.</p>'
-          : `<button data-act="sykehus">Bli frisk for ${kr(pris)}</button>`}
-      </div>`;
-  },
-
-  async reise() {
-    const s = st.spiller;
-    return `
-      <h2>Reise</h2>
-      <p class="dim">Du er i <b>${esc(s.sted)}</b>. Flybillett: ${kr(data.reisepris)}. Neste reise: <b class="mono" data-til="${s.reise_klar}"></b></p>
-      <div class="list">${data.byer.map(b => `
-        <div class="item"><div class="info"><b>${esc(b)}</b></div>
-          ${b === s.sted ? '<span class="dim">Du er her</span>' : `<button data-act="reis" data-args='${esc(JSON.stringify({ p_by: b }))}'>Fly hit</button>`}
-        </div>`).join('')}</div>`;
-  },
-
-  async kasino() {
-    return `
-      <h2>Kasino – rulett</h2>
-      <div class="card">
-        <div id="rulettRes" class="rulett-tall dim">–</div>
-        <p class="dim" style="text-align:center">Rød/svart/partall/oddetall gir dobbelt. Riktig tall gir 36 ganger innsatsen.</p>
-        <form id="rulettForm">
-          <div class="row" style="margin-bottom:10px">
-            <input name="innsats" type="number" min="100" max="5000000" placeholder="Innsats (100 – 5 000 000)" required>
-            <select name="valg">
-              <option value="rod">Rød</option><option value="svart">Svart</option>
-              <option value="partall">Partall</option><option value="oddetall">Oddetall</option>
-              ${Array.from({ length: 37 }, (_, i) => `<option value="${i}">Tallet ${i}</option>`).join('')}
-            </select>
-          </div>
-          <button style="width:100%">Spinn</button>
-        </form>
-      </div>`;
-  },
-
-  async angrep() {
-    const s = st.spiller;
-    return `
-      <h2>Angrep</h2>
-      <div class="card">
-        <p class="dim">Målet må være i samme by som deg (${esc(s.sted)}). Flere kuler og bedre våpen gir mer skade. Høy rank og god beskyttelse gjør målet tøffere.</p>
-        <p>Våpen: <b>${esc(vapenNavn(s.vapen))}</b> · Kuler: <b class="mono">${tall(s.kuler)}</b> · Klar om: <b class="mono" data-til="${s.angrep_klar}"></b></p>
-        <form data-rpc="angrip" class="row">
-          <input name="p_navn" placeholder="Spillernavn" required>
-          <input name="p_kuler" type="number" min="1" placeholder="Antall kuler" data-num required>
-          <button>Skyt</button>
-        </form>
-      </div>
-      <div class="card">
-        <h3>Detektiv</h3>
-        <p class="dim">Finn ut hvilken by en spiller er i. Koster 5 000 kr.</p>
-        <form data-rpc="detektiv" class="row">
-          <input name="p_navn" placeholder="Spillernavn" required>
-          <button>Lei detektiv</button>
-        </form>
-      </div>`;
-  },
-
-  async ranker() {
-    const ri = st.rank_indeks;
-    return `
-      <h2>Ranker</h2>
-      <div class="card">
-        <h3>Slik stiger du i rank</h3>
-        <p class="dim" style="margin-top:0">Du får erfaring hver gang du gjør noe i byen. Når du har nok erfaring, rykker du opp. Høyere rank gir bedre sjanser, nye jobber og gjør deg vanskeligere å drepe.</p>
-        <table>
-          <tr><th>Handling</th><th>Lykkes</th><th>Mislykkes</th></tr>
-          <tr><td>Kriminalitet</td><td>${data.krim.map(k => '+' + k.exp).join(' / ')}</td><td>+1</td></tr>
-          <tr><td>Biltyveri</td><td>+4 / +6 / +8</td><td>+1</td></tr>
-          <tr><td>Bryte ut en spiller</td><td>+5</td><td>+1</td></tr>
-          <tr><td>Angrep</td><td>+3 treff, drap +40 og mer</td><td>+1</td></tr>
-          <tr><td>Reise til ny by</td><td>+1</td><td>–</td></tr>
-        </table>
-        <p class="dim" style="margin-bottom:0;font-size:.85rem">Drap gir 40 erfaring pluss 15 for hver rank offeret hadde. Bank, butikk, kasino og chat gir ikke erfaring.</p>
-      </div>
-      <div class="card" style="padding:6px 10px">
-        <table>
-          <tr><th>Rank</th><th>Erfaring</th><th></th></tr>
-          ${data.ranker.map(r => `<tr class="${r.indeks === ri ? 'denne' : ''}">
-            <td>${r.indeks === ri ? '<b class="gold">' + esc(r.navn) + '</b>' : esc(r.navn)}</td>
-            <td class="mono">${tall(r.exp)}</td>
-            <td class="dim" style="white-space:nowrap">${r.indeks < ri ? 'Passert' : r.indeks === ri ? (st.neste_rank ? 'Du er her · ' + rankProsent() + ' %' : 'Du er her') : ''}</td></tr>`).join('')}
-        </table>
-      </div>`;
-  },
-
-  async toppliste() {
-    const l = await rpc('toppliste');
-    return `
-      <h2>Toppliste</h2>
-      <div class="card" style="padding:6px 10px">
-        <table><tr><th>#</th><th>Navn</th><th>Rank</th><th>Drap</th></tr>
-        ${l.map((p, i) => `<tr><td class="dim">${i + 1}</td>
-          <td>${p.online ? '<span class="dot" title="Pålogget"></span>' : ''}<button class="link" data-profil="${esc(p.navn)}">${esc(p.navn)}</button></td>
-          <td>${esc(p.rank)}</td><td class="mono">${p.drap}</td></tr>`).join('')}
-        </table>
-      </div>`;
-  },
-
-  async meldinger() {
-    const m = await rpc('mine_meldinger');
-    return `
-      <h2>Meldinger</h2>
-      <div class="card">
-        <h3>Ny melding</h3>
-        <form data-rpc="send_melding" id="skrivForm">
-          <div class="row" style="margin-bottom:8px">
-            <input name="p_til" placeholder="Til (spillernavn)" required>
-            <input name="p_emne" placeholder="Emne" maxlength="80">
-          </div>
-          <textarea name="p_tekst" rows="3" maxlength="2000" placeholder="Melding" required style="margin-bottom:8px"></textarea>
-          <button>Send</button>
-        </form>
-      </div>
-      <div class="list">${m.length ? m.map(x => `
-        <div class="item melding ${x.lest ? '' : 'ulest'}" style="display:block">
-          <div class="row" style="justify-content:space-between">
-            <button class="link" style="text-align:left;flex:1" data-apne="${x.id}" data-lest="${x.lest}"><b>${esc(x.emne)}</b></button>
-            <small class="dim" style="flex:0 0 auto">${esc(x.fra_navn)} · ${new Date(x.tid).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</small>
-          </div>
-          <div class="kropp hidden" id="m${x.id}">${esc(x.tekst)}
-            <div class="row" style="margin-top:10px;justify-content:flex-end">
-              ${x.fra_navn !== 'System' ? `<button class="small ghost" style="flex:0 0 auto" data-svar="${esc(x.fra_navn)}" data-emne="${esc(x.emne)}">Svar</button>` : ''}
-              <button class="small ghost" style="flex:0 0 auto" data-slett="${x.id}">Slett</button>
-            </div>
-          </div>
-        </div>`).join('') : '<p class="dim">Ingen meldinger.</p>'}</div>`;
-  },
-
-  async chat() {
-    return `
-      <h2>Chat</h2>
-      <div class="chatlogg" id="chatlogg"><span class="dim">Laster …</span></div>
-      <form id="chatForm" class="row">
-        <input name="tekst" maxlength="300" placeholder="Skriv noe …" autocomplete="off" required style="flex:5 1 200px">
-        <button style="flex:0 0 auto">Send</button>
-      </form>`;
-  },
-
-  async gravplass() {
-    const g = await rpc('gravplass_liste');
-    return `
-      <h2>Gravplass</h2>
-      <div class="card" style="padding:6px 10px">
-        ${g.length ? `<table><tr><th>Navn</th><th>Rank</th><th>Drept av</th><th>Når</th></tr>
-        ${g.map(x => `<tr><td>${esc(x.navn)}</td><td>${esc(x.rank)}</td><td class="bad">${esc(x.drept_av)}</td>
-          <td class="dim">${new Date(x.tid).toLocaleDateString('nb-NO')}</td></tr>`).join('')}</table>`
-          : '<p class="dim">Ingen er drept ennå.</p>'}
-      </div>`;
-  },
-};
-
-// Kode som må kjøre etter at en side er tegnet
-const ETTER = {
-  kasino() {
-    $('#rulettForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const f = new FormData(e.target);
-      const knapp = e.target.querySelector('button'); knapp.disabled = true;
-      try {
-        const r = await rpc('rulett', { p_innsats: Number(f.get('innsats')), p_valg: f.get('valg') });
-        const el = $('#rulettRes');
-        el.textContent = r.tall;
-        el.style.color = r.farge === 'rød' ? 'var(--red2)' : r.farge === 'grønn' ? 'var(--green)' : 'var(--text)';
-        varsel(r.melding, r.ok ? 'ok' : 'bad');
-        await oppdater();
-      } catch (err) { varsel(err.message, 'bad'); }
-      knapp.disabled = false;
-    };
-  },
-  async chat() {
-    const logg = $('#chatlogg');
-    if (!logg) return;
-    logg.innerHTML = '';
-    sisteChatId = 0;
-    await hentChat();
-    clearInterval(chatTimer);
-    chatTimer = setInterval(() => { if (side === 'chat' && !document.hidden) hentChat(); else clearInterval(chatTimer); }, 4000);
-    $('#chatForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const inp = e.target.tekst;
-      try { await rpc('send_chat', { p_tekst: inp.value }); inp.value = ''; await hentChat(); }
-      catch (err) { varsel(err.message, 'bad'); }
-    };
-  },
-};
-
-async function hentChat() {
-  try {
-    const nye = await rpc('chat_siste', { p_etter: sisteChatId });
-    for (const m of nye) { leggTilChat(m); sisteChatId = Math.max(sisteChatId, m.id); }
-  } catch { /* prøver igjen om litt */ }
-}
-
-function leggTilChat(m) {
-  const logg = $('#chatlogg');
-  if (!logg) return;
-  const d = document.createElement('div');
-  const t = new Date(m.tid).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
-  d.innerHTML = `<span class="t">${t}</span>${m.navn === 'System'
-    ? `<i class="bad">${esc(m.tekst)}</i>`
-    : `<b class="gold">${esc(m.navn)}:</b> ${esc(m.tekst)}`}`;
-  const nederst = logg.scrollHeight - logg.scrollTop - logg.clientHeight < 40;
-  logg.appendChild(d);
-  if (nederst || logg.children.length < 70) logg.scrollTop = logg.scrollHeight;
-}
-
-// ---------------------------------------------------------------- KLIKK OG SKJEMA
-$('#topp').addEventListener('click', (e) => {
-  const lenke = e.target.closest('[data-side-lenke]');
-  if (lenke) { side = lenke.dataset.sideLenke; tegnMeny(); visSide(side); window.scrollTo({ top: 0 }); }
+// =====================================================================
+//  KLIKK OG SKJEMA
+// =====================================================================
+document.addEventListener('click', async (e) => {
+  const t = e.target;
+  if (t.closest('[data-loggut]')) { await post('loggut').catch(() => {}); tilInnlogging(); return; }
+  const fa = t.closest('[data-fane]'); if (fa) return fane(fa.dataset.fane);
+  const g = t.closest('[data-gaa]'); if (g && !t.closest('[data-act]')) { $('#modal').classList.add('hidden'); return gaa(g.dataset.gaa, g.dataset.param ?? null); }
+  if (t.closest('[data-utvid]')) { detaljerApen = !detaljerApen; lagre('ug_detaljer', detaljerApen ? '1' : '0'); return tegnTopp(); }
+  const act = t.closest('[data-act]');
+  if (act) { act.disabled = true; await handling(act.dataset.act, act.dataset.args ? JSON.parse(act.dataset.args) : {}); act.disabled = false; return; }
+  const bj = t.closest('[data-bj]');
+  if (bj) { bj.disabled = true; try { const r = await rpc(bj.dataset.bj); if (r.ferdig) { varsel(r.melding, r.ok || r.uavgjort ? 'ok' : 'bad'); await oppdater(); } $('#innhold .innside').innerHTML = bjVisning(r); } catch (err) { varsel(err.message, 'bad'); } return; }
+  const sa = t.closest('[data-selg-aksje]');
+  if (sa) { const inp = sa.closest('form').querySelector('[name=p_antall]'); if (!inp.value) { inp.focus(); return varsel('Skriv inn hvor mange aksjer du vil selge.', 'bad'); } return handling('selg_aksje', { p_id: Number(sa.dataset.selgAksje), p_antall: Number(inp.value) }); }
+  const gr = t.closest('[data-godta-race]');
+  if (gr) { const sel = $('#raceBil select'); if (!sel) return varsel('Du trenger en bil i garasjen.', 'bad'); return handling('godta_utfordring', { p_id: Number(gr.dataset.godtaRace), p_bil: Number(sel.value) }); }
+  const apne = t.closest('[data-apne]');
+  if (apne) { const id = apne.dataset.apne; $('#m' + id).classList.toggle('hidden'); if (apne.dataset.lest === 'false') { apne.dataset.lest = 'true'; apne.parentElement.classList.remove('ulest'); await rpc('les_melding', { p_id: Number(id) }); await oppdater(); } return; }
+  const sl = t.closest('[data-slett]'); if (sl) { await rpc('slett_melding', { p_id: Number(sl.dataset.slett) }); return tegnSide(true); }
+  const sv = t.closest('[data-svar]'); if (sv) { const f = $('#skrivForm'); f.p_til.value = sv.dataset.svar; f.p_emne.value = sv.dataset.emne.startsWith('Sv: ') ? sv.dataset.emne : 'Sv: ' + sv.dataset.emne; f.p_tekst.focus(); return; }
+  const ko = t.closest('[data-kopier]');
+  if (ko) { const inp = document.getElementById(ko.dataset.kopier); try { await navigator.clipboard.writeText(inp.value); varsel('Lenken er kopiert.'); } catch { inp.select(); varsel('Marker og kopier lenken.'); } return; }
+  const pr = t.closest('[data-profil]'); if (pr) return visProfil(pr.dataset.profil);
+  if (t.closest('[data-lukk]') || t.id === 'modal') $('#modal').classList.add('hidden');
 });
-
-$('#side').addEventListener('click', async (e) => {
-  const act = e.target.closest('[data-act]');
-  if (act) {
-    act.disabled = true;
-    await handling(act.dataset.act, act.dataset.args ? JSON.parse(act.dataset.args) : {});
-    act.disabled = false;
-    return;
-  }
-  const lenke = e.target.closest('[data-side-lenke]');
-  if (lenke) { side = lenke.dataset.sideLenke; tegnMeny(); visSide(side); return; }
-
-  const apne = e.target.closest('[data-apne]');
-  if (apne) {
-    const id = apne.dataset.apne;
-    $('#m' + id).classList.toggle('hidden');
-    if (apne.dataset.lest === 'false') {
-      apne.dataset.lest = 'true';
-      apne.closest('.melding').classList.remove('ulest');
-      await rpc('les_melding', { p_id: Number(id) });
-      await oppdater();
-    }
-    return;
-  }
-  const slett = e.target.closest('[data-slett]');
-  if (slett) { await rpc('slett_melding', { p_id: Number(slett.dataset.slett) }); visSide('meldinger', true); return; }
-
-  const svar = e.target.closest('[data-svar]');
-  if (svar) {
-    const f = $('#skrivForm');
-    f.p_til.value = svar.dataset.svar;
-    f.p_emne.value = svar.dataset.emne.startsWith('Sv: ') ? svar.dataset.emne : 'Sv: ' + svar.dataset.emne;
-    f.p_tekst.focus(); window.scrollTo({ top: 0, behavior: 'smooth' });
-    return;
-  }
-});
-
-$('#side').addEventListener('submit', async (e) => {
+document.addEventListener('submit', async (e) => {
   const f = e.target;
+  if (f.id === 'sokForm') { e.preventDefault(); return gaa('sok', new FormData(f).get('q').trim()); }
+  if (f.id === 'bjForm') {
+    e.preventDefault(); const k = f.querySelector('button'); k.disabled = true;
+    try { const r = await rpc('bj_start', { p_innsats: Number(new FormData(f).get('innsats')) }); if (r.ferdig) varsel(r.melding, r.ok || r.uavgjort ? 'ok' : 'bad'); await oppdater(); $('#innhold .innside').innerHTML = bjVisning(r); }
+    catch (err) { varsel(err.message, 'bad'); k.disabled = false; }
+    return;
+  }
   if (!f.dataset.rpc) return;
   e.preventDefault();
   const args = {};
   for (const el of f.querySelectorAll('[name]')) args[el.name] = el.hasAttribute('data-num') ? Number(el.value) : el.value;
-  const knapp = f.querySelector('button:not([type=button])'); if (knapp) knapp.disabled = true;
-  await handling(f.dataset.rpc, args);
-  if (knapp) knapp.disabled = false;
+  const k = f.querySelector('button:not([type=button])'); if (k) k.disabled = true;
+  const r = await handling(f.dataset.rpc, args);
+  if (k) k.disabled = false;
+  if (f.dataset.rpc === 'ny_traad' && r?.id) gaa('forum', 't' + r.id);
 });
 
-// Profilvisning (fra topplisten)
-document.addEventListener('click', async (e) => {
-  const p = e.target.closest('[data-profil]');
-  if (p) {
-    try {
-      const x = await rpc('profil', { p_navn: p.dataset.profil });
-      $('#modal').innerHTML = `<div class="card">
-        <h2>${esc(x.navn)}</h2>
-        <p>${x.online ? '<span class="dot"></span>Pålogget' : '<span class="dim">Ikke pålogget</span>'}</p>
-        <div class="grid" style="margin-bottom:12px">
-          <div class="stat"><span>Rank</span><b>${esc(x.rank)}</b></div>
-          <div class="stat"><span>Drap</span><b>${x.drap}</b></div>
-        </div>
-        <p class="dim">Startet ${new Date(x.opprettet).toLocaleDateString('nb-NO')}${x.fengsel ? ' · sitter i fengsel' : ''}${x.beskyttet ? ' · ny og beskyttet' : ''}</p>
-        <div class="row"><button class="ghost" data-lukk>Lukk</button><button data-skriv="${esc(x.navn)}">Send melding</button></div>
-      </div>`;
-      $('#modal').classList.remove('hidden');
-    } catch (err) { varsel(err.message, 'bad'); }
-    return;
-  }
-  if (e.target.closest('[data-lukk]') || e.target.id === 'modal') { $('#modal').classList.add('hidden'); return; }
-  const skriv = e.target.closest('[data-skriv]');
-  if (skriv) {
-    $('#modal').classList.add('hidden');
-    side = 'meldinger'; tegnMeny(); await visSide('meldinger');
-    $('#skrivForm').p_til.value = skriv.dataset.skriv;
-    $('#skrivForm').p_emne.focus();
-  }
-});
+async function visProfil(navn) {
+  try {
+    const x = await rpc('profil', { p_navn: navn });
+    $('#modal').innerHTML = `<div class="boks"><div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">${avatar(x.navn)}<div><h2 style="font-size:1.5rem">${esc(x.navn)}</h2><span class="${x.online ? 'ok' : 'dim'}">${x.online ? '● Pålogget' : 'Ikke pålogget'}</span></div></div>
+      <div class="nokkeltall" style="margin-bottom:12px"><div><span>Rank</span><b>${esc(x.rank)}</b></div><div><span>Drap</span><b>${x.drap}</b></div><div><span>Gjeng</span><b>${esc(x.gjeng || '–')}</b></div><div><span>Prestasjoner</span><b>${x.prestasjoner}</b></div></div>
+      <p class="dim" style="font-size:.85rem">Startet ${new Date(x.opprettet).toLocaleDateString('nb-NO')}${x.fengsel ? ' · sitter i fengsel' : ''}${x.beskyttet ? ' · ny og beskyttet' : ''}</p>
+      <div class="rad"><button class="knapp sek" data-lukk>Lukk</button>${x.navn !== st.spiller.navn ? `<button class="knapp" data-gaa="meldinger" data-param="${esc(x.navn)}">Send melding</button>` : ''}</div></div>`;
+    $('#modal').classList.remove('hidden');
+  } catch (err) { varsel(err.message, 'bad'); }
+}
 
-// Oppstart: prøv å fortsette innlogget økt, ellers vis innlogging
 start();
 </script>
 </body>
