@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Undergrunnen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0c0b; --panel:#171513; --panel2:#1f1c19; --line:#2e2a25;
+  --text:#e9e4dc; --dim:#9a9187; --red:#c3262e; --red2:#e0434b;
+  --gold:#d6a84a; --green:#5fae6a; --radius:6px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+body{background:radial-gradient(ellipse at top,#1d1512 0%,var(--bg) 60%) fixed}
+a{color:var(--gold)}
+h1,h2,h3{font-family:"Bebas Neue",Impact,sans-serif;letter-spacing:.04em;font-weight:400;margin:0 0 .4em}
+h1{font-size:2.6rem;color:var(--red2)} h2{font-size:1.9rem} h3{font-size:1.3rem;color:var(--gold)}
+.mono{font-family:"IBM Plex Mono",monospace}
+.dim{color:var(--dim)} .ok{color:var(--green)} .bad{color:var(--red2)} .gold{color:var(--gold)}
+.hidden{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{background:#0f0e0d;border:1px solid var(--line);border-radius:var(--radius);padding:.55em .7em;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--red);border-color:transparent}
+button{background:var(--red);border:0;border-radius:var(--radius);padding:.55em 1em;font-weight:600;cursor:pointer;white-space:nowrap}
+button:hover{background:var(--red2)} button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+button.ghost:hover{border-color:var(--gold)}
+button.small{padding:.3em .7em;font-size:.85rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1 1 140px}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px}
+.item .info{min-width:0;flex:1}
+.item .info b{display:block}
+.item small{color:var(--dim)}
+.locked{opacity:.45}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px}
+.stat span{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim)}
+.stat b{font-family:"IBM Plex Mono",monospace;font-weight:500}
+.bar{height:6px;background:#0f0e0d;border-radius:3px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold))}
+table{width:100%;border-collapse:collapse}
+td,th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:500}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px}
+.link{background:none;padding:0;color:var(--gold);font-weight:500}
+.link:hover{background:none;text-decoration:underline}
+
+/* innlogging */
+#auth,#lag{max-width:400px;margin:8vh auto;padding:0 16px}
+.logo{text-align:center;margin-bottom:24px}
+.logo p{margin:0;color:var(--dim)}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs button{flex:1}
+form .felt{margin-bottom:10px}
+label{display:block;font-size:.8rem;color:var(--dim);margin-bottom:3px}
+
+/* spill */
+#spill{display:grid;grid-template-columns:210px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+header{grid-column:1/-1;background:#0a0908ee;border-bottom:1px solid var(--line);padding:10px 18px;position:sticky;top:0;z-index:5;backdrop-filter:blur(6px)}
+.topp{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.topp .navn{font-family:"Bebas Neue";font-size:1.6rem;line-height:1;color:var(--red2)}
+.topp .pill{font-size:.85rem;white-space:nowrap}
+.topp .pill span{color:var(--dim);margin-right:4px}
+.topp .loggut{margin-left:auto}
+.timere{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.timer{font-size:.75rem;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--dim)}
+.timer.klar{color:var(--green);border-color:#2f4a33}
+nav{border-right:1px solid var(--line);padding:14px 10px;position:sticky;top:96px;align-self:start}
+nav button{display:flex;justify-content:space-between;width:100%;background:none;text-align:left;font-weight:500;color:var(--dim);padding:.5em .8em;margin-bottom:2px}
+nav button:hover{background:var(--panel);color:var(--text)}
+nav button.aktiv{background:var(--panel);color:var(--text);box-shadow:inset 3px 0 0 var(--red)}
+nav .badge{background:var(--red);color:#fff;border-radius:10px;font-size:.7rem;padding:0 6px}
+main{padding:18px;max-width:860px;width:100%}
+#varsel{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:min(560px,92vw);z-index:20;padding:12px 16px;border-radius:var(--radius);background:var(--panel2);border:1px solid var(--line);box-shadow:0 8px 30px #000a}
+#varsel.ok{border-color:var(--green)} #varsel.bad{border-color:var(--red)}
+.fengselbanner{background:#2a1214;border:1px solid var(--red);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px}
+.chatlogg{height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:6px;background:#0f0e0d;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:10px}
+.chatlogg div{word-wrap:break-word}
+.chatlogg .t{color:var(--dim);font-size:.75rem;margin-right:6px}
+.melding .kropp{white-space:pre-wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.melding.ulest b{color:var(--gold)}
+.rulett-tall{font-family:"Bebas Neue";font-size:3.2rem;text-align:center;line-height:1}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
+.modal .card{max-width:380px;width:100%}
+
+@media (max-width:760px){
+  #spill{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
+  header{padding:8px 12px;position:static}
+  .topp{gap:10px}
+  .topp .navn{font-size:1.35rem}
+  nav{position:sticky;top:0;display:flex;overflow-x:auto;gap:4px;padding:8px;border-right:0;border-bottom:1px solid var(--line);background:var(--bg);z-index:4;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav button{width:auto;flex:0 0 auto;margin:0;gap:6px}
+  nav button.aktiv{box-shadow:inset 0 -2px 0 var(--red)}
+  main{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ INNLOGGING ============ -->
+<section id="auth" class="hidden">
+  <div class="logo"><h1>Undergrunnen</h1><p>Byen sover. Du gjør det ikke.</p></div>
+  <div class="card">
+    <div class="tabs">
+      <button type="button" id="tabLogg">Logg inn</button>
+      <button type="button" id="tabReg" class="ghost">Ny bruker</button>
+    </div>
+    <form id="authForm">
+      <div class="felt"><label>E-post</label><input name="epost" type="email" required autocomplete="email"></div>
+      <div class="felt"><label>Passord</label><input name="passord" type="password" required minlength="6" autocomplete="current-password"></div>
+      <button style="width:100%" id="authKnapp">Logg inn</button>
+      <p id="authFeil" class="bad"></p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ LAG KARAKTER ============ -->
+<section id="lag" class="hidden">
+  <div class="logo"><h1>Undergrunnen</h1></div>
+  <div class="card">
+    <div id="dodTekst"></div>
+    <h2>Velg ditt gangsternavn</h2>
+    <form id="lagForm">
+      <div class="felt"><input name="navn" required maxlength="16" placeholder="3–16 tegn"></div>
+      <button style="width:100%">Start i Oslo</button>
+      <p id="lagFeil" class="bad"></p>
+    </form>
+    <button class="ghost small" data-loggut>Logg ut</button>
+  </div>
+</section>
+
+<!-- ============ SPILLET ============ -->
+<section id="spill" class="hidden">
+  <header id="topp"></header>
+  <nav id="meny"></nav>
+  <main id="side"></main>
+</section>
+
+<div id="varsel" class="hidden"></div>
+<div id="modal" class="modal hidden"></div>
+
+<script type="module">
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const kr = (n) => Number(n || 0).toLocaleString('nb-NO') + ' kr';
+const tall = (n) => Number(n || 0).toLocaleString('nb-NO');
+
+let data = null;       // spilldata (kriminalitet, våpen osv.)
+let st = null;         // egen status
+let offset = 0;        // serverklokke minus klientklokke
+let side = 'oversikt';
+let chatTimer = null;
+let sisteChatId = 0;
+let pollTimer = null;
+
+const naa = () => Date.now() + offset;
+const sekIgjen = (iso) => iso ? Math.max(0, Math.ceil((new Date(iso).getTime() - naa()) / 1000)) : 0;
+const tid = (s) => s >= 3600 ? `${Math.floor(s/3600)}t ${Math.floor(s%3600/60)}m` : s >= 60 ? `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}` : `${s}s`;
+const fengslet = () => st?.spiller && sekIgjen(st.spiller.fengsel_til) > 0;
+
+class IkkeInnlogget extends Error {}
+async function post(sti, body = {}) {
+  let r;
+  try {
+    r = await fetch('/api/' + sti, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), credentials: 'same-origin' });
+  } catch { throw new Error('Ingen kontakt med serveren. Sjekk nettet.'); }
+  let d = {};
+  try { d = await r.json(); } catch { /* ikke json */ }
+  if (r.status === 401 && sti === 'rpc') throw new IkkeInnlogget(d.error || 'Du er ikke innlogget');
+  if (!r.ok) throw new Error(d.error || 'Noe gikk galt. Prøv igjen.');
+  return d;
+}
+async function rpc(fn, args = {}) {
+  return (await post('rpc', { fn, args })).data;
+}
+
+let varselTimer;
+function varsel(tekst, type = 'ok') {
+  const v = $('#varsel');
+  v.className = type; v.textContent = tekst;
+  clearTimeout(varselTimer);
+  varselTimer = setTimeout(() => v.classList.add('hidden'), 6000);
+}
+
+// Kjører en spillhandling, viser resultatet og oppdaterer siden
+async function handling(navn, args) {
+  try {
+    const r = await rpc(navn, args);
+    if (r && r.melding) varsel(r.melding, r.ok ? 'ok' : 'bad');
+    await oppdater();
+    await visSide(side, true);
+    return r;
+  } catch (e) {
+    if (e instanceof IkkeInnlogget) return tilInnlogging();
+    varsel(e.message, 'bad');
+    await oppdater().catch(() => {});
+  }
+}
+
+// ---------------------------------------------------------------- AUTH
+let registrer = false;
+function settAuthModus(reg) {
+  registrer = reg;
+  $('#tabLogg').className = reg ? 'ghost' : '';
+  $('#tabReg').className = reg ? '' : 'ghost';
+  $('#authKnapp').textContent = reg ? 'Opprett bruker' : 'Logg inn';
+  $('#authFeil').textContent = '';
+}
+$('#tabLogg').onclick = () => settAuthModus(false);
+$('#tabReg').onclick = () => settAuthModus(true);
+
+$('#authForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const knapp = $('#authKnapp'); knapp.disabled = true;
+  $('#authFeil').textContent = '';
+  try {
+    await post(registrer ? 'registrer' : 'logginn', { epost: f.get('epost'), passord: f.get('passord') });
+    e.target.reset();
+    await start();
+  } catch (err) { $('#authFeil').textContent = err.message; }
+  knapp.disabled = false;
+};
+
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('[data-loggut]')) { await post('loggut').catch(() => {}); tilInnlogging(); }
+});
+
+function tilInnlogging() {
+  stopp();
+  $('#modal').classList.add('hidden');
+  vis('auth');
+}
+
+$('#lagForm').onsubmit = async (e) => {
+  e.preventDefault();
+  $('#lagFeil').textContent = '';
+  try {
+    await rpc('opprett_spiller', { p_navn: new FormData(e.target).get('navn') });
+    await start();
+  } catch (err) {
+    if (err instanceof IkkeInnlogget) return tilInnlogging();
+    $('#lagFeil').textContent = err.message;
+  }
+};
+
+function vis(id) {
+  for (const s of ['auth', 'lag', 'spill']) $('#' + s).classList.toggle('hidden', s !== id);
+}
+
+
+let starter = false;
+async function start() {
+  if (starter) return; starter = true;
+  try {
+    if (!data) data = await rpc('spill_data');
+    await oppdater();
+    if (!st.spiller) { visLag(); return; }
+    vis('spill');
+    tegnMeny();
+    clearInterval(pollTimer);
+    pollTimer = setInterval(() => oppdater().catch((e) => { if (e instanceof IkkeInnlogget) tilInnlogging(); }), 20000);
+    await visSide(side);
+  } catch (e) {
+    if (e instanceof IkkeInnlogget) tilInnlogging();
+    else varsel(e.message, 'bad');
+  } finally { starter = false; }
+}
+
+function stopp() {
+  clearInterval(pollTimer);
+  clearInterval(chatTimer);
+  st = null;
+}
+
+// ---------------------------------------------------------------- STATUS
+async function oppdater() {
+  st = await rpc('min_status');
+  offset = new Date(st.tid).getTime() - Date.now();
+  if (!st.spiller) {
+    if (!$('#spill').classList.contains('hidden')) { clearInterval(pollTimer); visLag(); }
+    return;
+  }
+  tegnTopp();
+  tegnMeny();
+}
+
+function visLag() {
+  $('#dodTekst').innerHTML = st.dod
+    ? `<p class="bad"><b>${esc(st.dod.navn)}</b> ble drept av <b>${esc(st.dod.drept_av)}</b>. Livet går videre – start på nytt.</p>` : '';
+  vis('lag');
+}
+
+function vapenNavn(n) { return n ? data.vapen.find(v => v.nivaa === n)?.navn : 'Ingen'; }
+function beskNavn(n) { return n ? data.beskyttelse.find(v => v.nivaa === n)?.navn : 'Ingen'; }
+
+function tegnTopp() {
+  const s = st.spiller;
+  $('#topp').innerHTML = `
+    <div class="topp">
+      <div class="navn">${esc(s.navn)}</div>
+      <div class="pill"><span>Rank</span>${esc(st.rank)}</div>
+      <div class="pill"><span>Kontant</span><b class="mono gold">${kr(s.penger)}</b></div>
+      <div class="pill"><span>Bank</span><b class="mono">${kr(s.bank)}</b></div>
+      <div class="pill"><span>Helse</span><b class="mono ${s.helse < 50 ? 'bad' : ''}">${s.helse}%</b></div>
+      <div class="pill"><span>By</span>${esc(s.sted)}</div>
+      <button class="ghost small loggut" data-loggut>Logg ut</button>
+    </div>
+    <div class="timere">
+      <span class="timer" data-til="${s.fengsel_til || ''}" data-navn="Fengsel" data-skjul></span>
+      <span class="timer" data-til="${s.krim_klar}" data-navn="Krim"></span>
+      <span class="timer" data-til="${s.bil_klar}" data-navn="Bil"></span>
+      <span class="timer" data-til="${s.angrep_klar}" data-navn="Angrep"></span>
+      <span class="timer" data-til="${s.reise_klar}" data-navn="Reise"></span>
+    </div>`;
+  tikk();
+}
+
+const SIDER = [
+  ['oversikt', 'Oversikt'], ['krim', 'Kriminalitet'], ['bil', 'Biltyveri'], ['fengsel', 'Fengsel'],
+  ['bank', 'Bank'], ['butikk', 'Butikk'], ['sykehus', 'Sykehus'], ['reise', 'Reise'],
+  ['kasino', 'Kasino'], ['angrep', 'Angrep'], ['toppliste', 'Toppliste'],
+  ['meldinger', 'Meldinger'], ['chat', 'Chat'], ['gravplass', 'Gravplass'],
+];
+function tegnMeny() {
+  $('#meny').innerHTML = SIDER.map(([id, navn]) => {
+    let badge = '';
+    if (id === 'meldinger' && st?.uleste > 0) badge = `<span class="badge">${st.uleste}</span>`;
+    if (id === 'fengsel' && fengslet()) badge = `<span class="badge">!</span>`;
+    return `<button data-side="${id}" class="${id === side ? 'aktiv' : ''}">${navn}${badge}</button>`;
+  }).join('');
+}
+$('#meny').onclick = (e) => {
+  const b = e.target.closest('[data-side]');
+  if (b) { side = b.dataset.side; tegnMeny(); visSide(side); b.scrollIntoView({ inline: 'center', block: 'nearest' }); }
+};
+
+// Oppdaterer alle nedtellinger hvert sekund
+function tikk() {
+  document.querySelectorAll('[data-til]').forEach(el => {
+    const s = sekIgjen(el.dataset.til);
+    if (el.dataset.navn) {
+      if (el.hasAttribute('data-skjul')) el.classList.toggle('hidden', s === 0);
+      el.textContent = `${el.dataset.navn}: ${s ? tid(s) : 'klar'}`;
+      el.classList.toggle('klar', s === 0);
+    } else {
+      el.textContent = s ? tid(s) : 'klar';
+    }
+  });
+  document.querySelectorAll('[data-kausjon]').forEach(el => {
+    el.textContent = kr(sekIgjen(st?.spiller?.fengsel_til) * 25);
+  });
+}
+setInterval(tikk, 1000);
+
+// ---------------------------------------------------------------- SIDER
+async function visSide(id, stille = false) {
+  const main = $('#side');
+  if (!stille) main.innerHTML = '<p class="dim">Laster …</p>';
+  try {
+    const html = await SIDE_HTML[id]();
+    if (side !== id) return;
+    const scroll = window.scrollY;
+    main.innerHTML = (fengslet() && id !== 'fengsel'
+      ? `<div class="fengselbanner">Du sitter i fengsel. Ute om <b class="mono" data-til="${st.spiller.fengsel_til}"></b>. <button class="small ghost" data-side-lenke="fengsel">Til fengselet</button></div>` : '') + html;
+    if (stille) window.scrollTo(0, scroll);
+    tikk();
+    ETTER[id]?.();
+  } catch (e) { main.innerHTML = `<p class="bad">${esc(e.message)}</p>`; }
+}
+
+const rankIndeks = () => st.rank_indeks;
+
+const SIDE_HTML = {
+  async oversikt() {
+    const s = st.spiller;
+    const pst = st.neste_exp ? Math.min(100, ((s.exp - st.rank_exp) / (st.neste_exp - st.rank_exp)) * 100) : 100;
+    const online = await rpc('antall_online');
+    const besk = sekIgjen(s.beskyttet_til);
+    return `
+      <h2>Oversikt</h2>
+      <div class="card">
+        <h3>${esc(st.rank)}</h3>
+        <div class="dim">${st.neste_rank ? `Neste rank: ${esc(st.neste_rank)}` : 'Høyeste rank nådd'}</div>
+        <div class="bar"><i style="width:${pst.toFixed(1)}%"></i></div>
+        ${besk ? `<p class="ok">Du er ny i byen og kan ikke bli skutt de neste <b data-til="${s.beskyttet_til}"></b>. Angriper du noen, mister du beskyttelsen.</p>` : ''}
+      </div>
+      <div class="grid">
+        <div class="stat"><span>Kontanter</span><b class="gold">${kr(s.penger)}</b></div>
+        <div class="stat"><span>Bank</span><b>${kr(s.bank)}</b></div>
+        <div class="stat"><span>Helse</span><b>${s.helse}%</b></div>
+        <div class="stat"><span>By</span><b>${esc(s.sted)}</b></div>
+        <div class="stat"><span>Våpen</span><b>${esc(vapenNavn(s.vapen))}</b></div>
+        <div class="stat"><span>Beskyttelse</span><b>${esc(beskNavn(s.beskyttelse))}</b></div>
+        <div class="stat"><span>Kuler</span><b>${tall(s.kuler)}</b></div>
+        <div class="stat"><span>Drap</span><b>${s.drap}</b></div>
+        <div class="stat"><span>Biler i garasjen</span><b>${st.biler}</b></div>
+        <div class="stat"><span>Spillere pålogget</span><b>${online}</b></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>Tips</h3>
+        <p class="dim" style="margin:0">Kontanter kan bli tatt av den som dreper deg – sett pengene i banken. Høyere rank gir bedre sjanser, nye handlinger og gjør deg vanskeligere å drepe.</p>
+      </div>`;
+  },
+
+  async krim() {
+    const ri = rankIndeks();
+    return `
+      <h2>Kriminalitet</h2>
+      <p class="dim">Neste forsøk: <b class="mono" data-til="${st.spiller.krim_klar}"></b></p>
+      <div class="list">${data.krim.map(k => {
+        const laast = ri < k.min_rank;
+        const sjanse = Math.min(95, k.sjanse + ri * 4);
+        return `<div class="item ${laast ? 'locked' : ''}">
+          <div class="info"><b>${esc(k.navn)}</b>
+            <small>${laast ? `Krever ${esc(data.ranker[k.min_rank].navn)}` : `${sjanse}% sjanse · ${kr(k.min_gevinst)}–${kr(k.max_gevinst)} · ${k.ventetid}s ventetid`}</small></div>
+          <button data-act="begaa_krim" data-args='{"p_id":${k.id}}' ${laast ? 'disabled' : ''}>Utfør</button>
+        </div>`;
+      }).join('')}</div>`;
+  },
+
+  async bil() {
+    const ri = rankIndeks();
+    const biler = await rpc('min_garasje');
+    const sum = biler.reduce((a, b) => a + b.verdi, 0);
+    return `
+      <h2>Biltyveri</h2>
+      <p class="dim">Neste forsøk: <b class="mono" data-til="${st.spiller.bil_klar}"></b></p>
+      <div class="list">${data.bil_steder.map(b => {
+        const laast = ri < b.min_rank;
+        return `<div class="item ${laast ? 'locked' : ''}">
+          <div class="info"><b>${esc(b.navn)}</b>
+            <small>${laast ? `Krever ${esc(data.ranker[b.min_rank].navn)}` : `${Math.min(90, b.sjanse + ri * 3)}% sjanse`}</small></div>
+          <button data-act="stjel_bil" data-args='{"p_id":${b.id}}' ${laast ? 'disabled' : ''}>Stjel</button>
+        </div>`;
+      }).join('')}</div>
+      <div class="card" style="margin-top:16px">
+        <div class="row" style="justify-content:space-between">
+          <h3 style="margin:0">Garasje (${biler.length}/30)</h3>
+          ${biler.length ? `<button class="ghost small" style="flex:0 0 auto" data-act="selg_alle_biler">Selg alle for ${kr(sum)}</button>` : ''}
+        </div>
+        ${biler.length ? `<table><tr><th>Bil</th><th>Stjålet i</th><th>Verdi</th><th></th></tr>${biler.map(b =>
+          `<tr><td>${esc(b.bil)}</td><td class="dim">${esc(b.sted)}</td><td class="mono">${kr(b.verdi)}</td>
+           <td style="text-align:right"><button class="small ghost" data-act="selg_bil" data-args='{"p_id":${b.id}}'>Selg</button></td></tr>`).join('')}</table>`
+          : '<p class="dim">Garasjen er tom.</p>'}
+      </div>`;
+  },
+
+  async fengsel() {
+    const liste = await rpc('fengsel_liste');
+    return `
+      <h2>Fengsel</h2>
+      ${fengslet() ? `<div class="fengselbanner">
+          Du sitter inne i <b class="mono" data-til="${st.spiller.fengsel_til}"></b>.
+          Kausjon: <b class="mono" data-kausjon></b>
+          <button class="small" data-act="kjop_deg_ut">Betal kausjon</button></div>` : ''}
+      <p class="dim">Bryt ut andre for erfaring. Mislykkes du, kan du havne inne selv.</p>
+      ${liste.length ? `<div class="list">${liste.map(p => `
+        <div class="item"><div class="info"><b>${esc(p.navn)}</b><small>${esc(p.rank)} · <span data-til="${new Date(naa() + p.sek * 1000).toISOString()}"></span> igjen</small></div>
+        ${p.navn === st.spiller.navn ? '' : `<button data-act="bryt_ut" data-args='${esc(JSON.stringify({ p_navn: p.navn }))}'>Bryt ut</button>`}</div>`).join('')}</div>`
+        : '<p class="dim">Fengselet er tomt akkurat nå.</p>'}`;
+  },
+
+  async bank() {
+    const s = st.spiller;
+    return `
+      <h2>Bank</h2>
+      <div class="grid" style="margin-bottom:14px">
+        <div class="stat"><span>Kontanter</span><b class="gold">${kr(s.penger)}</b></div>
+        <div class="stat"><span>I banken</span><b>${kr(s.bank)}</b></div>
+      </div>
+      <div class="card">
+        <h3>Sett inn / ta ut</h3>
+        <form data-rpc="bank_sett_inn" class="row" style="margin-bottom:10px">
+          <input name="p_belop" type="number" min="1" placeholder="Beløp" data-num required>
+          <button>Sett inn</button>
+          <button type="button" class="ghost" data-act="bank_sett_inn" data-args='{"p_belop":${s.penger}}' ${s.penger ? '' : 'disabled'}>Sett inn alt</button>
+        </form>
+        <form data-rpc="bank_ta_ut" class="row">
+          <input name="p_belop" type="number" min="1" placeholder="Beløp" data-num required>
+          <button>Ta ut</button>
+        </form>
+      </div>
+      <div class="card">
+        <h3>Overfør til spiller</h3>
+        <p class="dim">Trekkes fra banken.</p>
+        <form data-rpc="overfor" class="row">
+          <input name="p_navn" placeholder="Spillernavn" required>
+          <input name="p_belop" type="number" min="1" placeholder="Beløp" data-num required>
+          <button>Overfør</button>
+        </form>
+      </div>`;
+  },
+
+  async butikk() {
+    const s = st.spiller;
+    const rad = (liste, har, act) => liste.map(v => `
+      <div class="item ${har >= v.nivaa ? 'locked' : ''}">
+        <div class="info"><b>${esc(v.navn)}</b><small>Styrke ×${v.styrke} · ${kr(v.pris)}</small></div>
+        ${har >= v.nivaa ? '<span class="dim">Eid</span>' : `<button data-act="${act}" data-args='{"p_nivaa":${v.nivaa}}' ${s.penger < v.pris ? 'disabled' : ''}>Kjøp</button>`}
+      </div>`).join('');
+    return `
+      <h2>Butikk</h2>
+      <div class="card"><h3>Våpen</h3><p class="dim">Nå: ${esc(vapenNavn(s.vapen))}</p><div class="list">${rad(data.vapen, s.vapen, 'kjop_vapen')}</div></div>
+      <div class="card"><h3>Beskyttelse</h3><p class="dim">Nå: ${esc(beskNavn(s.beskyttelse))}</p><div class="list">${rad(data.beskyttelse, s.beskyttelse, 'kjop_beskyttelse')}</div></div>
+      <div class="card"><h3>Kuler</h3>
+        <p class="dim">Du har ${tall(s.kuler)} kuler. Pris: ${kr(data.kulepris)} per kule.</p>
+        <form data-rpc="kjop_kuler" class="row">
+          <input name="p_antall" type="number" min="1" max="10000" placeholder="Antall" data-num required>
+          <button>Kjøp kuler</button>
+        </form>
+      </div>`;
+  },
+
+  async sykehus() {
+    const s = st.spiller;
+    const pris = (100 - s.helse) * 200;
+    return `
+      <h2>Sykehus</h2>
+      <div class="card">
+        <p>Helse: <b class="mono">${s.helse}%</b></p>
+        <div class="bar" style="margin-bottom:14px"><i style="width:${s.helse}%"></i></div>
+        ${s.helse >= 100 ? '<p class="ok">Du er i full form.</p>'
+          : `<button data-act="sykehus">Bli frisk for ${kr(pris)}</button>`}
+      </div>`;
+  },
+
+  async reise() {
+    const s = st.spiller;
+    return `
+      <h2>Reise</h2>
+      <p class="dim">Du er i <b>${esc(s.sted)}</b>. Flybillett: ${kr(data.reisepris)}. Neste reise: <b class="mono" data-til="${s.reise_klar}"></b></p>
+      <div class="list">${data.byer.map(b => `
+        <div class="item"><div class="info"><b>${esc(b)}</b></div>
+          ${b === s.sted ? '<span class="dim">Du er her</span>' : `<button data-act="reis" data-args='${esc(JSON.stringify({ p_by: b }))}'>Fly hit</button>`}
+        </div>`).join('')}</div>`;
+  },
+
+  async kasino() {
+    return `
+      <h2>Kasino – rulett</h2>
+      <div class="card">
+        <div id="rulettRes" class="rulett-tall dim">–</div>
+        <p class="dim" style="text-align:center">Rød/svart/partall/oddetall gir dobbelt. Riktig tall gir 36 ganger innsatsen.</p>
+        <form id="rulettForm">
+          <div class="row" style="margin-bottom:10px">
+            <input name="innsats" type="number" min="100" max="5000000" placeholder="Innsats (100 – 5 000 000)" required>
+            <select name="valg">
+              <option value="rod">Rød</option><option value="svart">Svart</option>
+              <option value="partall">Partall</option><option value="oddetall">Oddetall</option>
+              ${Array.from({ length: 37 }, (_, i) => `<option value="${i}">Tallet ${i}</option>`).join('')}
+            </select>
+          </div>
+          <button style="width:100%">Spinn</button>
+        </form>
+      </div>`;
+  },
+
+  async angrep() {
+    const s = st.spiller;
+    return `
+      <h2>Angrep</h2>
+      <div class="card">
+        <p class="dim">Målet må være i samme by som deg (${esc(s.sted)}). Flere kuler og bedre våpen gir mer skade. Høy rank og god beskyttelse gjør målet tøffere.</p>
+        <p>Våpen: <b>${esc(vapenNavn(s.vapen))}</b> · Kuler: <b class="mono">${tall(s.kuler)}</b> · Klar om: <b class="mono" data-til="${s.angrep_klar}"></b></p>
+        <form data-rpc="angrip" class="row">
+          <input name="p_navn" placeholder="Spillernavn" required>
+          <input name="p_kuler" type="number" min="1" placeholder="Antall kuler" data-num required>
+          <button>Skyt</button>
+        </form>
+      </div>
+      <div class="card">
+        <h3>Detektiv</h3>
+        <p class="dim">Finn ut hvilken by en spiller er i. Koster 5 000 kr.</p>
+        <form data-rpc="detektiv" class="row">
+          <input name="p_navn" placeholder="Spillernavn" required>
+          <button>Lei detektiv</button>
+        </form>
+      </div>`;
+  },
+
+  async toppliste() {
+    const l = await rpc('toppliste');
+    return `
+      <h2>Toppliste</h2>
+      <div class="card" style="padding:6px 10px">
+        <table><tr><th>#</th><th>Navn</th><th>Rank</th><th>Drap</th></tr>
+        ${l.map((p, i) => `<tr><td class="dim">${i + 1}</td>
+          <td>${p.online ? '<span class="dot" title="Pålogget"></span>' : ''}<button class="link" data-profil="${esc(p.navn)}">${esc(p.navn)}</button></td>
+          <td>${esc(p.rank)}</td><td class="mono">${p.drap}</td></tr>`).join('')}
+        </table>
+      </div>`;
+  },
+
+  async meldinger() {
+    const m = await rpc('mine_meldinger');
+    return `
+      <h2>Meldinger</h2>
+      <div class="card">
+        <h3>Ny melding</h3>
+        <form data-rpc="send_melding" id="skrivForm">
+          <div class="row" style="margin-bottom:8px">
+            <input name="p_til" placeholder="Til (spillernavn)" required>
+            <input name="p_emne" placeholder="Emne" maxlength="80">
+          </div>
+          <textarea name="p_tekst" rows="3" maxlength="2000" placeholder="Melding" required style="margin-bottom:8px"></textarea>
+          <button>Send</button>
+        </form>
+      </div>
+      <div class="list">${m.length ? m.map(x => `
+        <div class="item melding ${x.lest ? '' : 'ulest'}" style="display:block">
+          <div class="row" style="justify-content:space-between">
+            <button class="link" style="text-align:left;flex:1" data-apne="${x.id}" data-lest="${x.lest}"><b>${esc(x.emne)}</b></button>
+            <small class="dim" style="flex:0 0 auto">${esc(x.fra_navn)} · ${new Date(x.tid).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</small>
+          </div>
+          <div class="kropp hidden" id="m${x.id}">${esc(x.tekst)}
+            <div class="row" style="margin-top:10px;justify-content:flex-end">
+              ${x.fra_navn !== 'System' ? `<button class="small ghost" style="flex:0 0 auto" data-svar="${esc(x.fra_navn)}" data-emne="${esc(x.emne)}">Svar</button>` : ''}
+              <button class="small ghost" style="flex:0 0 auto" data-slett="${x.id}">Slett</button>
+            </div>
+          </div>
+        </div>`).join('') : '<p class="dim">Ingen meldinger.</p>'}</div>`;
+  },
+
+  async chat() {
+    return `
+      <h2>Chat</h2>
+      <div class="chatlogg" id="chatlogg"><span class="dim">Laster …</span></div>
+      <form id="chatForm" class="row">
+        <input name="tekst" maxlength="300" placeholder="Skriv noe …" autocomplete="off" required style="flex:5 1 200px">
+        <button style="flex:0 0 auto">Send</button>
+      </form>`;
+  },
+
+  async gravplass() {
+    const g = await rpc('gravplass_liste');
+    return `
+      <h2>Gravplass</h2>
+      <div class="card" style="padding:6px 10px">
+        ${g.length ? `<table><tr><th>Navn</th><th>Rank</th><th>Drept av</th><th>Når</th></tr>
+        ${g.map(x => `<tr><td>${esc(x.navn)}</td><td>${esc(x.rank)}</td><td class="bad">${esc(x.drept_av)}</td>
+          <td class="dim">${new Date(x.tid).toLocaleDateString('nb-NO')}</td></tr>`).join('')}</table>`
+          : '<p class="dim">Ingen er drept ennå.</p>'}
+      </div>`;
+  },
+};
+
+// Kode som må kjøre etter at en side er tegnet
+const ETTER = {
+  kasino() {
+    $('#rulettForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const f = new FormData(e.target);
+      const knapp = e.target.querySelector('button'); knapp.disabled = true;
+      try {
+        const r = await rpc('rulett', { p_innsats: Number(f.get('innsats')), p_valg: f.get('valg') });
+        const el = $('#rulettRes');
+        el.textContent = r.tall;
+        el.style.color = r.farge === 'rød' ? 'var(--red2)' : r.farge === 'grønn' ? 'var(--green)' : 'var(--text)';
+        varsel(r.melding, r.ok ? 'ok' : 'bad');
+        await oppdater();
+      } catch (err) { varsel(err.message, 'bad'); }
+      knapp.disabled = false;
+    };
+  },
+  async chat() {
+    const logg = $('#chatlogg');
+    if (!logg) return;
+    logg.innerHTML = '';
+    sisteChatId = 0;
+    await hentChat();
+    clearInterval(chatTimer);
+    chatTimer = setInterval(() => { if (side === 'chat' && !document.hidden) hentChat(); else clearInterval(chatTimer); }, 4000);
+    $('#chatForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const inp = e.target.tekst;
+      try { await rpc('send_chat', { p_tekst: inp.value }); inp.value = ''; await hentChat(); }
+      catch (err) { varsel(err.message, 'bad'); }
+    };
+  },
+};
+
+async function hentChat() {
+  try {
+    const nye = await rpc('chat_siste', { p_etter: sisteChatId });
+    for (const m of nye) { leggTilChat(m); sisteChatId = Math.max(sisteChatId, m.id); }
+  } catch { /* prøver igjen om litt */ }
+}
+
+function leggTilChat(m) {
+  const logg = $('#chatlogg');
+  if (!logg) return;
+  const d = document.createElement('div');
+  const t = new Date(m.tid).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
+  d.innerHTML = `<span class="t">${t}</span>${m.navn === 'System'
+    ? `<i class="bad">${esc(m.tekst)}</i>`
+    : `<b class="gold">${esc(m.navn)}:</b> ${esc(m.tekst)}`}`;
+  const nederst = logg.scrollHeight - logg.scrollTop - logg.clientHeight < 40;
+  logg.appendChild(d);
+  if (nederst || logg.children.length < 70) logg.scrollTop = logg.scrollHeight;
+}
+
+// ---------------------------------------------------------------- KLIKK OG SKJEMA
+$('#side').addEventListener('click', async (e) => {
+  const act = e.target.closest('[data-act]');
+  if (act) {
+    act.disabled = true;
+    await handling(act.dataset.act, act.dataset.args ? JSON.parse(act.dataset.args) : {});
+    act.disabled = false;
+    return;
+  }
+  const lenke = e.target.closest('[data-side-lenke]');
+  if (lenke) { side = lenke.dataset.sideLenke; tegnMeny(); visSide(side); return; }
+
+  const apne = e.target.closest('[data-apne]');
+  if (apne) {
+    const id = apne.dataset.apne;
+    $('#m' + id).classList.toggle('hidden');
+    if (apne.dataset.lest === 'false') {
+      apne.dataset.lest = 'true';
+      apne.closest('.melding').classList.remove('ulest');
+      await rpc('les_melding', { p_id: Number(id) });
+      await oppdater();
+    }
+    return;
+  }
+  const slett = e.target.closest('[data-slett]');
+  if (slett) { await rpc('slett_melding', { p_id: Number(slett.dataset.slett) }); visSide('meldinger', true); return; }
+
+  const svar = e.target.closest('[data-svar]');
+  if (svar) {
+    const f = $('#skrivForm');
+    f.p_til.value = svar.dataset.svar;
+    f.p_emne.value = svar.dataset.emne.startsWith('Sv: ') ? svar.dataset.emne : 'Sv: ' + svar.dataset.emne;
+    f.p_tekst.focus(); window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+});
+
+$('#side').addEventListener('submit', async (e) => {
+  const f = e.target;
+  if (!f.dataset.rpc) return;
+  e.preventDefault();
+  const args = {};
+  for (const el of f.querySelectorAll('[name]')) args[el.name] = el.hasAttribute('data-num') ? Number(el.value) : el.value;
+  const knapp = f.querySelector('button:not([type=button])'); if (knapp) knapp.disabled = true;
+  await handling(f.dataset.rpc, args);
+  if (knapp) knapp.disabled = false;
+});
+
+// Profilvisning (fra topplisten)
+document.addEventListener('click', async (e) => {
+  const p = e.target.closest('[data-profil]');
+  if (p) {
+    try {
+      const x = await rpc('profil', { p_navn: p.dataset.profil });
+      $('#modal').innerHTML = `<div class="card">
+        <h2>${esc(x.navn)}</h2>
+        <p>${x.online ? '<span class="dot"></span>Pålogget' : '<span class="dim">Ikke pålogget</span>'}</p>
+        <div class="grid" style="margin-bottom:12px">
+          <div class="stat"><span>Rank</span><b>${esc(x.rank)}</b></div>
+          <div class="stat"><span>Drap</span><b>${x.drap}</b></div>
+        </div>
+        <p class="dim">Startet ${new Date(x.opprettet).toLocaleDateString('nb-NO')}${x.fengsel ? ' · sitter i fengsel' : ''}${x.beskyttet ? ' · ny og beskyttet' : ''}</p>
+        <div class="row"><button class="ghost" data-lukk>Lukk</button><button data-skriv="${esc(x.navn)}">Send melding</button></div>
+      </div>`;
+      $('#modal').classList.remove('hidden');
+    } catch (err) { varsel(err.message, 'bad'); }
+    return;
+  }
+  if (e.target.closest('[data-lukk]') || e.target.id === 'modal') { $('#modal').classList.add('hidden'); return; }
+  const skriv = e.target.closest('[data-skriv]');
+  if (skriv) {
+    $('#modal').classList.add('hidden');
+    side = 'meldinger'; tegnMeny(); await visSide('meldinger');
+    $('#skrivForm').p_til.value = skriv.dataset.skriv;
+    $('#skrivForm').p_emne.focus();
+  }
+});
+
+// Oppstart: prøv å fortsette innlogget økt, ellers vis innlogging
+start();
+</script>
+</body>
+</html>

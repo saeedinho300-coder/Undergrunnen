@@ -1,0 +1,8 @@
+{
+  "name": "undergrunnen",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@netlify/database": "latest"
+  }
+}

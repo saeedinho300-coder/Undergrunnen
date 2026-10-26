@@ -1,0 +1,9 @@
+UNDERGRUNNEN – tekstbasert mafiaspill
+
+Publiseres automatisk av Netlify fra dette GitHub-repoet.
+  Nettside:  public/index.html
+  Server:    netlify/functions/api.mjs
+  Database:  netlify/database/migrations/ (kjøres automatisk av Netlify)
+
+Netlify trenger miljøvariabelen SESSION_SECRET (minst 32 tegn, kun Functions).
+Ikke rediger en migrasjon som allerede er tatt i bruk – lag en ny fil med høyere nummer.
